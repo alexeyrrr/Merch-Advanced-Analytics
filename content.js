@@ -38,10 +38,7 @@ function cardit(num, img, id, sname, asin, pric, stat, cdate, srank, pg, dud) {
 };
 
 function showshirt(t1, fr) {
-
     for (i = 0; i < 20; i++) {
-
-
         document.getElementById("shirts")
             .innerHTML = document.getElementById("shirts")
             .innerHTML + cardit(i, t1.merchandiseList[i].imageURL, t1.merchandiseList[i].id, t1.merchandiseList[i].name, t1.merchandiseList[i].marketplaceAsinMap.US, t1.merchandiseList[i].listPrice, t1.merchandiseList[i].status, t1.merchandiseList[i].createDate, 0, fr, t1.merchandiseList[i].daysUntilDeletion);
@@ -49,6 +46,19 @@ function showshirt(t1, fr) {
     };
 };
 
+
+function getShirtColor(shirtASIN){
+	shirtASIN = shirtASIN.String();
+	
+	color = test;
+	return color;
+}
+
+function getShirtSize(shirtASIN){
+	
+	
+	return size
+}
 
 function shirtlister() {
     cmd = window.location.href;
@@ -89,7 +99,7 @@ function shirtlister() {
                                 tn = i
                             }
 
-
+	
                             temp = "";
                             //document.getElementById("page").innerHTML=asintxt;
 
@@ -121,13 +131,6 @@ function shirtlister() {
                     };
                 };
                 req1.send();
-
-
-
-
-
-
-
 
             }
 
@@ -238,7 +241,7 @@ Date.prototype.setUTC = function(reset) {
     return true === reset ? new Date(Date.UTC(this.getFullYear(), this.getMonth(), this.getDate())) :
         new Date(Date.UTC(this.getFullYear(), this.getMonth(), this.getDate(), this.getHours(), this.getMinutes(), this.getSeconds(), this.getMilliseconds()));
 };
-
+/*** End Date Library */
 
 
 
@@ -333,7 +336,7 @@ function todayssales() {
 function fetchsales(count, m, sdata, cdata, rdata, rev, roy, chlabel, ts) {
     if (count >= 0) {
         var today = new Date().setTimeZone();
-      today.setUTCHours(7,0,0,0) ; 
+		today.setUTCHours(7,0,0,0) ; 
         var sls = 'https://merch.amazon.com/salesAnalyticsRecord/all?fromDate=' + today.adjustDate(-count)
             .getTime() + '&toDate=' + today.adjustDate(-count)
             .getTime();
@@ -347,33 +350,33 @@ function fetchsales(count, m, sdata, cdata, rdata, rev, roy, chlabel, ts) {
                 } else {
 
 
-                    var tots = 0;
-                    var totr = 0;
-                    var totc = 0;
-                    var totrev = 0;
-                    var totroy = 0;
+                    var totalSold = 0;
+                    var totalReturned = 0;
+                    var totalCancelled = 0;
+                    var totalRevenue = 0;
+                    var totalRoyalties = 0;
                     var ts = JSON.parse(reqs.responseText);
 
                     for (i = 0; i < ts.length; i++) {
                         if (ts[i].isParentAsin == true) {
-                            tots += parseInt(ts[i].unitsSold);
-                            totr += parseInt(ts[i].unitsReturned);
-                            totc += parseInt(ts[i].unitsCancelled);
-                            totrev += parseFloat(parseFloat(ts[i].revenueValue)
+                            totalSold += parseInt(ts[i].unitsSold);
+                            totalReturned += parseInt(ts[i].unitsReturned);
+                            totalCancelled += parseInt(ts[i].unitsCancelled);
+                            totalRevenue += parseFloat(parseFloat(ts[i].revenueValue)
                                 .toFixed(2));
-                            totroy += parseFloat(parseFloat(ts[i].royaltyValue)
+                            totalRoyalties += parseFloat(parseFloat(ts[i].royaltyValue)
                                 .toFixed(2));
                         };
                     };
 
-                    sdata.push(tots);
-                    cdata.push(totc);
-                    rdata.push(totr);
+                    sdata.push(totalSold);
+                    cdata.push(totalCancelled);
+                    rdata.push(totalReturned);
                     chlabel.push(["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][today.adjustDate(-count)
                         .getUTCDay()
                     ]);
-                    rev.push(totrev);
-                    roy.push(totroy);
+                    rev.push(totalRevenue);
+                    roy.push(totalRoyalties);
                     document.getElementById("twoweeksstats")
                         .innerHTML = "<center><h3>Loading Day [" + (m - count) + "/" + m + "]</h3></center>";
                     fetchsales(count - 1, m, sdata, cdata, rdata, rev, roy, chlabel, ts);
@@ -385,7 +388,6 @@ function fetchsales(count, m, sdata, cdata, rdata, rev, roy, chlabel, ts) {
         reqs.send();
 
     } else {
-
         xx = 0;
         cxx = 0;
         rr = 0;
@@ -445,6 +447,8 @@ function fetchsales(count, m, sdata, cdata, rdata, rev, roy, chlabel, ts) {
         var royt = new Chart(document.getElementById("canvas2")
                 .getContext("2d"))
             .Line(lineChartData2);
+			
+		/*Stats on top for the page */
         document.getElementById("twoweeksstats")
             .innerHTML = '<center><h3>Statistics For The Past 14 Days</h3></center><br><table class="table table-striped"><thead><tr><th class="text-center">Shirts Sold</th><th class="text-center">Shirts Cancelled</th><th class="text-center">Revenue</th><th class="text-center">Royalties</th></tr></thead><tbody>' +
             '<tr class="success text-center"><td><b>' + xx + '</b></td><td><b>' + cxx + '</b></td><td><b>' + rrev.toFixed(2) + '</b></td><td><b>' + rr.toFixed(2) + '</b></td></tr></tbody></table><br><button type="button" class="btn btn-success btn-block" id="refbutton">REFRESH</button>';
@@ -452,13 +456,9 @@ function fetchsales(count, m, sdata, cdata, rdata, rev, roy, chlabel, ts) {
             .on('click', function(e) {
                 location.reload();
             })
+			
+		/*Table Header */
         var cp2 = '<table class="table table-striped"><thead><tr><th>#</th><th>Shirt Name</th><th class="text-center">Listing page</th><th class="text-center">Units Sold</th><th class="text-center">Units Cancelled</th><th class="text-center">Revenue</th><th class="text-center">Royalties</th><th class="text-center">Edit Shirt</th></tr></thead><tbody>';
-
-
-
-
-
-
 
 
 		var today = new Date().setTimeZone();
@@ -476,8 +476,8 @@ function fetchsales(count, m, sdata, cdata, rdata, rev, roy, chlabel, ts) {
                 } else {
                     var ts = JSON.parse(reqs.responseText);
                     k = 0;
-                    for (var i = 0; i < ts.length; i++) {
-                        if (ts[i].isParentAsin) {
+                    for (var i = 0; i < ts.length; i++) {					
+						if (ts[i].isParentAsin == true) {
                             k++;
                             cp2 += '<tr><th scope="row">' + k + '</th><td>' + ts[i].asinName + '</td><td class="text-center">' +
                                 '<a target="_blank" href="https://www.amazon.com/dp/' + ts[i].id + '" class="btn btn-info">Preview</a>' +
@@ -486,7 +486,13 @@ function fetchsales(count, m, sdata, cdata, rdata, rev, roy, chlabel, ts) {
                                 '<td class="text-center">$' + ts[i].revenueValue + '</td>' +
                                 '<td class="text-center">$' + ts[i].royaltyValue + '</td>' +
                                 '<td class="text-center">' + '<a target="_blank" href="http://merch.amazon.com/merch-tshirt/title-setup/' + ts[i].merchandiseId + '/add_details" class="btn btn-info">Edit</a>' + '</td></tr>';
-                        };
+                        }else if (ts[i].isParentAsin == false) {
+							cp2 += '<tr>';
+							cp2 += ts[i].asinName;
+							cp2 += '</tr>';
+							
+							
+						};
                     }
                     cp2 += '</tbody></table>';
                     document.getElementById("shirtlist")
@@ -736,8 +742,6 @@ function querryasins(myasins, p, l) {
 
 
 
-
-
 function showallsins() {
 
     document.head.innerHTML = '<head><style></style></head>';
@@ -753,10 +757,6 @@ function showallsins() {
     querryasins(myasins, p, l);
 
 };
-
-
-
-
 
 
 
@@ -801,69 +801,6 @@ function qe() {
 
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
