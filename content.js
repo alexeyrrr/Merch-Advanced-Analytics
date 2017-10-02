@@ -954,9 +954,7 @@ function logincheck(cmd) {
                             shirtlister();
                             break;
                         case "twoweekssales":
-
                             twoweekssales();
-
                             break;
                         case "todaysales":
                             todayssales();

@@ -21,12 +21,6 @@ function gtanalyze(selectedText) {
 }
 
 
-function gohome(info, tab) {
-	l2 = "https://merch.amazon.com/MerchToolsShirtsLister/page=1/mt/";
-	chrome.tabs.create({ url: l2 });
-};
-
-
 function gotodaysales(info, tab) {
 	l2 = "https://merch.amazon.com/MerchToolsTodaySales";
 	chrome.tabs.create({ url: l2 });
@@ -57,47 +51,47 @@ function showasins(info, tab) {
 };
 
 
-
-var b0p = chrome.contextMenus.create({
-		"title": "MerchTools" , contexts:["browser_action"], onclick: function(info, tab) { 
-			gtmerchdbrd(); 
+var b01p = chrome.contextMenus.create({
+		"title": "Sales", contexts:["browser_action"], onclick: function(info, tab) {
 		}
 	});
 	
-var b01p = chrome.contextMenus.create({
-			"title": "Sales", contexts:["browser_action"], "parentId": b0p , onclick: function(info, tab) {
-			}
-		});
-		chrome.contextMenus.create({
-			"title": "Today", contexts:["browser_action"], "parentId": b01p , onclick: function(info, tab) { 
-				gotodaysales(); 
-			}
-		});
-		chrome.contextMenus.create({
-			"title": "Past 14 days", contexts:["browser_action"], "parentId": b01p , onclick: function(info, tab) { 
-				gotwoweeksssales(); 
-			}
-		});
-		chrome.contextMenus.create({
-			"title": "All Months", contexts:["browser_action"], "parentId": b01p , onclick: function(info, tab) { 
-				allmonthssales(); 
-			}
-		});
+	
+var b0p = chrome.contextMenus.create({
+		"title": "MerchTools" , contexts:["browser_action"], onclick: function(info, tab) { 
+		}
+	});
+	
 
-		chrome.contextMenus.create({
-			"title":  "Shirts Lister", contexts:["browser_action"], "parentId": b0p , onclick: function(info, tab) { 
-				gohome(); 
-			}
-		});
-		chrome.contextMenus.create({
-			"title":  "Quick Editor", contexts:["browser_action"], "parentId": b0p , onclick: function(info, tab) { 
-				quickeditor(); 
-			}
-		});
-		chrome.contextMenus.create({"title":  "Live ASINs", contexts:["browser_action"], "parentId": b0p , onclick: function(info, tab) { 
-				showasins(); 
-			}
-		});
+
+
+chrome.contextMenus.create({
+	"title":  "Quick Editor", contexts:["browser_action"], "parentId": b0p , onclick: function(info, tab) { 
+		quickeditor(); 
+	}
+});
+chrome.contextMenus.create({"title":  "Live ASINs", contexts:["browser_action"], "parentId": b0p , onclick: function(info, tab) { 
+		showasins(); 
+	}
+});
+
+chrome.contextMenus.create({
+	"title": "Today", contexts:["browser_action"], "parentId": b01p , onclick: function(info, tab) { 
+		gotodaysales(); 
+	}
+});
+chrome.contextMenus.create({
+	"title": "Past 14 days", contexts:["browser_action"], "parentId": b01p , onclick: function(info, tab) { 
+		gotwoweeksssales(); 
+	}
+});
+chrome.contextMenus.create({
+	"title": "All Months", contexts:["browser_action"], "parentId": b01p , onclick: function(info, tab) { 
+		allmonthssales(); 
+	}
+});
+
+
 
 /* Links to Merch Dashboard removing for now.
 var b1p = chrome.contextMenus.create({
