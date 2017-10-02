@@ -1168,7 +1168,7 @@ function saveShirtNiche() {
 	);	
 		
 	// Save it using the Chrome extension storage API.
-    chrome.storage.sync.set({parentASIN, data}, function () {
+    chrome.storage.sync.set({key, data}, function () {
         console.log('Saved', key, data);
     });
 }
