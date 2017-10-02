@@ -423,7 +423,6 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
                     document.getElementById("twoweeksstats")
                         .innerHTML = "<center><h3>Loading Day [" + (m - count) + "/" + m + "]</h3></center>";
 						
-					console.log(gendersArray)
                     fetchsales(count - 1, m, salesData, cancelData, returnData, rev, roy, chlabel, ts, gendersData);
                 };
 
@@ -437,12 +436,24 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
         unitsCancelled = 0;
         rRoyalties = 0;
         rrev = 0;
+		rgendersArray = {Mens: 0, Womens: 0, Kids: 0};
+		
         for (i = 0; i < salesData.length; i++) {
             unitsSold += salesData[i];
             rRoyalties += roy[i];
             rrev += rev[i];
             unitsCancelled += cancelData[i]
+			
+			console.log(gendersData[i]);
+			
+			for (var key in gendersData[i]){
+				rgendersArray[key] += gendersData[i][key];
+			}
+			
         }
+		
+		
+		
         var lineChartData1 = {
             "datasets": [{
                 "data": salesData,
@@ -501,12 +512,34 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
 		
 		/*Genders */
 		stats += '<table class="table table-striped"><thead><tr><th class="text-center">Gender</th><th class="text-center"># Sold</th></thead>'
-		stats += '<tbody><tr><td>';
-		stats += 	'Male'
-		stats += '</td>';
-		stats += test;
-		stats += '<td>';
-		stats += '</td>';
+		stats += '<tbody>';
+		stats += 	'<tr class="success text-center">';
+		stats += 		'<td>';
+		stats += 			'Mens'
+		stats += 		'</td>';
+		stats += 		'<td>';
+		stats += 			rgendersArray["Mens"];
+		stats += 		'</td>';
+		stats +=	'</tr>';
+		
+		stats += 		'<tr class="success text-center">';
+		stats += 		'<td>';
+		stats += 			'Womens'
+		stats += 		'</td>';
+		stats += 		'<td>';
+		stats += 				rgendersArray["Womens"];
+		stats += 		'</td>';
+		stats +=	'</tr>';
+		
+		stats += 	'<tr class="success text-center">';
+		stats += 		'<td>';
+		stats += 			'Kids'
+		stats += 		'</td>';
+		stats += 		'<td>';
+		stats +=				rgendersArray["Kids"];
+		stats += 		'</td>';
+		stats +=	'</tr>';
+		
 		stats += '</tbody></table><br>';
 		stats += '<button type="button" class="btn btn-success btn-block" id="refbutton">REFRESH</button>';
 		
