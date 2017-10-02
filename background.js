@@ -5,11 +5,6 @@ function gtmerchdbrd(selectedText) {
 	chrome.tabs.create({url: webpagecall});
 }
 
-function gtmerchforum(selectedText) {
-	var webpagecall = 'https://forums.developer.amazon.com/spaces/80/index.html' ;
-	chrome.tabs.create({url: webpagecall});
-}
-
 function gtcreat(selectedText) {
 	var webpagecall = 'https://merch.amazon.com/merch-tshirt/title-setup/new/upload_art' ;
 	chrome.tabs.create({url: webpagecall});
@@ -104,6 +99,7 @@ var b01p = chrome.contextMenus.create({
 			}
 		});
 
+/* Links to Merch Dashboard removing for now.
 var b1p = chrome.contextMenus.create({
 			"title": "Merch Dashboard" , contexts:["browser_action"], onclick: function(info, tab) { 
 				gtmerchdbrd(); 
@@ -124,6 +120,7 @@ var b1p = chrome.contextMenus.create({
 				gtanalyze(); 
 			}
 		});
+*/
 
 
 var option = {
