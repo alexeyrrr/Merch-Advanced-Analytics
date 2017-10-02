@@ -82,7 +82,7 @@ function getShirtSize(shirtASIN){
 }
 
 function getShirtGender(shirtASIN){
-	knownGenders = ["Mens", "Womens", "Kids", "Youth" ]
+	knownGenders = ["Mens", "Womens", "Kids"];
 
 	for(var i = 0, len = knownGenders.length; i < len; i++){
 		term = knownGenders[i];
@@ -369,7 +369,7 @@ function todayssales() {
 
 
 
-function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlabel, ts) {
+function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlabel, ts, gendersArray) {
     if (count >= 0) {
         var today = new Date().setTimeZone();
 		today.setUTCHours(7,0,0,0) ; 
@@ -384,13 +384,12 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
                     alert("error");
 
                 } else {
-
-
                     var totalSold = 0;
                     var totalReturned = 0;
                     var totalCancelled = 0;
                     var totalRevenue = 0;
                     var totalRoyalties = 0;
+					var gendersArray = {Mens: 0, Womens: 0, Kids: 0};
                     var ts = JSON.parse(reqs.responseText);
 
                     for (i = 0; i < ts.length; i++) {
@@ -402,12 +401,20 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
                                 .toFixed(2));
                             totalRoyalties += parseFloat(parseFloat(ts[i].royaltyValue)
                                 .toFixed(2));
-                        };
+                        }else if (ts[i].isParentAsin == false) {
+							shirtGender = getShirtGender(ts[i].asinName);
+							for (var key in gendersArray){
+								if (key.toString() == shirtGender){
+									gendersArray[key] += 1;
+								}
+							}
+						};
                     };
 
                     salesData.push(totalSold);
                     cancelData.push(totalCancelled);
                     returnData.push(totalReturned);
+					gendersData.push(gendersArray);
                     chlabel.push(["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][today.adjustDate(-count)
                         .getUTCDay()
                     ]);
@@ -415,7 +422,9 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
                     roy.push(totalRoyalties);
                     document.getElementById("twoweeksstats")
                         .innerHTML = "<center><h3>Loading Day [" + (m - count) + "/" + m + "]</h3></center>";
-                    fetchsales(count - 1, m, salesData, cancelData, returnData, rev, roy, chlabel, ts);
+						
+					console.log(gendersArray)
+                    fetchsales(count - 1, m, salesData, cancelData, returnData, rev, roy, chlabel, ts, gendersData);
                 };
 
             };
@@ -582,11 +591,12 @@ function twoweekssales() {
     salesData = [];
     cancelData = [];
     returnData = [];
+	gendersData = [];
     rev = [];
     roy = [];
     chlabel = [];
 
-    fetchsales(14, 14, salesData, cancelData, returnData, rev, roy, chlabel);
+    fetchsales(14, 14, salesData, cancelData, returnData, rev, roy, chlabel, gendersData);
 
 
 };
