@@ -608,7 +608,7 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
 		stats += '<tr class="success text-center"><td><b>' + unitsSold + '</b></td><td><b>' + unitsCancelled + '</b></td><td><b>' + rrev.toFixed(2) + '</b></td><td><b>' + rRoyalties.toFixed(2) + '</b></td></tr>';
 		stats += '</tbody></table><br>';
 		
-		/*Genders */
+		/*Genders 
 		stats += '<table class="table table-striped"><thead><tr><th class="text-center">Gender</th><th class="text-center"># Sold</th></thead>'
 		stats += '<tbody>';
 		stats += 	'<tr class="success text-center">';
@@ -639,6 +639,8 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
 		stats +=	'</tr>';
 		
 		stats += '</tbody></table><br>';
+		*/
+		
 		stats += '<button type="button" class="btn btn-success btn-block" id="refbutton">REFRESH</button>';
 		
         document.getElementById("twoweeksstats")
@@ -679,6 +681,8 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
                                 '<td class="text-center">$' + ts[i].royaltyValue + '</td>' +
                                 '<td class="text-center">' + '<a target="_blank" href="http://merch.amazon.com/merch-tshirt/title-setup/' + ts[i].merchandiseId + '/add_details" class="btn btn-info">Edit</a>' + '</td></tr>';
                         }else if (ts[i].isParentAsin == false) {
+							/*
+							//Diplays shirts color, size and gender below each one.
 							cp2 += '<tr>';
 							cp2 += 		'<td>';
 							cp2 += 			getShirtColor(ts[i].asinName);
@@ -690,7 +694,7 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
 							cp2 +=			getShirtGender(ts[i].asinName);
 							cp2 += 		'</td>';
 							cp2 += '</tr>';
-							
+							*/
 							
 						};
                     }
@@ -717,9 +721,11 @@ function twoweekssales() {
         ' <div class="panel panel-default">    <div class="panel-heading">Sales/Cancellations</div>    <div class="panel-body"><center><canvas id="canvas1" height="450" width="800" ></canvas></center></div> </div>' +
         ' <div class="panel panel-default">    <div class="panel-heading">Revenue/Royalties</div>    <div class="panel-body"><center><canvas id="canvas2" height="450" width="800" ></canvas></center></div> </div>' +
 		' <div class="panel panel-default">    <div class="panel-heading">Advanced Analytics</div>    <div class="panel-body">'+
-		'<canvas id="canvas3" height="450" width="250" ></canvas>' +
-		'<canvas id="canvas4" height="450" width="250" ></canvas>' +
-		'<canvas id="canvas5" height="450" width="250" ></canvas></div> </div>' +
+		'<center>' +
+		'<canvas id="canvas3" height="450" width="280" style="padding:10px"></canvas>' +
+		'<canvas id="canvas4" height="450" width="280" style="padding:10px"></canvas>' +
+		'<canvas id="canvas5" height="450" width="280" style="padding:10px"></canvas></div> </div>' +
+		'</center>' +
         '<br><div class="panel panel-default"><div class="panel-heading">Shirts Sold</div> <div class="panel-body" id="shirtlist"></div></div></div></body>';
     document.title = "Past 14 Days Sales - MerchTools ";
     document.body.style.backgroundColor = "#D1F8CC";
