@@ -60,3 +60,9 @@ div.desc {
     bottom: 0;
 	font-size: 1.7rem;
 }
+
+.niche-input{
+	float: left;
+    width: calc(100% - 83px);
+    margin: 4px;
+}

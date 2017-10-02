@@ -998,26 +998,31 @@ function qe() {
             } else {
                 var ts = JSON.parse(reqs.responseText);
                 var cp2 = '<h2>Live Listings:</h2><br>' +
-                    '<table class="table table-striped"><thead><tr><th>#</th><th>Title</th><th class="text-center">Listing page</th><th class="text-center">Price</th><th class="text-center">Edit</th></tr></thead><tbody>';
+                    '<table class="table table-striped"><thead><tr><th>#</th><th>Title</th><th class="text-center">Listing page</th><th class="text-center">Niche</th><th class="text-center">Price</th><th class="text-center">Edit</th></tr></thead><tbody>';
                 k = 0;
                 for (var i = 0; i < ts.length; i++) {
                     k++;
                     cp2 += '<tr><th scope="row">' + k + '</th><td>' + ts[i].name + '</td><td class="text-center">' +
                         '<a target="_blank" href="https://www.amazon.com/dp/' + ts[i].marketplaceAsinMap.US + '" class="btn btn-info">Preview</a>' +
+						'<td class="text-center">' +
+							  '<input type="text" name="niche" class="niche-input"/>' +
+							  '<input type="hidden" name="parentASIN" value='+ ts[i].marketplaceAsinMap.US + '>' +
+							  '<input type="submit" value="Save" class="btn btn-info save"/>' +
+						'</td>' +
                         '<td class="text-center">' + ts[i].listPrice + '</td>' +
                         '<td class="text-center">' + '<a target="_blank" href="http://merch.amazon.com/merch-tshirt/title-setup/' + ts[i].id + '/add_details" class="btn btn-info">Edit</a>' + '</td></tr>';
                 }
                 cp2 += '</tbody></table>';
                 document.getElementById("shirtlist")
                     .innerHTML = cp2;
-
+					
+				initSaveButtons(); //initialize event listeners for buttons
             };
 
         };
     };
 
     reqs.send();
-
 
 
 }
@@ -1124,3 +1129,90 @@ if (cmd.indexOf("MerchToolsAllASINs") !== -1) {
 if (cmd.indexOf("MerchToolsEditor") !== -1) {
     logincheck("qe");
 };
+
+
+/**************** Niche Storage ****************/
+function saveShirtNiche() {
+		// Get a value saved in a form.
+	//var nicheText = this.previousSibling.value;
+	
+	
+	var parentofSelected = this.parentNode;
+	
+	
+	
+	var children = parentofSelected.childNodes;
+	for (var i=0; i < children.length; i++) {
+		if (children[i].name == "niche") {
+			nicheText = children[i].value;
+		}
+		if (children[i].name == "parentASIN") {
+			parentASIN = children[i].value;
+		}
+	}
+
+
+
+	console.log("niche:" + nicheText +"; asin:"+ parentASIN);
+	
+	// Check that there's some code there.
+	/*
+	if (!theValue) {
+	  message('Error: No value specified');
+	  return;
+	}
+	// Save it using the Chrome extension storage API.
+	chrome.storage.sync.set({
+		'value': theValue
+	}, function() {
+		// Notify that we saved.
+		message('Settings saved');
+	});
+	*/
+}
+
+function initSaveButtons(){
+	saveButtons = document.getElementsByClassName('save');
+
+	for (var i = 0; i < saveButtons.length; i++) {
+		saveButtons[i].addEventListener('click', saveShirtNiche, false);
+	}	
+}
+
+
+
+
+            
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
