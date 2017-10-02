@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head><title>MerchAnalysis Settings</title></head>
+<style>
+table {
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+td, th {
+    border: 0px solid #dddddd;
+    text-align: left;
+    padding: 8px;
+}
+
+tr:nth-child(even) {
+    background-color: #dddddd;
+}
+</style>
+</head>
+<body>
+<body>
+<table>
+<form>
+  <tr><td></td>
+  	<td>Sales</td>
+  	<td><input type="radio" name="sales" value="1" checked> <img src="img/sound.png" height="16" width="16">
+   		<input type="radio" name="sales" value="0"> <img src="img/sound.png" height="16" width="16">
+   	</td></tr>
+  <tr><td>Notifications:</td>
+       <td>Cancels</td>
+	   <td><input type="radio" name="cancels" value="1" checked> <img src="img/sound.png" height="16" width="16">
+  		   <input type="radio" name="cancels" value="0"> <img src="img/sound.png" height="16" width="16"> </td></tr>
+  <tr><td></td><td>Logout</td>
+  <td><input type="radio" name="lout" value="1" checked> <img src="img/sound.png" height="16" width="16">
+  	  <input type="radio" name="lout" value="0"> <img src="img/sound.png" height="16" width="16"> </td>
+  </tr>
+<tr></tr><tr><td>Pop-up </td><td></td>
+<td><input type="radio" name="pop" value="1" checked> ON
+  <input type="radio" name="pop" value="0"> OFF </td>
+</form>
+</table> 
+<button id="save">Save</button>
+
+<div id="status"></div>
+<script src="options.js"></script>
+</body>
+</html>

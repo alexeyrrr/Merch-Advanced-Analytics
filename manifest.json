@@ -1,0 +1,27 @@
+{
+   "background": {
+      "scripts": [ "background.js" ]
+   },
+   "browser_action": {
+      "default_icon": "icon128.png",
+      "default_popup": "popup.html",
+      "default_title": "MerchTools"
+   },
+   "content_scripts": [ {
+      "css": [ "bootstrap.min.css", "css.css" ],
+      "js": [ "content.js", "jquery.js", "bootstrap.min.js", "Chart.js" ],
+      "matches": [ "https://*/MerchToolsShirtsLister/*", "https://*/MerchToolsTodaySales/*", "https://*/MerchToolsTwoWeeksSales/*", "https://*/MerchToolsAllMonthsSales/*", "https://*/MerchToolsAllASINs/*", "https://*/MerchToolsEditor/*" ],
+      "run_at": "document_end"
+   } ],
+   "description": "Analysis tool for Merch by Amazon",
+   "icons": {
+      "128": "icon128.png",
+      "16": "icon16.png",
+      "48": "icon48.png"
+   },
+   "manifest_version": 2,
+   "name": "MerchAnalysis",
+   "permissions": [ "tabs", "activeTab", "contextMenus", "notifications", "storage", "*://*.amazon.com/*" ],
+   "update_url": "https://clients2.google.com/service/update2/crx",
+   "version": "0.0.0.1"
+}
