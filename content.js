@@ -48,9 +48,7 @@ function showshirt(t1, fr) {
 
 /*Alexey's functions */
 function getShirtColor(shirtASIN){
-	shirtASIN = shirtASIN.toString().toLowerCase();
-	
-	knownColors = ["dark heather", "heather grey", "heather blue", "black", "navy", "silver", "royal blue", "brown", "slate", "red", "asphalt", "grass", "olive", "kelly green", "baby blue", "white", "lemon", "cranberry", "pink", "orange", "purple"];
+	knownColors = ["Dark Heather", "Heather Grey", "Heather Blue", "Black", "Navy", "Silver", "Royal Blue", "Brown", "Slate", "Red", "Asphalt", "Grass", "Olive", "Kelly Green", "Baby Blue", "White", "Lemon", "Cranberry", "Pink", "Orange", "Purple"];
 	for(var i = 0, len = knownColors.length; i < len; i++){
 		term = knownColors[i];
 		var index = shirtASIN.indexOf(term); 
@@ -65,17 +63,25 @@ function getShirtColor(shirtASIN){
 }
 
 function getShirtSize(shirtASIN){
-	knownSizes = ["Small", "Medium", "Large", "XL", "2XL", "3XL" , "4", "6", "8", "10", "12"]
+	adultSizes = ["Small", "Medium", "Large", "XL", "2XL", "3XL"];
+	youthSizes =  ["4", "6", "8", "10", "12"];
 	
-	for(var i = 0, len = knownSizes.length; i < len; i++){
-		term = knownSizes[i];
-		var index = shirtASIN.indexOf(term); 
-		if (index != -1) {
-			size =  knownSizes[i];
+	for(var i = 0, len = adultSizes.length + youthSizes.length ; i < len; i++){
+		var indexAdult = shirtASIN.indexOf(adultSizes[i]); 
+		if (indexAdult != -1) {
+			size =  adultSizes[i];
 			break;
-		} else{
-			size = "Unknown Size";
 		}
+		
+		var indexYouth = shirtASIN.indexOf(youthSizes[i]); 
+		if (indexYouth != -1) {
+			size = "Youth"
+			break
+		}	
+	}
+	
+	if (size == null){ //Just in case can't determine the size
+		size = "Unknown Size";
 	}
 	
 	return size;
@@ -369,7 +375,7 @@ function todayssales() {
 
 
 
-function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlabel, ts, gendersArray) {
+function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlabel, ts, gendersArray, sizesArray) {
     if (count >= 0) {
         var today = new Date().setTimeZone();
 		today.setUTCHours(7,0,0,0) ; 
@@ -390,6 +396,8 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
                     var totalRevenue = 0;
                     var totalRoyalties = 0;
 					var gendersArray = {Mens: 0, Womens: 0, Kids: 0};
+					var sizesArray = {'Small': 0, 'Medium': 0, 'Large': 0, 'XL': 0, '2XL': 0, '3XL': 0, 'Youth': 0};
+	
                     var ts = JSON.parse(reqs.responseText);
 
                     for (i = 0; i < ts.length; i++) {
@@ -402,12 +410,22 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
                             totalRoyalties += parseFloat(parseFloat(ts[i].royaltyValue)
                                 .toFixed(2));
                         }else if (ts[i].isParentAsin == false) {
+							//Determine Gender And Count it 
 							shirtGender = getShirtGender(ts[i].asinName);
 							for (var key in gendersArray){
 								if (key.toString() == shirtGender){
 									gendersArray[key] += 1;
 								}
 							}
+							
+							//Determine Size And Count it 
+							shirtSize = getShirtSize(ts[i].asinName);
+							for (var key in sizesArray){
+								if (key.toString() == shirtSize){
+									sizesArray[key] += 1;
+								}
+							}
+							
 						};
                     };
 
@@ -415,6 +433,7 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
                     cancelData.push(totalCancelled);
                     returnData.push(totalReturned);
 					gendersData.push(gendersArray);
+					sizesData.push(sizesArray);
                     chlabel.push(["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][today.adjustDate(-count)
                         .getUTCDay()
                     ]);
@@ -423,7 +442,7 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
                     document.getElementById("twoweeksstats")
                         .innerHTML = "<center><h3>Loading Day [" + (m - count) + "/" + m + "]</h3></center>";
 						
-                    fetchsales(count - 1, m, salesData, cancelData, returnData, rev, roy, chlabel, ts, gendersData);
+                    fetchsales(count - 1, m, salesData, cancelData, returnData, rev, roy, chlabel, ts, gendersData, sizesData);
                 };
 
             };
@@ -437,6 +456,8 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
         rRoyalties = 0;
         rrev = 0;
 		rgendersArray = {Mens: 0, Womens: 0, Kids: 0};
+		rsizesArray = {'Small': 0, 'Medium': 0, 'Large': 0, 'XL': 0, '2XL': 0, '3XL': 0, 'Youth': 0};
+		
 		
         for (i = 0; i < salesData.length; i++) {
             unitsSold += salesData[i];
@@ -444,12 +465,17 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
             rrev += rev[i];
             unitsCancelled += cancelData[i]
 			
+			//Add Genders Together
 			for (var key in gendersData[i]){
 				rgendersArray[key] += gendersData[i][key];
 			}
+			
+			//Add Sizes Together
+			for (var key in sizesData[i]){
+				rsizesArray[key] += sizesData[i][key];
+			}
         }
-		
-		
+				
         var lineChartData1 = {
             "datasets": [{
                 "data": salesData,
@@ -495,30 +521,48 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
 		
 		
 		/* New Gender Chart */
-		var colors =["#3498db", "#e86dab", "#95a5a6"];
+		var genderColors = {"Mens": "#3498db", "Womens": "#e86dab", "Kids": "#95a5a6"};
 		lineChartData3 = [];
-		var counter = 0;
 		for (var key in rgendersArray){
 			lineChartData3.push({
 				"value": rgendersArray[key],
-				"color": colors[counter],
+				"color": genderColors[key],
 				"label": key
 			})
-			counter ++;
 		}
-
+			
 		var genderChart = new Chart(document.getElementById("canvas3")
 			.getContext("2d"))
 		.Pie(lineChartData3);
 		/* End New Gender Chart */
 	
+		
+		/* New Sizes Chart */
+		var sizesColors = {'Small': '#ffab91', 'Medium': '#ff8a65', 'Large': '#ff7043', 'XL': '#ff5722', '2XL': '#e64a19', '3XL': '#d84315', 'Youth': '#ffccbc'};
+		lineChartData4 = [];
+		for (var key in rsizesArray){
+			lineChartData4.push({
+				"value": rsizesArray[key],
+				"color": sizesColors[key],
+				"label": key
+			})
+		}
+			
+		var genderChart = new Chart(document.getElementById("canvas4")
+			.getContext("2d"))
+		.Pie(lineChartData4);
+		/* End New Sizes Chart */
+		
 
+	
+		/*Generate Other Line Charts */
         var sales = new Chart(document.getElementById("canvas1")
                 .getContext("2d"))
             .Line(lineChartData1);
         var royt = new Chart(document.getElementById("canvas2")
                 .getContext("2d"))
             .Line(lineChartData2);
+			
 			
 		/*Stats on top for the page */
 		stats = '<center><h3>Statistics For The Past 14 Days</h3></center><br>';	
@@ -645,11 +689,12 @@ function twoweekssales() {
     cancelData = [];
     returnData = [];
 	gendersData = [];
+	sizesData = [];
     rev = [];
     roy = [];
     chlabel = [];
 
-    fetchsales(14, 14, salesData, cancelData, returnData, rev, roy, chlabel, gendersData);
+    fetchsales(14, 14, salesData, cancelData, returnData, rev, roy, chlabel, gendersData, sizesData);
 
 
 };
