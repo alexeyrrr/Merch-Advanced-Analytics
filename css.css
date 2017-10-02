@@ -45,3 +45,18 @@ div.desc {
   float:left;
   margin-right:10px;
 }
+
+.canvas-wrapper{
+	position: relative;
+	width: 33%;
+	float: left;
+	margin-bottom: 15px;
+}
+
+.canvas-title{
+	width: 100%;
+	position: absolute;
+	left: 0;
+    bottom: 0;
+	font-size: 1.7rem;
+}

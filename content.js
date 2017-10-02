@@ -535,8 +535,7 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
             "labels": chlabel
 
         };
-		
-		
+			
 		/* New Gender Chart */
 		var genderColors = {"Mens": "#3498db", "Womens": "#e86dab", "Kids": "#84cb74"};
 		lineChartData3 = [];
@@ -722,9 +721,19 @@ function twoweekssales() {
         ' <div class="panel panel-default">    <div class="panel-heading">Revenue/Royalties</div>    <div class="panel-body"><center><canvas id="canvas2" height="450" width="800" ></canvas></center></div> </div>' +
 		' <div class="panel panel-default">    <div class="panel-heading">Advanced Analytics</div>    <div class="panel-body">'+
 		'<center>' +
-		'<canvas id="canvas3" height="450" width="280" style="padding:10px"></canvas>' +
-		'<canvas id="canvas4" height="450" width="280" style="padding:10px"></canvas>' +
-		'<canvas id="canvas5" height="450" width="280" style="padding:10px"></canvas></div> </div>' +
+			'<div class="canvas-wrapper">' +
+				'<canvas id="canvas3" height="350" width="280" style="padding:10px"></canvas>' +
+				'<h3 class="canvas-title">Gender Distribution</h3>' +
+			'</div>' +
+			'<div class="canvas-wrapper">'+
+				'<canvas id="canvas4" height="350" width="280" style="padding:10px"></canvas>' +
+				'<h3 class="canvas-title">Size Distribution</h3>' +
+			'</div>'+
+			'<div class="canvas-wrapper">'+
+				'<canvas id="canvas5" height="350" width="280" style="padding:10px"></canvas>'+
+				'<h3 class="canvas-title">Color Distribution</h3>' +
+			'</div>' +
+			'</div> </div>' +
 		'</center>' +
         '<br><div class="panel panel-default"><div class="panel-heading">Shirts Sold</div> <div class="panel-body" id="shirtlist"></div></div></div></body>';
     document.title = "Past 14 Days Sales - MerchTools ";
