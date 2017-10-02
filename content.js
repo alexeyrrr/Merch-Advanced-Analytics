@@ -1,12 +1,8 @@
 var header = '<!DOCTYPE html><html><head>' + '<style>div.img {    background-color: lightblue;  border: 1px solid #ccc;}div.img:hover {    border: 1px solid #777;}div.img img {    width: 100%;    height: auto;}div.desc {    padding: 15px;    text-align: left;}* {    box-sizing: border-box;}.responsive {    padding: 0 6px;    float: left;    width: 24.99999%;}@media only screen and (max-width: 700px){    .responsive {        width: 49.99999%;        margin: 6px 0;    }}@media only screen and (max-width: 500px){    .responsive {        width: 100%;    }}.clearfix:after {    content: "";    display: table;    clear: both;}</style>' + '</head><body margin: 100px 150px 100px 80px;>';
 var footer = '</div></body></html>';
-//var ovrpr='<div class="progress"><div class="progress-bar progress-bar-striped active" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" id ="ovrl" style="width:0%"></div><div class="progress-bar progress-bar-danger" role="progressbar" id="emp" style="width:60%"></div></div>';
-//var progr = '<div id ="page"><div class="container"><div class="progress" >    <div id ="progload"class="progress-bar progress-bar-warning progress-bar-striped active" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width:0%">  </div>  </div></div></div>';
 
 
 function when(t) {
-
-
     var dateVal = "/Date(" + t.toString() + ")/";
     var a = new Date(parseFloat(dateVal.substr(6)));
     var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -41,13 +37,6 @@ function cardit(num, img, id, sname, asin, pric, stat, cdate, srank, pg, dud) {
     return cardcode + editsh + chekrev + revbutt;
 };
 
-function progbarset(id, pro, st) {
-    document.getElementById(id)
-        .innerHTML = st + "(" + pro + "%)";
-    document.getElementById(id)
-        .style = "width:" + pro + "%";
-};
-
 function showshirt(t1, fr) {
 
     for (i = 0; i < 20; i++) {
@@ -77,11 +66,7 @@ function shirtlister() {
         if (req.readyState == 4) {
 
 
-            //progbarset("progload","15","Connecting ..");
             if ([200, 201, 202, 203, 204, 205, 206, 207, 226].indexOf(req.status) === -1) {} else {
-
-                //progbarset("progload","30","Login ....");
-
                 var x = JSON.parse(req.responseText);
                 var mm = parseInt(x.publishedItemCount) / parseInt(x.publishedItemCountLimit) * 100;
                 var mange1 = 'https://merch.amazon.com/merchandise/list?pageSize=20&pageNumber=' + pg + '&statusFilters%5B%5D=LIVE&statusFilters%5B%5D=NOT_DISCOVERABLE&statusFilters%5B%5D=PENDING&statusFilters%5B%5D=PROCESSING&statusFilters%5B%5D=STOPPED&keywords=';
@@ -95,7 +80,7 @@ function shirtlister() {
 
 
                         } else {
-                            //  progbarset("progload","60","Loading Shirts ..");
+                            
                             myasins = [];
                             var t1 = JSON.parse(req1.responseText);
                             az = parseInt(t1.totalMerchandiseCount);
@@ -105,7 +90,6 @@ function shirtlister() {
                             }
 
 
-                            //progbarset("progload","100","Shirts Ready  ..");
                             temp = "";
                             //document.getElementById("page").innerHTML=asintxt;
 
@@ -347,8 +331,6 @@ function todayssales() {
 
 
 function fetchsales(count, m, sdata, cdata, rdata, rev, roy, chlabel, ts) {
-
-
     if (count >= 0) {
         var today = new Date().setTimeZone();
       today.setUTCHours(7,0,0,0) ; 
@@ -479,8 +461,8 @@ function fetchsales(count, m, sdata, cdata, rdata, rev, roy, chlabel, ts) {
 
 
 
-       var today = new Date().setTimeZone();
-      today.setUTCHours(7,0,0,0) ; 
+		var today = new Date().setTimeZone();
+		today.setUTCHours(7,0,0,0) ; 
 
         var sls = 'https://merch.amazon.com/salesAnalyticsRecord/all?fromDate=' + today.adjustDate(-14)
             .getTime() + '&toDate=' + today.getTime();
@@ -515,14 +497,8 @@ function fetchsales(count, m, sdata, cdata, rdata, rev, roy, chlabel, ts) {
         };
 
         reqs.send();
-
-
-
     };
-
-
 };
-
 
 
 
@@ -548,22 +524,6 @@ function twoweekssales() {
 
 
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

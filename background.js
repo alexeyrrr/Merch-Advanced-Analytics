@@ -20,7 +20,6 @@ function gtanalyze(selectedText) {
 	 chrome.tabs.create({url: webpagecall});
 }
 
-
 function gotodaysales(info, tab) {
 	l2 = "https://merch.amazon.com/MerchToolsTodaySales";
 	chrome.tabs.create({ url: l2 });
