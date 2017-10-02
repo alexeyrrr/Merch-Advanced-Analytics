@@ -983,7 +983,12 @@ function showallsins() {
 function qe() {
     document.head.innerHTML = '<head><style></style></head>';
 
-    document.body.innerHTML = '<body ><br><div class="container"><br><div class="panel panel-default"><div class="alert alert-success"><strong> Use  CTRL + F (PC) or ⌘ + F (MAC) to open the search bar.</strong></div><div class="panel-body" id="shirtlist"></div></div></div></body>';
+	bodyHTML = '<body ><br><div class="container"><br><div class="panel panel-default">';
+	bodyHTML += '<div class="alert alert-success"><strong> Use  CTRL + F (PC) or ⌘ + F (MAC) to open the search bar.</strong>';
+	bodyHTML +=		'<div class="btn btn-info" id="reset-button">Clear All Niche Data</div>'
+	bodyHTML += '</div><div class="panel-body" id="shirtlist"></div></div></div></body>';
+	
+    document.body.innerHTML = bodyHTML
     document.title = "Quick Editor  - MerchTools ";
     document.body.style.backgroundColor = "#D1F8CC";
 
@@ -998,6 +1003,7 @@ function qe() {
             } else {
                 var ts = JSON.parse(reqs.responseText);
                 var cp2 = '<h2>Live Listings:</h2><br>' +
+					'<div id="status"></div>' +
                     '<table class="table table-striped"><thead><tr><th>#</th><th>Title</th><th class="text-center">Listing page</th><th class="text-center">Niche</th><th class="text-center">Price</th><th class="text-center">Edit</th></tr></thead><tbody>';
                 k = 0;
                 for (var i = 0; i < ts.length; i++) {
@@ -1005,6 +1011,7 @@ function qe() {
                     cp2 += '<tr><th scope="row">' + k + '</th><td>' + ts[i].name + '</td><td class="text-center">' +
                         '<a target="_blank" href="https://www.amazon.com/dp/' + ts[i].marketplaceAsinMap.US + '" class="btn btn-info">Preview</a>' +
 						'<td class="text-center">' +
+								'Preset niche is ' + readShirtNiche("B075S8H5JN") + // //ts[i].marketplaceAsinMap.US
 							  '<input type="text" name="niche" class="niche-input"/>' +
 							  '<input type="hidden" name="parentASIN" value='+ ts[i].marketplaceAsinMap.US + '>' +
 							  '<input type="submit" value="Save" class="btn btn-info save"/>' +
@@ -1133,14 +1140,8 @@ if (cmd.indexOf("MerchToolsEditor") !== -1) {
 
 /**************** Niche Storage ****************/
 function saveShirtNiche() {
-		// Get a value saved in a form.
-	//var nicheText = this.previousSibling.value;
-	
-	
+	// Get a values saved in a form.
 	var parentofSelected = this.parentNode;
-	
-	
-	
 	var children = parentofSelected.childNodes;
 	for (var i=0; i < children.length; i++) {
 		if (children[i].name == "niche") {
@@ -1150,33 +1151,63 @@ function saveShirtNiche() {
 			parentASIN = children[i].value;
 		}
 	}
-
-
-
-	console.log("niche:" + nicheText +"; asin:"+ parentASIN);
+	
 	
 	// Check that there's some code there.
-	/*
-	if (!theValue) {
-	  message('Error: No value specified');
+	if (!parentASIN || !nicheText) {
+	  alert('Error: input fields not set properly');
 	  return;
 	}
+	
+	//Assemble Stringified JSON
+	var key = parentASIN;
+	
+	var data = JSON.stringify({
+		'niche': nicheText
+		}
+	);	
+		
 	// Save it using the Chrome extension storage API.
-	chrome.storage.sync.set({
-		'value': theValue
-	}, function() {
-		// Notify that we saved.
-		message('Settings saved');
-	});
-	*/
+    chrome.storage.sync.set({parentASIN, data}, function () {
+        console.log('Saved', key, data);
+    });
 }
 
-function initSaveButtons(){
-	saveButtons = document.getElementsByClassName('save');
+function readShirtNiche(ASIN){
+	//console.log("trying to fetch niche for " + ASIN);
+	
+	chrome.storage.sync.get("key", function (data) {
+		if(data["key"] == ASIN){
+			chrome.storage.sync.get("data", function (data2) {
+				var result = data2["data"];
+				
+				console.log(result);
+				return result;
+			})
+		} 
+	})
+	
+	
+	//return result;
+	
 
+}
+
+function clearAllNicheData(){
+	 //chrome.storage.sync.clear();
+	 //alert("All previous data has been cleared");
+}
+
+
+
+function initSaveButtons(){ //Adds event listeners to all buttons
+	saveButtons = document.getElementsByClassName('save');
 	for (var i = 0; i < saveButtons.length; i++) {
 		saveButtons[i].addEventListener('click', saveShirtNiche, false);
 	}	
+	
+	//Listener for reset button
+	//document.getElementById('reset-button').addEventListener("click", clearAllNicheData, false);
 }
 
 
