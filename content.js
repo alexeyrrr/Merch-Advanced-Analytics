@@ -444,14 +444,10 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
             rrev += rev[i];
             unitsCancelled += cancelData[i]
 			
-			console.log(gendersData[i]);
-			
 			for (var key in gendersData[i]){
 				rgendersArray[key] += gendersData[i][key];
 			}
-			
         }
-		
 		
 		
         var lineChartData1 = {
@@ -496,6 +492,26 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
             "labels": chlabel
 
         };
+		
+		
+		/* New Gender Chart */
+		var colors =["#3498db", "#e86dab", "#95a5a6"];
+		lineChartData3 = [];
+		var counter = 0;
+		for (var key in rgendersArray){
+			lineChartData3.push({
+				"value": rgendersArray[key],
+				"color": colors[counter],
+				"label": key
+			})
+			counter ++;
+		}
+
+		var genderChart = new Chart(document.getElementById("canvas3")
+			.getContext("2d"))
+		.Pie(lineChartData3);
+		/* End New Gender Chart */
+	
 
         var sales = new Chart(document.getElementById("canvas1")
                 .getContext("2d"))
@@ -618,6 +634,10 @@ function twoweekssales() {
     document.body.innerHTML = '<body ><br><br><div class="container"><div class="panel panel-default"></center><div class="panel-body" id="twoweeksstats"><center><h3>Loading..</h3></center></div></div>' +
         ' <div class="panel panel-default">    <div class="panel-heading">Sales/Cancellations</div>    <div class="panel-body"><center><canvas id="canvas1" height="450" width="800" ></canvas></center></div> </div>' +
         ' <div class="panel panel-default">    <div class="panel-heading">Revenue/Royalties</div>    <div class="panel-body"><center><canvas id="canvas2" height="450" width="800" ></canvas></center></div> </div>' +
+		' <div class="panel panel-default">    <div class="panel-heading">Advanced Information</div>    <div class="panel-body">'+
+		'<canvas id="canvas3" height="450" width="250" ></canvas>' +
+		'<canvas id="canvas4" height="450" width="250" ></canvas>' +
+		'<canvas id="canvas5" height="450" width="250" ></canvas></div> </div>' +
         '<br><div class="panel panel-default"><div class="panel-heading">Shirts Sold</div> <div class="panel-body" id="shirtlist"></div></div></div></body>';
     document.title = "Past 14 Days Sales - MerchTools ";
     document.body.style.backgroundColor = "#D1F8CC";
