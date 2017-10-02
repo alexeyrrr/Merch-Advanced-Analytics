@@ -2,115 +2,97 @@
 
 
 function gtmerchdbrd(selectedText) {
- var webpagecall = 'https://merch.amazon.com/dashboard/' ;
- chrome.tabs.create({url: webpagecall});
+	var webpagecall = 'https://merch.amazon.com/dashboard/' ;
+	chrome.tabs.create({url: webpagecall});
 }
 
 function gtmerchforum(selectedText) {
- var webpagecall = 'https://forums.developer.amazon.com/spaces/80/index.html' ;
- chrome.tabs.create({url: webpagecall});
+	var webpagecall = 'https://forums.developer.amazon.com/spaces/80/index.html' ;
+	chrome.tabs.create({url: webpagecall});
 }
 
 function gtcreat(selectedText) {
- var webpagecall = 'https://merch.amazon.com/merch-tshirt/title-setup/new/upload_art' ;
- chrome.tabs.create({url: webpagecall});
+	var webpagecall = 'https://merch.amazon.com/merch-tshirt/title-setup/new/upload_art' ;
+	chrome.tabs.create({url: webpagecall});
 }
 
 function gtmanage(selectedText) {
- var webpagecall = 'https://merch.amazon.com/manage' ;
- chrome.tabs.create({url: webpagecall});
+	var webpagecall = 'https://merch.amazon.com/manage' ;
+	chrome.tabs.create({url: webpagecall});
 }
 
 function gtanalyze(selectedText) {
- var webpagecall = 'https://merch.amazon.com/analyze' ;
- chrome.tabs.create({url: webpagecall});
+	 var webpagecall = 'https://merch.amazon.com/analyze' ;
+	 chrome.tabs.create({url: webpagecall});
 }
 
 
-
-
-
-
-
-
-
-  
-
-
-
-
 function gohome(info, tab) {
-       l2 = "https://merch.amazon.com/MerchToolsShirtsLister/page=1/mt/";
-       chrome.tabs.create({ url: l2 });
-  };
+	l2 = "https://merch.amazon.com/MerchToolsShirtsLister/page=1/mt/";
+	chrome.tabs.create({ url: l2 });
+};
 
 
 function gotodaysales(info, tab) {
-       l2 = "https://merch.amazon.com/MerchToolsTodaySales";
-       chrome.tabs.create({ url: l2 });
-	};
+	l2 = "https://merch.amazon.com/MerchToolsTodaySales";
+	chrome.tabs.create({ url: l2 });
+};
 
 
 function gotwoweeksssales(info, tab) {
-       l2 = "https://merch.amazon.com/MerchToolsTwoWeeksSales";
-       chrome.tabs.create({ url: l2 });
-	 };
+	l2 = "https://merch.amazon.com/MerchToolsTwoWeeksSales";
+	chrome.tabs.create({ url: l2 });
+};
 
 
 function allmonthssales(info, tab) {
-       l2 = "https://merch.amazon.com/MerchToolsAllMonthsSales";
-       chrome.tabs.create({ url: l2 });
-	 };
-
-
+	l2 = "https://merch.amazon.com/MerchToolsAllMonthsSales";
+	chrome.tabs.create({ url: l2 });
+};
 
 
 function quickeditor(info, tab) {
-       l2 = "https://merch.amazon.com/MerchToolsEditor";
-       chrome.tabs.create({ url: l2 });
-	 };
+	l2 = "https://merch.amazon.com/MerchToolsEditor";
+	chrome.tabs.create({ url: l2 });
+};
 
 
 function showasins(info, tab) {
-       l2 = "https://merch.amazon.com/MerchToolsAllASINs";
-       chrome.tabs.create({ url: l2 });
-	 };
-
-
-
-
-
+	l2 = "https://merch.amazon.com/MerchToolsAllASINs";
+	chrome.tabs.create({ url: l2 });
+};
 
 
 
 var b0p = chrome.contextMenus.create({
-		"title": "MerchTools" , contexts:["all"], onclick: function(info, tab) { 
+		"title": "MerchTools" , contexts:["browser_action"], onclick: function(info, tab) { 
 			gtmerchdbrd(); 
 		}
 	});
 	
 var b01p = chrome.contextMenus.create({
-			"title": "Sales", contexts:["all"], "parentId": b0p , onclick: function(info, tab) {}});
+			"title": "Sales", contexts:["browser_action"], "parentId": b0p , onclick: function(info, tab) {}
+		});
 		chrome.contextMenus.create({
-			"title": "Today", contexts:["all"], "parentId": b01p , onclick: function(info, tab) { 
+			"title": "Today", contexts:["browser_action"], "parentId": b01p , onclick: function(info, tab) { 
 				gotodaysales(); 
 			}});
-		chrome.contextMenus.create({"title": "Past 14 days", contexts:["all"], "parentId": b01p , onclick: function(info, tab) { gotwoweeksssales(); }} );
-		chrome.contextMenus.create({"title": "All Months", contexts:["all"], "parentId": b01p , onclick: function(info, tab) { allmonthssales(); }} );
+		chrome.contextMenus.create({"title": "Past 14 days", contexts:["browser_action"], "parentId": b01p , onclick: function(info, tab) { gotwoweeksssales(); }} );
+		chrome.contextMenus.create({"title": "All Months", contexts:["browser_action"], "parentId": b01p , onclick: function(info, tab) { allmonthssales(); }} );
 
-		chrome.contextMenus.create({"title":  "Shirts Lister", contexts:["all"], "parentId": b0p , onclick: function(info, tab) { gohome(); }} );
-		chrome.contextMenus.create({"title":  "Quick Editor", contexts:["all"], "parentId": b0p , onclick: function(info, tab) { quickeditor(); }} );
-		chrome.contextMenus.create({"title":  "Live ASINs", contexts:["all"], "parentId": b0p , onclick: function(info, tab) { showasins(); }} );
+		chrome.contextMenus.create({"title":  "Shirts Lister", contexts:["browser_action"], "parentId": b0p , onclick: function(info, tab) { gohome(); }} );
+		chrome.contextMenus.create({"title":  "Quick Editor", contexts:["browser_action"], "parentId": b0p , onclick: function(info, tab) { quickeditor(); }} );
+		chrome.contextMenus.create({"title":  "Live ASINs", contexts:["browser_action"], "parentId": b0p , onclick: function(info, tab) { showasins(); }} );
 
 var b1p = chrome.contextMenus.create({
-			"title": "Merch Dashboard" , contexts:["all"], onclick: function(info, tab) { 
+			"title": "Merch Dashboard" , contexts:["browser_action"], onclick: function(info, tab) { 
 				gtmerchdbrd(); 
 			}
 		});
 		
-		chrome.contextMenus.create({"title": "Create", contexts:["all"], "parentId": b1p , onclick: function(info, tab) { gtcreat(); }} );
-		chrome.contextMenus.create({"title": "Manage", contexts:["all"], "parentId": b1p , onclick: function(info, tab) { gtmanage(); }} );
-		chrome.contextMenus.create({"title": "Analyse", contexts:["all"], "parentId": b1p , onclick: function(info, tab) { gtanalyze(); }} );
+		chrome.contextMenus.create({"title": "Create", contexts:["browser_action"], "parentId": b1p , onclick: function(info, tab) { gtcreat(); }} );
+		chrome.contextMenus.create({"title": "Manage", contexts:["browser_action"], "parentId": b1p , onclick: function(info, tab) { gtmanage(); }} );
+		chrome.contextMenus.create({"title": "Analyse", contexts:["browser_action"], "parentId": b1p , onclick: function(info, tab) { gtanalyze(); }} );
 
 
 var option = {
