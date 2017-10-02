@@ -113,7 +113,7 @@ var b1p = chrome.contextMenus.create({
 
 
 var option = {
-		playSound: true,
+		playSound: false, //change to true 
 	};
 
 var SaleSound = new Audio();

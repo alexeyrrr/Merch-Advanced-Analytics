@@ -46,19 +46,58 @@ function showshirt(t1, fr) {
     };
 };
 
-
+/*Alexey's functions */
 function getShirtColor(shirtASIN){
-	shirtASIN = shirtASIN.String();
+	shirtASIN = shirtASIN.toString().toLowerCase();
 	
-	color = test;
+	knownColors = ["dark heather", "heather grey", "heather blue", "black", "navy", "silver", "royal blue", "brown", "slate", "red", "asphalt", "grass", "olive", "kelly green", "baby blue", "white", "lemon", "cranberry", "pink", "orange", "purple"];
+	for(var i = 0, len = knownColors.length; i < len; i++){
+		term = knownColors[i];
+		var index = shirtASIN.indexOf(term); 
+		if (index != -1) {
+			color =  knownColors[i];
+			break;
+		} else{
+			color = "Unknown Color";
+		}
+	}
 	return color;
 }
 
 function getShirtSize(shirtASIN){
+	knownSizes = ["Small", "Medium", "Large", "XL", "2XL", "3XL" , "4", "6", "8", "10", "12"]
 	
+	for(var i = 0, len = knownSizes.length; i < len; i++){
+		term = knownSizes[i];
+		var index = shirtASIN.indexOf(term); 
+		if (index != -1) {
+			size =  knownSizes[i];
+			break;
+		} else{
+			size = "Unknown Size";
+		}
+	}
 	
-	return size
+	return size;
 }
+
+function getShirtGender(shirtASIN){
+	knownGenders = ["Mens", "Womens", "Kids", "Youth" ]
+
+	for(var i = 0, len = knownGenders.length; i < len; i++){
+		term = knownGenders[i];
+		var index = shirtASIN.indexOf(term); 
+		if (index != -1) {
+			shirtGender =  knownGenders[i];
+			break;
+		} else{
+			shirtGender = "Unknown Gender";
+		}
+	}
+	return shirtGender;
+}
+
+/*End Alexey's functions */
 
 function shirtlister() {
     cmd = window.location.href;
@@ -142,7 +181,7 @@ function shirtlister() {
 
 
 
-//****************************what is this ? secret code? *********************************************
+//*************************************************************************
 function drawtodaysales(tts) {
     var tsales = '<h2>Today Sales</h2><br><table class="table table-striped"><thead><tr><th>#</th><th>Shirt Name</th><th class="text-center">Listing page</th><th class="text-center">UnitsSold</th><th class="text-center">Revenue</th><th class="text-center">Royalties</th><th class="text-center">Edit</th></tr></thead><tbody>';
     k = 0;
@@ -255,7 +294,7 @@ function todayssales() {
 
     tot = 0;
     var today = new Date().setTimeZone();
-      today.setUTCHours(7,0,0,0) ; 
+	today.setUTCHours(7,0,0,0) ; 
     var sls = 'https://merch.amazon.com/salesAnalyticsRecord/all?fromDate=' + today.getTime() + '&toDate=' + today.getTime();
     //var sls= 'https://merch.amazon.com/salesAnalyticsRecord/all?fromDate=1461999600000&toDate=1467270000000';
     var reqs = new XMLHttpRequest();
@@ -325,15 +364,12 @@ function todayssales() {
     };
 
     reqs.send();
-
-
-
 }
 
 
 
 
-function fetchsales(count, m, sdata, cdata, rdata, rev, roy, chlabel, ts) {
+function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlabel, ts) {
     if (count >= 0) {
         var today = new Date().setTimeZone();
 		today.setUTCHours(7,0,0,0) ; 
@@ -369,9 +405,9 @@ function fetchsales(count, m, sdata, cdata, rdata, rev, roy, chlabel, ts) {
                         };
                     };
 
-                    sdata.push(totalSold);
-                    cdata.push(totalCancelled);
-                    rdata.push(totalReturned);
+                    salesData.push(totalSold);
+                    cancelData.push(totalCancelled);
+                    returnData.push(totalReturned);
                     chlabel.push(["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][today.adjustDate(-count)
                         .getUTCDay()
                     ]);
@@ -379,7 +415,7 @@ function fetchsales(count, m, sdata, cdata, rdata, rev, roy, chlabel, ts) {
                     roy.push(totalRoyalties);
                     document.getElementById("twoweeksstats")
                         .innerHTML = "<center><h3>Loading Day [" + (m - count) + "/" + m + "]</h3></center>";
-                    fetchsales(count - 1, m, sdata, cdata, rdata, rev, roy, chlabel, ts);
+                    fetchsales(count - 1, m, salesData, cancelData, returnData, rev, roy, chlabel, ts);
                 };
 
             };
@@ -388,26 +424,26 @@ function fetchsales(count, m, sdata, cdata, rdata, rev, roy, chlabel, ts) {
         reqs.send();
 
     } else {
-        xx = 0;
-        cxx = 0;
-        rr = 0;
+        unitsSold = 0;
+        unitsCancelled = 0;
+        rRoyalties = 0;
         rrev = 0;
-        for (i = 0; i < sdata.length; i++) {
-            xx += sdata[i];
-            rr += roy[i];
+        for (i = 0; i < salesData.length; i++) {
+            unitsSold += salesData[i];
+            rRoyalties += roy[i];
             rrev += rev[i];
-            cxx += cdata[i]
+            unitsCancelled += cancelData[i]
         }
         var lineChartData1 = {
             "datasets": [{
-                "data": sdata,
+                "data": salesData,
                 label: 'Sales',
                 "pointStrokeColor": "#fff",
                 "fillColor": "rgba(91, 185, 70, 0.75)",
                 "pointColor": "rgba(91, 185, 70,1)",
                 "strokeColor": "rgba(91, 185, 70,1)"
             }, {
-                "data": cdata,
+                "data": cancelData,
                 label: 'Cancellations',
                 "pointStrokeColor": "#fff",
                 "fillColor": "rgba(255, 61, 61, 0.75)",
@@ -449,9 +485,25 @@ function fetchsales(count, m, sdata, cdata, rdata, rev, roy, chlabel, ts) {
             .Line(lineChartData2);
 			
 		/*Stats on top for the page */
+		stats = '<center><h3>Statistics For The Past 14 Days</h3></center><br>';	
+		stats += '<table class="table table-striped"><thead><tr><th class="text-center">Shirts Sold</th><th class="text-center">Shirts Cancelled</th><th class="text-center">Revenue</th><th class="text-center">Royalties</th></tr></thead><tbody>';
+		stats += '<tr class="success text-center"><td><b>' + unitsSold + '</b></td><td><b>' + unitsCancelled + '</b></td><td><b>' + rrev.toFixed(2) + '</b></td><td><b>' + rRoyalties.toFixed(2) + '</b></td></tr>';
+		stats += '</tbody></table><br>';
+		
+		/*Genders */
+		stats += '<table class="table table-striped"><thead><tr><th class="text-center">Gender</th><th class="text-center"># Sold</th></thead>'
+		stats += '<tbody><tr><td>';
+		stats += 	'Male'
+		stats += '</td>';
+		stats += test;
+		stats += '<td>';
+		stats += '</td>';
+		stats += '</tbody></table><br>';
+		stats += '<button type="button" class="btn btn-success btn-block" id="refbutton">REFRESH</button>';
+		
         document.getElementById("twoweeksstats")
-            .innerHTML = '<center><h3>Statistics For The Past 14 Days</h3></center><br><table class="table table-striped"><thead><tr><th class="text-center">Shirts Sold</th><th class="text-center">Shirts Cancelled</th><th class="text-center">Revenue</th><th class="text-center">Royalties</th></tr></thead><tbody>' +
-            '<tr class="success text-center"><td><b>' + xx + '</b></td><td><b>' + cxx + '</b></td><td><b>' + rrev.toFixed(2) + '</b></td><td><b>' + rr.toFixed(2) + '</b></td></tr></tbody></table><br><button type="button" class="btn btn-success btn-block" id="refbutton">REFRESH</button>';
+            .innerHTML = stats;
+            
         $('#refbutton')
             .on('click', function(e) {
                 location.reload();
@@ -488,7 +540,15 @@ function fetchsales(count, m, sdata, cdata, rdata, rev, roy, chlabel, ts) {
                                 '<td class="text-center">' + '<a target="_blank" href="http://merch.amazon.com/merch-tshirt/title-setup/' + ts[i].merchandiseId + '/add_details" class="btn btn-info">Edit</a>' + '</td></tr>';
                         }else if (ts[i].isParentAsin == false) {
 							cp2 += '<tr>';
-							cp2 += ts[i].asinName;
+							cp2 += 		'<td>';
+							cp2 += 			getShirtColor(ts[i].asinName);
+							cp2 += 		'</td>';
+							cp2 += 		'<td>';
+							cp2 +=			getShirtSize(ts[i].asinName);
+							cp2 += 		'</td>';
+							cp2 += 		'<td>';
+							cp2 +=			getShirtGender(ts[i].asinName);
+							cp2 += 		'</td>';
 							cp2 += '</tr>';
 							
 							
@@ -519,23 +579,21 @@ function twoweekssales() {
         '<br><div class="panel panel-default"><div class="panel-heading">Shirts Sold</div> <div class="panel-body" id="shirtlist"></div></div></div></body>';
     document.title = "Past 14 Days Sales - MerchTools ";
     document.body.style.backgroundColor = "#D1F8CC";
-    sdata = [];
-    cdata = [];
-    rdata = [];
+    salesData = [];
+    cancelData = [];
+    returnData = [];
     rev = [];
     roy = [];
     chlabel = [];
 
-    fetchsales(14, 14, sdata, cdata, rdata, rev, roy, chlabel);
+    fetchsales(14, 14, salesData, cancelData, returnData, rev, roy, chlabel);
 
 
 };
 
 
 
-function merchmonths(count, m, sdata, cdata, rdata, rev, roy, chlabel, ts) {
-
-
+function merchmonths(count, m, salesData, cancelData, returnData, rev, roy, chlabel, ts) {
     if (count >= 0) {
         var today = new Date().setTimeZone();
       today.setUTCHours(7,0,0,0) ; 
@@ -573,9 +631,9 @@ function merchmonths(count, m, sdata, cdata, rdata, rev, roy, chlabel, ts) {
                         };
                     };
 
-                    sdata.push(tots);
-                    cdata.push(totc);
-                    rdata.push(totr);
+                    salesData.push(tots);
+                    cancelData.push(totc);
+                    returnData.push(totr);
                     chlabel.push(['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][today.adjustMonth(-count)
                         .getMonth()
                     ]);
@@ -583,7 +641,7 @@ function merchmonths(count, m, sdata, cdata, rdata, rev, roy, chlabel, ts) {
                     roy.push(totroy);
                     document.getElementById("twoweeksstats")
                         .innerHTML = "<center><h3>Loading Month [" + (m - count) + "/" + m + "]</h3></center>";
-                    merchmonths(count - 1, m, sdata, cdata, rdata, rev, roy, chlabel, ts);
+                    merchmonths(count - 1, m, salesData, cancelData, returnData, rev, roy, chlabel, ts);
                 };
 
             };
@@ -597,22 +655,22 @@ function merchmonths(count, m, sdata, cdata, rdata, rev, roy, chlabel, ts) {
         cxx = 0;
         rr = 0;
         rrev = 0;
-        for (i = 0; i < sdata.length; i++) {
-            xx += sdata[i];
+        for (i = 0; i < salesData.length; i++) {
+            xx += salesData[i];
             rr += roy[i];
             rrev += rev[i];
-            cxx += cdata[i]
+            cxx += cancelData[i]
         }
         var lineChartData1 = {
             "datasets": [{
-                "data": sdata,
+                "data": salesData,
                 label: 'Sales',
                 "pointStrokeColor": "#fff",
                 "fillColor": "rgba(91, 185, 70, 0.75)",
                 "pointColor": "rgba(91, 185, 70,1)",
                 "strokeColor": "rgba(91, 185, 70,1)"
             }, {
-                "data": cdata,
+                "data": cancelData,
                 label: 'Cancellations',
                 "pointStrokeColor": "#fff",
                 "fillColor": "rgba(255, 61, 61, 0.75)",
@@ -683,9 +741,9 @@ function merchmonthsall() {
         '<br></div></body>';
     document.title = "Merch Months - MerchTools ";
     document.body.style.backgroundColor = "#D1F8CC";
-    sdata = [];
-    cdata = [];
-    rdata = [];
+    salesData = [];
+    cancelData = [];
+    returnData = [];
     rev = [];
     roy = [];
     chlabel = [];
@@ -694,7 +752,7 @@ function merchmonthsall() {
         new Date(2015, 7, 1),
         new Date()
     );
-    merchmonths(iio, iio, sdata, cdata, rdata, rev, roy, chlabel);
+    merchmonths(iio, iio, salesData, cancelData, returnData, rev, roy, chlabel);
 
 
 };
@@ -843,7 +901,6 @@ function logincheck(cmd) {
                         });
 
 
-
                 } else {
 
                     switch (cmd) {
@@ -878,20 +935,9 @@ function logincheck(cmd) {
 
 
 
-
-
-
-
-
-
-
-
 var cmd = window.location.href;
 if (cmd.indexOf("MerchToolsShirtsLister") !== -1) {
-
     logincheck("shirts");
-
-
 };
 
 if (cmd.indexOf("MerchToolsTodaySales") !== -1) {
@@ -914,6 +960,5 @@ if (cmd.indexOf("MerchToolsAllASINs") !== -1) {
 
 
 if (cmd.indexOf("MerchToolsEditor") !== -1) {
-
     logincheck("qe");
 };
