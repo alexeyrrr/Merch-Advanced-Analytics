@@ -375,7 +375,7 @@ function todayssales() {
 
 
 
-function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlabel, ts, gendersArray, sizesArray) {
+function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlabel, ts, gendersArray, sizesArray, shirtColorsArray) {
     if (count >= 0) {
         var today = new Date().setTimeZone();
 		today.setUTCHours(7,0,0,0) ; 
@@ -397,6 +397,7 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
                     var totalRoyalties = 0;
 					var gendersArray = {Mens: 0, Womens: 0, Kids: 0};
 					var sizesArray = {'Small': 0, 'Medium': 0, 'Large': 0, 'XL': 0, '2XL': 0, '3XL': 0, 'Youth': 0};
+					var shirtColorsArray = {'Dark Heather': 0, 'Heather Grey': 0, 'Heather Blue': 0, 'Black': 0, 'Navy': 0, 'Silver': 0, 'Royal Blue': 0, 'Brown': 0, 'Slate': 0, 'Red': 0, 'Asphalt': 0, 'Grass': 0, 'Olive': 0, 'Kelly Green': 0, 'Baby Blue': 0, 'White': 0, 'Lemon': 0, 'Cranberry': 0, 'Pink': 0, 'Orange': 0, 'Purple': 0};
 	
                     var ts = JSON.parse(reqs.responseText);
 
@@ -426,6 +427,14 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
 								}
 							}
 							
+														//Determine Size And Count it 
+							shirtColor = getShirtColor(ts[i].asinName);
+							for (var key in shirtColorsArray){
+								if (key.toString() == shirtColor){
+									shirtColorsArray[key] += 1;
+								}
+							}
+							
 						};
                     };
 
@@ -434,6 +443,8 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
                     returnData.push(totalReturned);
 					gendersData.push(gendersArray);
 					sizesData.push(sizesArray);
+					shirtColorsData.push(shirtColorsArray);
+					
                     chlabel.push(["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][today.adjustDate(-count)
                         .getUTCDay()
                     ]);
@@ -442,7 +453,7 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
                     document.getElementById("twoweeksstats")
                         .innerHTML = "<center><h3>Loading Day [" + (m - count) + "/" + m + "]</h3></center>";
 						
-                    fetchsales(count - 1, m, salesData, cancelData, returnData, rev, roy, chlabel, ts, gendersData, sizesData);
+                    fetchsales(count - 1, m, salesData, cancelData, returnData, rev, roy, chlabel, ts, gendersData, sizesData, shirtColorsData);
                 };
 
             };
@@ -457,6 +468,7 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
         rrev = 0;
 		rgendersArray = {Mens: 0, Womens: 0, Kids: 0};
 		rsizesArray = {'Small': 0, 'Medium': 0, 'Large': 0, 'XL': 0, '2XL': 0, '3XL': 0, 'Youth': 0};
+		rshirtColorsArray = {'Dark Heather': 0, 'Heather Grey': 0, 'Heather Blue': 0, 'Black': 0, 'Navy': 0, 'Silver': 0, 'Royal Blue': 0, 'Brown': 0, 'Slate': 0, 'Red': 0, 'Asphalt': 0, 'Grass': 0, 'Olive': 0, 'Kelly Green': 0, 'Baby Blue': 0, 'White': 0, 'Lemon': 0, 'Cranberry': 0, 'Pink': 0, 'Orange': 0, 'Purple': 0};
 		
 		
         for (i = 0; i < salesData.length; i++) {
@@ -473,6 +485,11 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
 			//Add Sizes Together
 			for (var key in sizesData[i]){
 				rsizesArray[key] += sizesData[i][key];
+			}
+			
+			//Add Shirt Colors Together
+			for (var key in shirtColorsData[i]){
+				rshirtColorsArray[key] += shirtColorsData[i][key];
 			}
         }
 				
@@ -521,7 +538,7 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
 		
 		
 		/* New Gender Chart */
-		var genderColors = {"Mens": "#3498db", "Womens": "#e86dab", "Kids": "#95a5a6"};
+		var genderColors = {"Mens": "#3498db", "Womens": "#e86dab", "Kids": "#84cb74"};
 		lineChartData3 = [];
 		for (var key in rgendersArray){
 			lineChartData3.push({
@@ -548,12 +565,33 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
 			})
 		}
 			
-		var genderChart = new Chart(document.getElementById("canvas4")
+		var sizesChart = new Chart(document.getElementById("canvas4")
 			.getContext("2d"))
 		.Pie(lineChartData4);
 		/* End New Sizes Chart */
 		
+		
+		/* New Shirt Colors Chart */
+		var shirtColorsColors = {'Dark Heather': "#454b4b", 'Heather Grey': "#d5d9da", 'Heather Blue': "#696c9c", 'Black': "#222", 
+			'Navy': "#15232b", 'Silver': "#cfd1d1", 'Royal Blue': "#1c4086", 'Brown': "#31261d", 'Slate': "#818189", 'Red': "#b71111", 'Asphalt': "#3f3e3c", 
+			'Grass': "#5e9444", 'Olive': "#4a4f26", 'Kelly Green': "#006136", 'Baby Blue': "#8fb8db", 'White': "#eeeeee", 'Lemon': "#f0e87b", 'Cranberry': "#6e0a25",
+			'Pink': "#f8a3bc", 'Orange': "#ff5c39", 'Purple': "#514689"};
+		lineChartData5 = [];
+		for (var key in rshirtColorsArray){
+			lineChartData5.push({
+				"value": rshirtColorsArray[key],
+				"color": shirtColorsColors[key],
+				"label": key
+			})
+		}
+			
+		var genderChart = new Chart(document.getElementById("canvas5")
+			.getContext("2d"))
+		.Pie(lineChartData5);
+		/* End Shirt Colors Chart */
 
+	
+	
 	
 		/*Generate Other Line Charts */
         var sales = new Chart(document.getElementById("canvas1")
@@ -678,7 +716,7 @@ function twoweekssales() {
     document.body.innerHTML = '<body ><br><br><div class="container"><div class="panel panel-default"></center><div class="panel-body" id="twoweeksstats"><center><h3>Loading..</h3></center></div></div>' +
         ' <div class="panel panel-default">    <div class="panel-heading">Sales/Cancellations</div>    <div class="panel-body"><center><canvas id="canvas1" height="450" width="800" ></canvas></center></div> </div>' +
         ' <div class="panel panel-default">    <div class="panel-heading">Revenue/Royalties</div>    <div class="panel-body"><center><canvas id="canvas2" height="450" width="800" ></canvas></center></div> </div>' +
-		' <div class="panel panel-default">    <div class="panel-heading">Advanced Information</div>    <div class="panel-body">'+
+		' <div class="panel panel-default">    <div class="panel-heading">Advanced Analytics</div>    <div class="panel-body">'+
 		'<canvas id="canvas3" height="450" width="250" ></canvas>' +
 		'<canvas id="canvas4" height="450" width="250" ></canvas>' +
 		'<canvas id="canvas5" height="450" width="250" ></canvas></div> </div>' +
@@ -690,11 +728,12 @@ function twoweekssales() {
     returnData = [];
 	gendersData = [];
 	sizesData = [];
+	shirtColorsData = [];
     rev = [];
     roy = [];
     chlabel = [];
 
-    fetchsales(14, 14, salesData, cancelData, returnData, rev, roy, chlabel, gendersData, sizesData);
+    fetchsales(14, 14, salesData, cancelData, returnData, rev, roy, chlabel, gendersData, sizesData, shirtColorsData);
 
 
 };
