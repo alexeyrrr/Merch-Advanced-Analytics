@@ -50,46 +50,42 @@ function showasins(info, tab) {
 	chrome.tabs.create({ url: l2 });
 };
 
+	
+chrome.contextMenus.create({
+	"title": "Sales: Today", contexts:["browser_action"], onclick: function(info, tab) { 
+		gotodaysales(); 
+	}
+});
 
-var b01p = chrome.contextMenus.create({
-		"title": "Sales", contexts:["browser_action"], onclick: function(info, tab) {
-		}
-	});
-	
-	
+chrome.contextMenus.create({
+	"title": "Sales: 14 days", contexts:["browser_action"], onclick: function(info, tab) { 
+		gotwoweeksssales(); 
+	}
+});
+
+chrome.contextMenus.create({
+	"title": "Sales: All Months", contexts:["browser_action"] , onclick: function(info, tab) { 
+		allmonthssales(); 
+	}
+});
+
+		
 var b0p = chrome.contextMenus.create({
-		"title": "MerchTools" , contexts:["browser_action"], onclick: function(info, tab) { 
-		}
-	});
-	
-
-
+	"title": "Other Tools" , contexts:["browser_action"], onclick: function(info, tab) { 
+	}
+});
 
 chrome.contextMenus.create({
 	"title":  "Quick Editor", contexts:["browser_action"], "parentId": b0p , onclick: function(info, tab) { 
 		quickeditor(); 
 	}
 });
+
 chrome.contextMenus.create({"title":  "Live ASINs", contexts:["browser_action"], "parentId": b0p , onclick: function(info, tab) { 
-		showasins(); 
-	}
+	showasins(); 
+}
 });
 
-chrome.contextMenus.create({
-	"title": "Today", contexts:["browser_action"], "parentId": b01p , onclick: function(info, tab) { 
-		gotodaysales(); 
-	}
-});
-chrome.contextMenus.create({
-	"title": "Past 14 days", contexts:["browser_action"], "parentId": b01p , onclick: function(info, tab) { 
-		gotwoweeksssales(); 
-	}
-});
-chrome.contextMenus.create({
-	"title": "All Months", contexts:["browser_action"], "parentId": b01p , onclick: function(info, tab) { 
-		allmonthssales(); 
-	}
-});
 
 
 
