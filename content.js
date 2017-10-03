@@ -567,7 +567,6 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
 			}
 		});
 		
-		console.log("rnicheArray: ", rnicheArray);
 							
 		setTimeout(function(){ 
 			
@@ -595,8 +594,6 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
 				//Add Shirt Niches Together
 				for (var key in shirtNicheData[i]){
 					rnicheArray[key] += shirtNicheData[i][key];
-					
-					console.log("rnicheArray: ", rnicheArray[key]);
 				}
 			}
 			
