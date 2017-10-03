@@ -981,7 +981,7 @@ function showallsins() {
 
 
 function qe() {
-    document.head.innerHTML = '<head><style></style></head>';
+    document.head.innerHTML = '<head><style></style></head><script src="jquery.js"></script>';
 
 	bodyHTML = '<body ><br><div class="container"><br><div class="panel panel-default">';
 	bodyHTML += '<div class="alert alert-success"><strong> Use  CTRL + F (PC) or ⌘ + F (MAC) to open the search bar.</strong>';
@@ -990,7 +990,7 @@ function qe() {
 	
     document.body.innerHTML = bodyHTML
     document.title = "Quick Editor  - MerchTools ";
-    document.body.style.backgroundColor = "#D1F8CC";
+    document.body.style.backgroundColor = "#FFFFFF";  //"#D1F8CC";
 
 
     var sls = 'https://merch.amazon.com/merchandise/all';
@@ -1011,8 +1011,7 @@ function qe() {
                     cp2 += '<tr><th scope="row">' + k + '</th><td>' + ts[i].name + '</td><td class="text-center">' +
                         '<a target="_blank" href="https://www.amazon.com/dp/' + ts[i].marketplaceAsinMap.US + '" class="btn btn-info">Preview</a>' +
 						'<td class="text-center">' +
-								'Preset niche is ' + readShirtNiche("B075S8H5JN") + // //ts[i].marketplaceAsinMap.US
-							  '<input type="text" name="niche" class="niche-input"/>' +
+							  '<input type="text" name="nicheName" class="niche-input"/>' +
 							  '<input type="hidden" name="parentASIN" value='+ ts[i].marketplaceAsinMap.US + '>' +
 							  '<input type="submit" value="Save" class="btn btn-info save"/>' +
 						'</td>' +
@@ -1139,81 +1138,89 @@ if (cmd.indexOf("MerchToolsEditor") !== -1) {
 
 
 /**************** Niche Storage ****************/
-function saveShirtNiche() {
-	// Get a values saved in a form.
-	var parentofSelected = this.parentNode;
-	var children = parentofSelected.childNodes;
-	for (var i=0; i < children.length; i++) {
-		if (children[i].name == "niche") {
-			nicheText = children[i].value;
-		}
-		if (children[i].name == "parentASIN") {
-			parentASIN = children[i].value;
-		}
-	}
+function saveShirtNiche(nicheName, parentASIN) {		
+	//Assemble Stringified JSON	
+	var key = parentASIN,
+	data = JSON.stringify({
+		'niche': nicheName
+	});
+    var jsonfile = {};
+    jsonfile[key] = data;
 	
 	
-	// Check that there's some code there.
-	if (!parentASIN || !nicheText) {
-	  alert('Error: input fields not set properly');
-	  return;
-	}
-	
-	//Assemble Stringified JSON
-	var key = parentASIN;
-	
-	var data = JSON.stringify({
-		'niche': nicheText
-		}
-	);	
-		
-	// Save it using the Chrome extension storage API.
-    chrome.storage.sync.set({key, data}, function () {
+	// Save it using the Chrome extension storage API.	
+    chrome.storage.sync.set(jsonfile, function () {
         console.log('Saved', key, data);
     });
 }
 
-function readShirtNiche(ASIN){
-	//console.log("trying to fetch niche for " + ASIN);
-	
-	chrome.storage.sync.get("key", function (data) {
-		if(data["key"] == ASIN){
-			chrome.storage.sync.get("data", function (data2) {
-				var result = data2["data"];
-				
-				console.log(result);
-				return result;
-			})
-		} 
-	})
-	
-	
-	//return result;
-	
 
+
+function readShirtNiche(){
+	//divs = document.getElementsByClassName('niche-name');	
+	
+	$('[name="nicheName"]').each(function () {
+		//Get ASIN
+		var myKey = $(this).closest('td').find('[name="parentASIN"]').val();
+		
+		var that = $(this);
+		
+		//Fetch Matching Niche
+		chrome.storage.sync.get(myKey, function(items) {
+			if (typeof(items[myKey]) != 'undefined'){
+				parsedJson = JSON.parse(items[myKey]);
+				that.val(parsedJson["niche"]);
+			}
+		});
+			
+		
+	});
+	
+		
+	
+	
+	
 }
+	
+	
 
 function clearAllNicheData(){
-	 //chrome.storage.sync.clear();
-	 //alert("All previous data has been cleared");
+	 chrome.storage.sync.clear();
+	 alert("All previous data has been cleared");
 }
 
 
 
 function initSaveButtons(){ //Adds event listeners to all buttons
-	saveButtons = document.getElementsByClassName('save');
+	/*saveButtons = document.getElementsByClassName('save');
 	for (var i = 0; i < saveButtons.length; i++) {
-		saveButtons[i].addEventListener('click', saveShirtNiche, false);
-	}	
+		index = i;
+		saveButtons[i].addEventListener('click', function(){saveShirtNiche(index);}, false)
+	}
+	*/
 	
-	//Listener for reset button
-	//document.getElementById('reset-button').addEventListener("click", clearAllNicheData, false);
+	$(function(){
+		$('.save').on('click',function(){
+			nicheName = $(this).closest('td').find('[name="nicheName"]').val();
+			parentASIN = $(this).closest('td').find('[name="parentASIN"]').val();
+			saveShirtNiche(nicheName, parentASIN);
+		});
+			
+			
+		
+		//Listener for reset button
+		document.getElementById('reset-button').addEventListener("click", function(){clearAllNicheData();}, false);
+		
+		
+		readShirtNiche();
+		
+		
+		
+	})
+	
+
+	
 }
-
-
-
-
-            
 
 
 
