@@ -103,22 +103,25 @@ function getShirtGender(shirtASIN){
 	return shirtGender;
 }
 
-function getShirtNiche(shirtASIN){
+
+
+
+function getShirtNiche(shirtASIN, func){
 	var myKey = String(shirtASIN);
 	
-	//Fetch Matching Niche
 	chrome.storage.sync.get(myKey, function(items) {
-		if (typeof(items[myKey]) != 'undefined'){
+		if(Object.keys(items).length == 0){ //If no matches, set to unknown
+			func("unknown niche");
+			
+		} else{
 			parsedJson = JSON.parse(items[myKey]);
-			console.log("niche is", parsedJson["niche"]);
-			return parsedJson["niche"];
-		} else {
-			return "unknown niche";
+			func(parsedJson["niche"]);
 		}
 	});
-	
 }
 
+							
+	
 /*End Alexey's functions */
 
 function shirtlister() {
@@ -391,7 +394,7 @@ function todayssales() {
 
 
 
-function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlabel, ts, gendersArray, sizesArray, shirtColorsArray) {
+function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlabel, ts, gendersArray, sizesArray, shirtColorsArray, nicheArray) {
     if (count >= 0) {
         var today = new Date().setTimeZone();
 		today.setUTCHours(7,0,0,0) ; 
@@ -438,23 +441,33 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
 
 					
                     var ts = JSON.parse(reqs.responseText);
-
-                    for (i = 0; i < ts.length; i++) {
-                        if (ts[i].isParentAsin == true) {
-                            totalSold += parseInt(ts[i].unitsSold);
-                            totalReturned += parseInt(ts[i].unitsReturned);
-                            totalCancelled += parseInt(ts[i].unitsCancelled);
-                            totalRevenue += parseFloat(parseFloat(ts[i].revenueValue)
-                                .toFixed(2));
-                            totalRoyalties += parseFloat(parseFloat(ts[i].royaltyValue)
-                                .toFixed(2));
+					
+					for (i = 0; i < ts.length; i++) {
+						if (ts[i].isParentAsin == true) {
+							totalSold += parseInt(ts[i].unitsSold);
+							totalReturned += parseInt(ts[i].unitsReturned);
+							totalCancelled += parseInt(ts[i].unitsCancelled);
+							totalRevenue += parseFloat(parseFloat(ts[i].revenueValue)
+								.toFixed(2));
+							totalRoyalties += parseFloat(parseFloat(ts[i].royaltyValue)
+								.toFixed(2));
 								
-														
-							shirtNiche = getShirtNiche(ts[i].id);
-							console.log("shirt niche is ", shirtNiche);
 							
-								
-                        }else if (ts[i].isParentAsin == false) {
+							
+							//Determine Shirt Niche
+							getShirtNiche(ts[i].id, function(shirtNiche){								
+								for (var key in nicheArray){
+									if (key.toString() == shirtNiche){
+										nicheArray[key] += 1;
+									}
+								}
+								console.log(nicheArray);
+							});
+							
+
+							
+							
+						}else if (ts[i].isParentAsin == false) {
 							//Determine Gender And Count it 
 							shirtGender = getShirtGender(ts[i].asinName);
 							for (var key in gendersArray){
@@ -479,24 +492,53 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
 								}
 							}
 						};
-                    };
-
-                    salesData.push(totalSold);
-                    cancelData.push(totalCancelled);
-                    returnData.push(totalReturned);
+					};
+					
+						
+					
+						
+						
+						
+					salesData.push(totalSold);
+					cancelData.push(totalCancelled);
+					returnData.push(totalReturned);
 					gendersData.push(gendersArray);
 					sizesData.push(sizesArray);
 					shirtColorsData.push(shirtColorsArray);
+
 					
-                    chlabel.push(["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][today.adjustDate(-count)
-                        .getUTCDay()
-                    ]);
-                    rev.push(totalRevenue);
-                    roy.push(totalRoyalties);
-                    document.getElementById("twoweeksstats")
-                        .innerHTML = "<center><h3>Loading Day [" + (m - count) + "/" + m + "]</h3></center>";
+					setTimeout(function () {
+        
+    
+						shirtNicheData.push(nicheArray);
+						//console.log(shirtNicheData);
 						
-                    fetchsales(count - 1, m, salesData, cancelData, returnData, rev, roy, chlabel, ts, gendersData, sizesData, shirtColorsData);
+
+								
+					
+						chlabel.push(["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][today.adjustDate(-count)
+							.getUTCDay()
+						]);
+						rev.push(totalRevenue);
+						roy.push(totalRoyalties);
+						document.getElementById("twoweeksstats")
+							.innerHTML = "<center><h3>Loading Day [" + (m - count) + "/" + m + "]</h3></center>";
+							
+						fetchsales(count - 1, m, salesData, cancelData, returnData, rev, roy, chlabel, ts, gendersData, sizesData, shirtColorsData, shirtNicheData);
+						
+						
+					
+					}, 6000)
+
+					
+					
+				  
+					
+					
+					
+
+					
+				
                 };
 
             };
@@ -513,7 +555,27 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
 		rsizesArray = {'Small': 0, 'Medium': 0, 'Large': 0, 'XL': 0, '2XL': 0, '3XL': 0, 'Youth': 0};
 		rshirtColorsArray = {'Dark Heather': 0, 'Heather Grey': 0, 'Heather Blue': 0, 'Black': 0, 'Navy': 0, 'Silver': 0, 'Royal Blue': 0, 'Brown': 0, 'Slate': 0, 'Red': 0, 'Asphalt': 0, 'Grass': 0, 'Olive': 0, 'Kelly Green': 0, 'Baby Blue': 0, 'White': 0, 'Lemon': 0, 'Cranberry': 0, 'Pink': 0, 'Orange': 0, 'Purple': 0};
 		
-		
+		//Assemble Dynamic Blank Array For Niches
+		var rnicheArray = {};
+		chrome.storage.sync.get(null, function(items) {
+			var allValues = Object.values(items);
+			
+			for (i = 0; i < allValues.length; i++){
+				allValues[i] =  JSON.parse(allValues[i]);
+				allValues[i] = allValues[i]["niche"]
+			}
+			
+			uniqueArray = allValues.filter(function(item, pos) {
+				return allValues.indexOf(item) == pos;
+			})
+
+			//Init count to 0
+			for (i = 0; i < uniqueArray.length; i++){
+				rnicheArray[uniqueArray[i]] = 0;
+			}
+		});
+					
+					
         for (i = 0; i < salesData.length; i++) {
             unitsSold += salesData[i];
             rRoyalties += roy[i];
@@ -534,6 +596,13 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
 			for (var key in shirtColorsData[i]){
 				rshirtColorsArray[key] += shirtColorsData[i][key];
 			}
+			
+			//Add Shirt Niches Together
+			for (var key in shirtNicheData[i]){
+				rnicheArray[key] += shirtNicheData[i][key];
+			}
+			
+			
         }
 				
         var lineChartData1 = {
@@ -632,6 +701,33 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
 		.Pie(lineChartData5);
 		/* End Shirt Colors Chart */
 
+	
+	
+		/* New Shirt Niches Chart */
+		var shirtNicheColors = ["#e0f2f1", "#b2dfdb", "#80cbc4", "#4db6ac", "#26a69a", "#009688", "#00897b", "#00796b", "#00695c", "#004d40"];
+		lineChartData6 = [];
+		
+		colorIndex = 0;
+		for (var key in rnicheArray){
+			lineChartData6.push({
+				"value": rnicheArray[key],
+				"color": shirtNicheColors[colorIndex],
+				"label": key
+			})
+			colorIndex ++;
+			if (colorIndex > 9){ //Reset and reloop over colors
+				colorIndex = 0;
+			}
+		}
+			
+		var genderChart = new Chart(document.getElementById("canvas6")
+			.getContext("2d"))
+		.Pie(lineChartData6);
+		
+		
+		
+		/* End Shirt Niches Chart */
+	
 	
 	
 	
