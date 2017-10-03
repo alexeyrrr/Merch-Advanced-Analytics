@@ -103,6 +103,22 @@ function getShirtGender(shirtASIN){
 	return shirtGender;
 }
 
+function getShirtNiche(shirtASIN){
+	var myKey = String(shirtASIN);
+	
+	//Fetch Matching Niche
+	chrome.storage.sync.get(myKey, function(items) {
+		if (typeof(items[myKey]) != 'undefined'){
+			parsedJson = JSON.parse(items[myKey]);
+			console.log("niche is", parsedJson["niche"]);
+			return parsedJson["niche"];
+		} else {
+			return "unknown niche";
+		}
+	});
+	
+}
+
 /*End Alexey's functions */
 
 function shirtlister() {
@@ -398,7 +414,29 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
 					var gendersArray = {Mens: 0, Womens: 0, Kids: 0};
 					var sizesArray = {'Small': 0, 'Medium': 0, 'Large': 0, 'XL': 0, '2XL': 0, '3XL': 0, 'Youth': 0};
 					var shirtColorsArray = {'Dark Heather': 0, 'Heather Grey': 0, 'Heather Blue': 0, 'Black': 0, 'Navy': 0, 'Silver': 0, 'Royal Blue': 0, 'Brown': 0, 'Slate': 0, 'Red': 0, 'Asphalt': 0, 'Grass': 0, 'Olive': 0, 'Kelly Green': 0, 'Baby Blue': 0, 'White': 0, 'Lemon': 0, 'Cranberry': 0, 'Pink': 0, 'Orange': 0, 'Purple': 0};
-	
+
+					//Assemble Dynamic Blank Array For Niches
+					var nicheArray = {};
+					chrome.storage.sync.get(null, function(items) {
+						var allValues = Object.values(items);
+						
+						for (i = 0; i < allValues.length; i++){
+							allValues[i] =  JSON.parse(allValues[i]);
+							allValues[i] = allValues[i]["niche"]
+						}
+						
+						uniqueArray = allValues.filter(function(item, pos) {
+							return allValues.indexOf(item) == pos;
+						})
+
+						//Init count to 0
+						for (i = 0; i < uniqueArray.length; i++){
+							nicheArray[uniqueArray[i]] = 0;
+						}
+					});
+					
+
+					
                     var ts = JSON.parse(reqs.responseText);
 
                     for (i = 0; i < ts.length; i++) {
@@ -410,6 +448,12 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
                                 .toFixed(2));
                             totalRoyalties += parseFloat(parseFloat(ts[i].royaltyValue)
                                 .toFixed(2));
+								
+														
+							shirtNiche = getShirtNiche(ts[i].id);
+							console.log("shirt niche is ", shirtNiche);
+							
+								
                         }else if (ts[i].isParentAsin == false) {
 							//Determine Gender And Count it 
 							shirtGender = getShirtGender(ts[i].asinName);
@@ -427,14 +471,13 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
 								}
 							}
 							
-														//Determine Size And Count it 
+							//Determine Size And Count it 
 							shirtColor = getShirtColor(ts[i].asinName);
 							for (var key in shirtColorsArray){
 								if (key.toString() == shirtColor){
 									shirtColorsArray[key] += 1;
 								}
 							}
-							
 						};
                     };
 
@@ -735,6 +778,12 @@ function twoweekssales() {
 			'</div>' +
 			'</div> </div>' +
 		'</center>' +
+		' <div class="panel panel-default">    <div class="panel-heading">Niche Analysis</div>    <div class="panel-body">'+
+			'<div class="canvas-wrapper">'+
+				'<canvas id="canvas6" height="350" width="280" style="padding:10px"></canvas>'+
+				'<h3 class="canvas-title">Niche Distribution</h3>' +
+			'</div>' +
+		'</div> </div>' +
         '<br><div class="panel panel-default"><div class="panel-heading">Shirts Sold</div> <div class="panel-body" id="shirtlist"></div></div></div></body>';
     document.title = "Past 14 Days Sales - MerchTools ";
     document.body.style.backgroundColor = "#D1F8CC";
@@ -1156,9 +1205,7 @@ function saveShirtNiche(nicheName, parentASIN) {
 
 
 
-function readShirtNiche(){
-	//divs = document.getElementsByClassName('niche-name');	
-	
+function readShirtNiche(){	
 	$('[name="nicheName"]').each(function () {
 		//Get ASIN
 		var myKey = $(this).closest('td').find('[name="parentASIN"]').val();
@@ -1172,14 +1219,7 @@ function readShirtNiche(){
 				that.val(parsedJson["niche"]);
 			}
 		});
-			
-		
 	});
-	
-		
-	
-	
-	
 }
 	
 	
@@ -1190,15 +1230,7 @@ function clearAllNicheData(){
 }
 
 
-
-function initSaveButtons(){ //Adds event listeners to all buttons
-	/*saveButtons = document.getElementsByClassName('save');
-	for (var i = 0; i < saveButtons.length; i++) {
-		index = i;
-		saveButtons[i].addEventListener('click', function(){saveShirtNiche(index);}, false)
-	}
-	*/
-	
+function initSaveButtons(){ //Adds event listeners to all buttons	
 	$(function(){
 		$('.save').on('click',function(){
 			nicheName = $(this).closest('td').find('[name="nicheName"]').val();
@@ -1206,20 +1238,12 @@ function initSaveButtons(){ //Adds event listeners to all buttons
 			saveShirtNiche(nicheName, parentASIN);
 		});
 			
-			
-		
 		//Listener for reset button
 		document.getElementById('reset-button').addEventListener("click", function(){clearAllNicheData();}, false);
 		
 		
-		readShirtNiche();
-		
-		
-		
+		readShirtNiche();		
 	})
-	
-
-	
 }
 
 
