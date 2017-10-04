@@ -851,7 +851,7 @@ function twoweekssales() {
 			'</center>' +
 		'</div> </div>' +
         '<br><div class="panel panel-default"><div class="panel-heading">Shirts Sold</div> <div class="panel-body" id="shirtlist"></div></div></div></body>';
-    numberofDays = 7;
+    numberofDays = 14;
 	
 	document.title = "Past " + numberofDays +"  Days Sales - Merch Analytics ";
     document.body.style.backgroundColor = "#D1F8CC";
