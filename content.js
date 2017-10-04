@@ -495,10 +495,6 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
 					};
 					
 					setTimeout(function(){
-						
-						
-						
-					
 						salesData.push(totalSold);
 						cancelData.push(totalCancelled);
 						returnData.push(totalReturned);
@@ -734,7 +730,7 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
 				
 				
 			/*Stats on top for the page */
-			stats = '<center><h3>Statistics For The Past ' + numberofDays + ' Days</h3></center><br>';	
+			stats = '<center><h3>Statistics For The Past ' + (numberofDays + 1) + ' Days</h3></center><br>';	
 			stats += '<table class="table table-striped"><thead><tr><th class="text-center">Shirts Sold</th><th class="text-center">Shirts Cancelled</th><th class="text-center">Revenue</th><th class="text-center">Royalties</th></tr></thead><tbody>';
 			stats += '<tr class="success text-center"><td><b>' + unitsSold + '</b></td><td><b>' + unitsCancelled + '</b></td><td><b>' + rrev.toFixed(2) + '</b></td><td><b>' + rRoyalties.toFixed(2) + '</b></td></tr>';
 			stats += '</tbody></table><br>';
@@ -760,6 +756,7 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
 							alert('Cannot get info for more than 90 days');
 							
 						} else{
+							numberOfDaysInput --; //Need to do this to get right info
 							saveNumberOfDays(numberOfDaysInput);
 							location.reload();
 						}
@@ -776,7 +773,7 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
 			var today = new Date().setTimeZone();
 			today.setUTCHours(7,0,0,0) ; 
 
-			var sls = 'https://merch.amazon.com/salesAnalyticsRecord/all?fromDate=' + today.adjustDate(-14)
+			var sls = 'https://merch.amazon.com/salesAnalyticsRecord/all?fromDate=' + today.adjustDate(-m)
 				.getTime() + '&toDate=' + today.getTime();
 			var reqs = new XMLHttpRequest();
 			reqs.open("GET", sls, true);
@@ -866,7 +863,7 @@ function twoweekssales() {
 		'</div> </div>' +
         '<br><div class="panel panel-default"><div class="panel-heading">Shirts Sold</div> <div class="panel-body" id="shirtlist"></div></div></div></body>';
 	
-	readNumberOfDays(function(number){	//Have to wrap everythign in a callback	
+	readNumberOfDays(function(number){	//Have to wrap everything in a callback	
 		numberofDays = (typeof number === 'undefined') ? 14 : number; //Set default value if there's a problem
 		
 		
