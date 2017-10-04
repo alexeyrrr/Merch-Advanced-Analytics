@@ -734,10 +734,17 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
 				
 				
 			/*Stats on top for the page */
-			stats = '<center><h3>Statistics For The Past 14 Days</h3></center><br>';	
+			stats = '<center><h3>Statistics For The Past ' + numberofDays + ' Days</h3></center><br>';	
 			stats += '<table class="table table-striped"><thead><tr><th class="text-center">Shirts Sold</th><th class="text-center">Shirts Cancelled</th><th class="text-center">Revenue</th><th class="text-center">Royalties</th></tr></thead><tbody>';
 			stats += '<tr class="success text-center"><td><b>' + unitsSold + '</b></td><td><b>' + unitsCancelled + '</b></td><td><b>' + rrev.toFixed(2) + '</b></td><td><b>' + rRoyalties.toFixed(2) + '</b></td></tr>';
-			stats += '</tbody></table><br>';		
+			stats += '</tbody></table><br>';
+			/*
+			stats += '<div>'
+				   + '<input type="text" name="numberOfDaysInput" />' 
+				   + '<input type="submit" value="Update" class="btn btn-info save-number-days"/>'
+				   + '</div>';
+		   */
+				   
 			stats += '<button type="button" class="btn btn-success btn-block" id="refbutton">REFRESH</button>';
 			
 			document.getElementById("twoweeksstats")
@@ -844,7 +851,9 @@ function twoweekssales() {
 			'</center>' +
 		'</div> </div>' +
         '<br><div class="panel panel-default"><div class="panel-heading">Shirts Sold</div> <div class="panel-body" id="shirtlist"></div></div></div></body>';
-    document.title = "Past 14 Days Sales - MerchTools ";
+    numberofDays = 7;
+	
+	document.title = "Past " + numberofDays +"  Days Sales - Merch Analytics ";
     document.body.style.backgroundColor = "#D1F8CC";
     salesData = [];
     cancelData = [];
@@ -856,8 +865,9 @@ function twoweekssales() {
     rev = [];
     roy = [];
     chlabel = [];
-
-    fetchsales(14, 14, salesData, cancelData, returnData, rev, roy, chlabel, gendersData, sizesData, shirtColorsData, shirtNicheData);
+	
+	
+    fetchsales(numberofDays, numberofDays, salesData, cancelData, returnData, rev, roy, chlabel, gendersData, sizesData, shirtColorsData, shirtNicheData);
 
 
 };
