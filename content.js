@@ -527,7 +527,7 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
 							
 						fetchsales(count - 1, m, salesData, cancelData, returnData, rev, roy, chlabel, ts, gendersData, sizesData, shirtColorsData, shirtNicheData);
 						
-					}, 500);
+					}, 200);
 					
 
 				
@@ -738,21 +738,35 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
 			stats += '<table class="table table-striped"><thead><tr><th class="text-center">Shirts Sold</th><th class="text-center">Shirts Cancelled</th><th class="text-center">Revenue</th><th class="text-center">Royalties</th></tr></thead><tbody>';
 			stats += '<tr class="success text-center"><td><b>' + unitsSold + '</b></td><td><b>' + unitsCancelled + '</b></td><td><b>' + rrev.toFixed(2) + '</b></td><td><b>' + rRoyalties.toFixed(2) + '</b></td></tr>';
 			stats += '</tbody></table><br>';
-			/*
-			stats += '<div>'
-				   + '<input type="text" name="numberOfDaysInput" />' 
-				   + '<input type="submit" value="Update" class="btn btn-info save-number-days"/>'
-				   + '</div>';
-		   */
-				   
-			stats += '<button type="button" class="btn btn-success btn-block" id="refbutton">REFRESH</button>';
 			
+			stats += '<div>'
+				   + '<span>Set Date Range </span>'
+				   + 	'<input type="text" name="numberOfDaysInput" />' 
+				   + 	'<input type="submit" value="Update & Refresh" class="btn btn-success" id="save-number-days"/>'
+				   + '</div>';
+		   
+						
 			document.getElementById("twoweeksstats")
 				.innerHTML = stats;
 				
-			$('#refbutton')
+			$('#save-number-days')
 				.on('click', function(e) {
-					location.reload();
+					numberOfDaysInput = parseInt($(this).closest("div").find('[name="numberOfDaysInput"]').val());
+										
+					if (numberOfDaysInput === parseInt(numberOfDaysInput, 10)){ //Check if integer
+						if(numberOfDaysInput <= 0){
+							alert('Enter a number greater than 0');
+						} else if (numberOfDaysInput > 90){
+							alert('Cannot get info for more than 90 days');
+							
+						} else{
+							saveNumberOfDays(numberOfDaysInput);
+							location.reload();
+						}
+						
+					} else{
+						alert("Please complete field with a number");
+					}
 				})
 				
 			/*Table Header */
@@ -851,23 +865,31 @@ function twoweekssales() {
 			'</center>' +
 		'</div> </div>' +
         '<br><div class="panel panel-default"><div class="panel-heading">Shirts Sold</div> <div class="panel-body" id="shirtlist"></div></div></div></body>';
-    numberofDays = 14;
 	
-	document.title = "Past " + numberofDays +"  Days Sales - Merch Analytics ";
-    document.body.style.backgroundColor = "#D1F8CC";
-    salesData = [];
-    cancelData = [];
-    returnData = [];
-	gendersData = [];
-	sizesData = [];
-	shirtColorsData = [];
-	shirtNicheData = [];
-    rev = [];
-    roy = [];
-    chlabel = [];
+	readNumberOfDays(function(number){	//Have to wrap everythign in a callback	
+		numberofDays = (typeof number === 'undefined') ? 14 : number; //Set default value if there's a problem
+		
+		
+		
+		document.title = "Past " + numberofDays +"  Days Sales - Merch Analytics ";
+		document.body.style.backgroundColor = "#D1F8CC";
+		salesData = [];
+		cancelData = [];
+		returnData = [];
+		gendersData = [];
+		sizesData = [];
+		shirtColorsData = [];
+		shirtNicheData = [];
+		rev = [];
+		roy = [];
+		chlabel = [];
+		
+		
+		fetchsales(numberofDays, numberofDays, salesData, cancelData, returnData, rev, roy, chlabel, gendersData, sizesData, shirtColorsData, shirtNicheData);
+		
+	});
 	
-	
-    fetchsales(numberofDays, numberofDays, salesData, cancelData, returnData, rev, roy, chlabel, gendersData, sizesData, shirtColorsData, shirtNicheData);
+
 
 
 };
@@ -1254,6 +1276,33 @@ if (cmd.indexOf("MerchToolsAllASINs") !== -1) {
 if (cmd.indexOf("MerchToolsEditor") !== -1) {
     logincheck("qe");
 };
+
+/************** Number of Days Entry ***********/
+function saveNumberOfDays(number) {		
+	//Assemble Stringified JSON	
+	var key = "numberOfDays";
+	var data = number;
+    var jsonfile = {};
+	
+    jsonfile[key] = data;
+	
+	// Save it using the Chrome extension storage API.	
+    chrome.storage.sync.set(jsonfile, function () {
+        console.log('Saved', key, data);
+    });
+}
+
+function readNumberOfDays(callback){		
+	var myKey = "numberOfDays";
+	
+	chrome.storage.sync.get(myKey, function(items) {
+		if (typeof(items[myKey]) != 'undefined'){			
+			callback(items[myKey]);
+		}
+	});
+	
+}
+
 
 
 /**************** Niche Storage ****************/
