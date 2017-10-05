@@ -976,18 +976,57 @@ function merchmonths(count, m, salesData, cancelData, returnData, rev, roy, chla
         cxx = 0;
         rr = 0;
         rrev = 0;
+		
         for (i = 0; i < salesData.length; i++) {
             xx += salesData[i];
             rr += roy[i];
             rrev += rev[i];
-            cxx += cancelData[i]
+            cxx += cancelData[i];
         }
+		
+		
+		/* Calculate Projections */
+		daysSinceStartOfMonth = new Date().getDate();
+		var projectionSalesArray = new Array(salesData.length).fill(null); //Array of Nulls for Projection
+		var projectionRevenueArray = new Array(salesData.length).fill(null); //Array of Nulls for Projection
+		var projectionRoyaltiesArray = new Array(salesData.length).fill(null); //Array of Nulls for Projection
+		
+
+		/* Projected Sales */
+		salesThisMonthSoFar = salesData[salesData.length - 1];
+		projectedSales = (salesThisMonthSoFar * 30 / daysSinceStartOfMonth); //Calculate Projection
+		
+		projectionSalesArray[projectionSalesArray.length - 1] = projectedSales; 
+		
+		
+		/* Projected Revenue */
+		revenueThisMonthSoFar = rev[rev.length - 1];
+		projectedRevenue = (revenueThisMonthSoFar * 30 / daysSinceStartOfMonth); //Calculate Projection
+		
+		projectionRevenueArray[projectionRevenueArray.length - 1] = projectedRevenue; 
+		
+		
+		/* Projected Profit */
+		royaltiesThisMonthSoFar = roy[roy.length - 1];
+		projectedRoyalties = (royaltiesThisMonthSoFar * 30 / daysSinceStartOfMonth); //Calculate Projection
+		
+		projectionRoyaltiesArray[projectionRoyaltiesArray.length - 1] = projectedRoyalties; 
+
+		
+		/*Generate Charts */
         var lineChartData1 = {
             "datasets": [{
+				"data": projectionSalesArray,
+                label: 'Projected Sales',
+                "pointStrokeColor": "#fff",
+                "fillColor": "rgba(200, 200, 200, 0.75)",
+                "pointColor": "#ddd",
+                "strokeColor": "#ddd"
+            }, {
                 "data": salesData,
                 label: 'Sales',
                 "pointStrokeColor": "#fff",
-                "fillColor": "rgba(91, 185, 70, 0.75)",
+                "fillColor": "rgba(91, 185, 70, 1)",
                 "pointColor": "rgba(91, 185, 70,1)",
                 "strokeColor": "rgba(91, 185, 70,1)"
             }, {
@@ -1006,19 +1045,33 @@ function merchmonths(count, m, salesData, cancelData, returnData, rev, roy, chla
 
         var lineChartData2 = {
             "datasets": [{
+				"data": projectionRevenueArray,
+                label: 'Projected Revenue',
+                "pointStrokeColor": "#fff",
+                "fillColor": "rgba(200, 200, 200, 0.75)",
+                "pointColor": "#ddd",
+                "strokeColor": "#ddd"
+            }, {
+				"data": projectionRoyaltiesArray,
+                label: 'Projected Revenue',
+                "pointStrokeColor": "#fff",
+                "fillColor": "rgba(220, 220, 220, 0.75)",
+                "pointColor": "#ddd",
+                "strokeColor": "#ddd"
+            }, {
                 "data": rev,
                 label: 'Revenue',
                 "pointStrokeColor": "#fff",
-                "fillColor": "rgba(246, 145, 30, 0.75)",
-                "pointColor": "rgba(246, 145, 30,1)",
-                "strokeColor": "rgba(246, 145, 30,1)"
+                "fillColor": "rgba(246, 145, 30, 1)",
+                "pointColor": "rgba(246, 145, 30, 1)",
+                "strokeColor": "rgba(246, 145, 30, 1)"
             }, {
                 "data": roy,
                 label: 'Royalties',
                 "pointStrokeColor": "#fff",
                 "fillColor": "rgba(215, 45, 255, 0.5)",
-                "pointColor": "rgba(215, 45, 255,1)",
-                "strokeColor": "rgba(215, 45, 255,1)"
+                "pointColor": "rgba(215, 45, 255, 1)",
+                "strokeColor": "rgba(215, 45, 255, 1)"
 
             }],
             "labels": chlabel
@@ -1070,7 +1123,7 @@ function merchmonthsall() {
     chlabel = [];
 
     iio = monthDiff(
-        new Date(2015, 7, 1),
+        new Date(2016, 6, 1),
         new Date()
     );
     merchmonths(iio, iio, salesData, cancelData, returnData, rev, roy, chlabel);
