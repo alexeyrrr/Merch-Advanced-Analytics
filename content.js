@@ -773,7 +773,14 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
 				})
 				
 			/*Table Header */
-			var cp2 = '<table class="table table-striped"><thead><tr><th>#</th><th>Shirt Name</th><th class="text-center">Listing page</th><th class="text-center">Units Sold</th><th class="text-center">Units Cancelled</th><th class="text-center">Revenue</th><th class="text-center">Royalties</th><th class="text-center">Edit Shirt</th></tr></thead><tbody>';
+			var cp2 = '<table class="table table-striped"><thead><tr><th>#</th><th>Shirt Name</th><th class="text-center">Listing page</th>'
+					+ '<th class="text-center">Units Sold</th>'
+					+ '<th class="text-center">Units Cancelled</th>'
+					+ '<th class="text-center">Revenue</th>'
+					+ '<th class="text-center">Royalties</th>'
+					+ '<th class="text-center">Average Royalties Per Shirt </th>'
+					+ '<th class="text-center">Edit Shirt</th>'
+					+ '</tr></thead><tbody>';
 
 
 			var today = new Date().setTimeZone();
@@ -800,6 +807,7 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
 									'<td class="text-center">' + ts[i].unitsCancelled + '</td>' +
 									'<td class="text-center">$' + ts[i].revenueValue + '</td>' +
 									'<td class="text-center">$' + ts[i].royaltyValue + '</td>' +
+									'<td class="text-center">$' + (ts[i].royaltyValue / (ts[i].unitsSold - ts[i].unitsCancelled)).toFixed(2) + '</td>' +
 									'<td class="text-center">' + '<a target="_blank" href="http://merch.amazon.com/merch-tshirt/title-setup/' + ts[i].merchandiseId + '/add_details" class="btn btn-info">Edit</a>' + '</td></tr>';
 							}else if (ts[i].isParentAsin == false) {
 								/*
@@ -822,6 +830,7 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
 						cp2 += '</tbody></table>';
 						document.getElementById("shirtlist")
 							.innerHTML = cp2;
+							
 					};
 
 				};
