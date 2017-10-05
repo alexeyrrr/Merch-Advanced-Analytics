@@ -751,6 +751,12 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
 			document.getElementById("twoweeksstats")
 				.innerHTML = stats;
 				
+			if(m == 0 ){ //Hide Top 2 Charts if Days == 1, since they're useless.
+				document.getElementById('salesPanel').style.display = "none";
+				document.getElementById('revenuePanel').style.display = "none";
+			}
+			
+				
 			$('#save-number-days')
 				.on('click', function(e) {
 					numberOfDaysInput = parseInt($(this).closest("div").find('[name="numberOfDaysInput"]').val());
@@ -850,8 +856,8 @@ function twoweekssales() {
     var d = new Date();
     n = d.toString();
     document.body.innerHTML = '<body ><br><br><div class="container"><div class="panel panel-default"></center><div class="panel-body" id="twoweeksstats"><center><h3>Loading..</h3></center></div></div>' +
-        ' <div class="panel panel-default">    <div class="panel-heading">Sales/Cancellations</div>    <div class="panel-body"><center><canvas id="canvas1" height="450" width="800" ></canvas></center></div> </div>' +
-        ' <div class="panel panel-default">    <div class="panel-heading">Revenue/Royalties</div>    <div class="panel-body"><center><canvas id="canvas2" height="450" width="800" ></canvas></center></div> </div>' +
+        ' <div class="panel panel-default" id="salesPanel">    <div class="panel-heading">Sales/Cancellations</div>    <div class="panel-body"><center><canvas id="canvas1" height="450" width="800" ></canvas></center></div> </div>' +
+        ' <div class="panel panel-default" id="revenuePanel">    <div class="panel-heading">Revenue/Royalties</div>    <div class="panel-body"><center><canvas id="canvas2" height="450" width="800" ></canvas></center></div> </div>' +
 		' <div class="panel panel-default">    <div class="panel-heading">Advanced Analytics</div>    <div class="panel-body">'+
 		'<center>' +
 			'<div class="canvas-wrapper">' +
