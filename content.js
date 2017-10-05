@@ -731,15 +731,21 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
 				
 			/*Stats on top for the page */
 			stats = '<center><h3>Statistics For The Past ' + (numberofDays + 1) + ' Days</h3></center><br>';	
-			stats += '<table class="table table-striped"><thead><tr><th class="text-center">Shirts Sold</th><th class="text-center">Shirts Cancelled</th><th class="text-center">Revenue</th><th class="text-center">Royalties</th></tr></thead><tbody>';
-			stats += '<tr class="success text-center"><td><b>' + unitsSold + '</b></td><td><b>' + unitsCancelled + '</b></td><td><b>' + rrev.toFixed(2) + '</b></td><td><b>' + rRoyalties.toFixed(2) + '</b></td></tr>';
-			stats += '</tbody></table><br>';
-			
-			stats += '<div>'
-				   + '<span>Set Date Range </span>'
-				   + 	'<input type="text" name="numberOfDaysInput" />' 
-				   + 	'<input type="submit" value="Update & Refresh" class="btn btn-success" id="save-number-days"/>'
-				   + '</div>';
+			stats += '<table class="table table-striped"><thead><tr><th class="text-center">Shirts Sold</th><th class="text-center">Shirts Cancelled</th><th class="text-center">Revenue</th><th class="text-center">Royalties</th>'
+					+ '<th class="text-center">Average Royalties / Shirt </th>'
+					+ '</tr></thead><tbody>'
+					+ '<tr class="success text-center"><td><b>' + unitsSold + '</b></td>'
+					+ '<td><b>' + unitsCancelled + '</b></td>'
+					+ '<td><b>' + rrev.toFixed(2) + '</b></td>'
+					+ '<td><b>' + rRoyalties.toFixed(2) + '</b></td>'
+					+ '<td><b>' + (rRoyalties /(unitsSold - unitsCancelled)).toFixed(2) + '</b></td>'
+					+ '</tr></tbody></table><br>'
+
+					+ '<div>'
+					+ '<span>Set Date Range </span>'
+					+ 	'<input type="text" name="numberOfDaysInput" />' 
+					+ 	'<input type="submit" value="Update & Refresh" class="btn btn-success" id="save-number-days"/>'
+					+ '</div>';
 		   
 						
 			document.getElementById("twoweeksstats")
