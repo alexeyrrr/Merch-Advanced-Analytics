@@ -807,13 +807,20 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
 						for (var i = 0; i < ts.length; i++) {					
 							if (ts[i].isParentAsin == true) {
 								k++;
+								if((ts[i].unitsSold - ts[i].unitsCancelled) != 0){
+									avgSaleValue = (ts[i].royaltyValue / (ts[i].unitsSold - ts[i].unitsCancelled)).toFixed(2)
+								} else {
+									avgSaleValue = 0;
+								}
+								
+								
 								cp2 += '<tr><th scope="row">' + k + '</th><td>' + ts[i].asinName + '</td><td class="text-center">' +
 									'<a target="_blank" href="https://www.amazon.com/dp/' + ts[i].id + '" class="btn btn-info">Preview</a>' +
 									'<td class="text-center">' + ts[i].unitsSold + '</td>' +
 									'<td class="text-center">' + ts[i].unitsCancelled + '</td>' +
 									'<td class="text-center">$' + ts[i].revenueValue + '</td>' +
 									'<td class="text-center">$' + ts[i].royaltyValue + '</td>' +
-									'<td class="text-center">$' + (ts[i].royaltyValue / (ts[i].unitsSold - ts[i].unitsCancelled)).toFixed(2) + '</td>' +
+									'<td class="text-center">$' + avgSaleValue + '</td>' +
 									'<td class="text-center">' + '<a target="_blank" href="http://merch.amazon.com/merch-tshirt/title-setup/' + ts[i].merchandiseId + '/add_details" class="btn btn-info">Edit</a>' + '</td></tr>';
 							}else if (ts[i].isParentAsin == false) {
 								/*
@@ -857,13 +864,15 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
 function twoweekssales() {
 
     document.head.innerHTML = "<head><style></style></head>"
-			+ "<script src='tablesort.min.js'></script>";
+			+ "<script src='tablesort.min.js'></script>"
+			+ "<script src='tablesort.number.js'></script>";
+			
 			
 	var style = document.createElement('link');
 	style.rel = 'stylesheet';
 	style.type = 'text/css';
 	style.href = chrome.extension.getURL('css.css');
-	(document.head||document.documentElement).appendChild(style);
+	//(document.head||document.documentElement).appendChild(style);
 
 
 			
