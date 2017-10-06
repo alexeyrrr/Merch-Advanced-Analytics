@@ -779,7 +779,7 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
 				})
 				
 			/*Table Header */
-			var cp2 = '<table class="table table-striped"><thead><tr><th>#</th><th>Shirt Name</th><th class="text-center">Listing page</th>'
+			var cp2 = '<table class="table table-striped" id="shirtListTable"><thead><tr><th>#</th><th>Shirt Name</th><th class="text-center">Listing page</th>'
 					+ '<th class="text-center">Units Sold</th>'
 					+ '<th class="text-center">Units Cancelled</th>'
 					+ '<th class="text-center">Revenue</th>'
@@ -837,6 +837,10 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
 						document.getElementById("shirtlist")
 							.innerHTML = cp2;
 							
+							
+						new Tablesort(document.getElementById('shirtListTable'));
+
+							
 					};
 
 				};
@@ -852,7 +856,17 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
 
 function twoweekssales() {
 
-    document.head.innerHTML = '<head><style></style></head>';
+    document.head.innerHTML = "<head><style></style></head>"
+			+ "<script src='tablesort.min.js'></script>";
+			
+	var style = document.createElement('link');
+	style.rel = 'stylesheet';
+	style.type = 'text/css';
+	style.href = chrome.extension.getURL('css.css');
+	(document.head||document.documentElement).appendChild(style);
+
+
+			
     var d = new Date();
     n = d.toString();
     document.body.innerHTML = '<body ><br><br><div class="container"><div class="panel panel-default"></center><div class="panel-body" id="twoweeksstats"><center><h3>Loading..</h3></center></div></div>' +
