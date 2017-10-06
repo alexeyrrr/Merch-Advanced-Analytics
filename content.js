@@ -128,7 +128,7 @@ function shirtlister() {
     vp = cmd.indexOf("/mt/") - cmd.indexOf("/page=");
     var pg = parseInt(cmd.slice(cmd.indexOf("/page=") + 6, cmd.indexOf("/mt/")));
 
-    document.body.style.backgroundColor = "#1874d2";
+    document.body.style.backgroundColor = "#ecf1f2";
     document.body.innerHTML = header + "<div class='well'><div id ='nav'></div><div id ='shirts'></div>" + footer;
     document.title = "My Shirts - MerchTools";
 
@@ -314,7 +314,7 @@ function todayssales() {
     n = d.toString();
     document.body.innerHTML = '<body ><br><div class="container"><div class="panel panel-default"><br><div class="panel-body" id="todaystats">Loading..</div></div><br><div class="panel panel-default"><div class="panel-body" id="shirtlist"></div></div></div></body>';
     document.title = "Today's Sales - MerchTools ";
-    document.body.style.backgroundColor = "#D1F8CC";
+    document.body.style.backgroundColor = "#ecf1f2";
 
     tot = 0;
     var today = new Date().setTimeZone();
@@ -913,7 +913,7 @@ function twoweekssales() {
 		
 		
 		document.title = "Past " + numberofDays +"  Days Sales - Merch Analytics ";
-		document.body.style.backgroundColor = "#D1F8CC";
+		document.body.style.backgroundColor = "#ecf1f2";
 		salesData = [];
 		cancelData = [];
 		returnData = [];
@@ -1137,7 +1137,7 @@ function merchmonthsall() {
         ' <div class="panel panel-default">    <div class="panel-heading">Revenue/Royalties</div>    <div class="panel-body"><center><canvas id="canvas2" height="450" width="800" ></canvas></center></div> </div>' +
         '<br></div></body>';
     document.title = "Merch Months - MerchTools ";
-    document.body.style.backgroundColor = "#D1F8CC";
+    document.body.style.backgroundColor = "#ecf1f2";
     salesData = [];
     cancelData = [];
     returnData = [];
@@ -1204,7 +1204,7 @@ function showallsins() {
         ' <div class="panel panel-default">    <div class="panel-heading">Live ASINs</div>    <div class="panel-body"><div class="form-group"><br><textarea class="form-control" rows="20" id="asintxt" onclick="this.select()"></textarea> </div></div> </div>' +
         '<br></div></body>';
     document.title = "All ASINs - MerchTools ";
-    document.body.style.backgroundColor = "#D1F8CC";
+    document.body.style.backgroundColor = "#ecf1f2";
 
     myasins = [];
     p = 1;
@@ -1225,7 +1225,7 @@ function qe() {
 	
     document.body.innerHTML = bodyHTML
     document.title = "Quick Editor  - MerchTools ";
-    document.body.style.backgroundColor = "#FFFFFF";  //"#D1F8CC";
+    document.body.style.backgroundColor = "#ecf1f2";  //"#D1F8CC";
 
 
     var sls = 'https://merch.amazon.com/merchandise/all';
