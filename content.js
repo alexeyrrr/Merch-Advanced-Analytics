@@ -908,7 +908,7 @@ function twoweekssales() {
         '<br><div class="panel panel-default"><div class="panel-heading">Shirts Sold</div> <div class="panel-body" id="shirtlist"></div></div></div></body>';
 	
 	readNumberOfDays(function(number){	//Have to wrap everything in a callback	
-		numberofDays = (typeof number === 'undefined') ? 14 : number; //Set default value if there's a problem
+		numberofDays = number;
 		
 		
 		
@@ -1392,7 +1392,10 @@ function readNumberOfDays(callback){
 	chrome.storage.sync.get(myKey, function(items) {
 		if (typeof(items[myKey]) != 'undefined'){			
 			callback(items[myKey]);
+		} else{
+			callback(14);// default value
 		}
+		
 	});
 	
 }
