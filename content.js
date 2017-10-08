@@ -312,7 +312,10 @@ Date.prototype.setUTC = function(reset) {
 
 
 function todayssales() {
-    document.head.innerHTML = '<head><style></style></head>';
+    document.head.innerHTML = '<head><style></style></head>'
+				+ "<script src='tablesort.min.js'></script>"
+			+ "<script src='tablesort.number.js'></script>";
+			
     var d = new Date();
     n = d.toString();
     document.body.innerHTML = '<body ><br><div class="container"><div class="panel panel-default"><br><div class="panel-body" id="todaystats">Loading..</div></div><br><div class="panel panel-default"><div class="panel-body" id="shirtlist"></div></div></div></body>';
@@ -359,7 +362,7 @@ function todayssales() {
                     '<tr class="success text-center"><td><b>' + tots + '</b></td><td><b>' + totc + '</b></td><td><b>' + totrev.toFixed(2) + '</b></td><td><b>' + totroy.toFixed(2) + '</b></td></tr></tbody></table><br><button type="button" class="btn btn-success btn-block" id="refbutton">REFRESH</button>';
 
                 var cp2 = '<h2>Shirts Sold:</h2><br>' +
-                    '<table class="table table-striped"><thead><tr><th>#</th><th>Shirt Name</th><th class="text-center">Listing page</th><th class="text-center">Units Sold</th><th class="text-center">Units Cancelled</th><th class="text-center">Revenue</th><th class="text-center">Royalties</th><th class="text-center">Edit Shirt</th></tr></thead><tbody>';
+                    '<table class="table table-striped" id="shirtsSoldToday"><thead><tr><th>#</th><th>Shirt Name</th><th class="text-center">Listing page</th><th class="text-center">Units Sold</th><th class="text-center">Units Cancelled</th><th class="text-center">Revenue</th><th class="text-center">Royalties</th><th class="text-center">Edit Shirt</th></tr></thead><tbody>';
 
                 k = 0;
 
@@ -380,7 +383,11 @@ function todayssales() {
 
                 document.getElementById("shirtlist")
                     .innerHTML = cp2;
-                $('#refbutton')
+                
+				new Tablesort(document.getElementById('shirtsSoldToday'));
+				
+				
+				$('#refbutton')
                     .on('click', function(e) {
                         location.reload();
                     })
@@ -742,12 +749,16 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
 				stats = '<center><h3>Statistics For The Past ' + (numberofDays + 1) + ' Days</h3></center><br>';	
 				stats += '<table class="table table-striped"><thead><tr><th class="text-center">Shirts Sold</th><th class="text-center">Shirts Cancelled</th><th class="text-center">Revenue</th><th class="text-center">Royalties</th>'
 						+ '<th class="text-center">Average Royalties / Shirt </th>'
+						+ '<th class="text-center">Average Sales / Day </th>'
+						+ '<th class="text-center">Average Royalties / Day </th>'
 						+ '</tr></thead><tbody>'
 						+ '<tr class="success text-center"><td><b>' + unitsSold + '</b></td>'
 						+ '<td><b>' + unitsCancelled + '</b></td>'
 						+ '<td><b>' + rrev.toFixed(2) + '</b></td>'
 						+ '<td><b>' + rRoyalties.toFixed(2) + '</b></td>'
 						+ '<td><b>' + (rRoyalties /(unitsSold - unitsCancelled)).toFixed(2) + '</b></td>'
+						+ '<td><b>' + (unitsSold /(numberofDays + 1)).toFixed(2) + '</b></td>'
+						+ '<td><b>' + (rRoyalties /(numberofDays + 1)).toFixed(2) + '</b></td>'
 						+ '</tr></tbody></table><br>'
 
 						+ '<div>'
@@ -778,8 +789,8 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
 								
 							} else{
 								numberOfDaysInput --; //Need to do this to get right info
-								saveNumberOfDays(numberOfDaysInput);
-								location.reload();
+								twoweekssales(numberOfDaysInput);
+								//location.reload();
 							}
 							
 						} else{
@@ -905,7 +916,7 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
 
 
 
-function twoweekssales() {
+function twoweekssales(number) {
 
     document.head.innerHTML = "<head><style></style></head>"
 			+ "<script src='tablesort.min.js'></script>"
@@ -953,32 +964,23 @@ function twoweekssales() {
 		'</div> </div>' +
         '<br><div class="panel panel-default"><div class="panel-heading">Shirts Sold</div> <div class="panel-body" id="shirtlist"></div></div></div></body>';
 	
-	readNumberOfDays(function(number){	//Have to wrap everything in a callback	
-		numberofDays = number;
+	numberofDays = number; //Reset scope of var
 		
-		
-		
-		document.title = "Past " + numberofDays +"  Days Sales - Merch Analytics ";
-		document.body.style.backgroundColor = "#ecf1f2";
-		salesData = [];
-		cancelData = [];
-		returnData = [];
-		gendersData = [];
-		sizesData = [];
-		shirtColorsData = [];
-		shirtNicheData = [];
-		rev = [];
-		roy = [];
-		chlabel = [];
-		
-		
-		fetchsales(numberofDays, numberofDays, salesData, cancelData, returnData, rev, roy, chlabel, gendersData, sizesData, shirtColorsData, shirtNicheData);
-		
-	});
+	document.title = "Past " + numberofDays +"  Days Sales - Merch Analytics ";
+	document.body.style.backgroundColor = "#ecf1f2";
+	salesData = [];
+	cancelData = [];
+	returnData = [];
+	gendersData = [];
+	sizesData = [];
+	shirtColorsData = [];
+	shirtNicheData = [];
+	rev = [];
+	roy = [];
+	chlabel = [];
 	
-
-
-
+	
+	fetchsales(numberofDays, numberofDays, salesData, cancelData, returnData, rev, roy, chlabel, gendersData, sizesData, shirtColorsData, shirtNicheData);
 };
 
 
@@ -1367,7 +1369,7 @@ function logincheck(cmd) {
                             shirtlister();
                             break;
                         case "twoweekssales":
-                            twoweekssales();
+                            twoweekssales(14);
                             break;
                         case "todaysales":
                             todayssales();
@@ -1421,37 +1423,6 @@ if (cmd.indexOf("MerchToolsAllASINs") !== -1) {
 if (cmd.indexOf("MerchToolsEditor") !== -1) {
     logincheck("qe");
 };
-
-/************** Number of Days Entry ***********/
-function saveNumberOfDays(number) {		
-	//Assemble Stringified JSON	
-	var key = "numberOfDays";
-	var data = number;
-    var jsonfile = {};
-	
-    jsonfile[key] = data;
-	
-	// Save it using the Chrome extension storage API.	
-    chrome.storage.sync.set(jsonfile, function () {
-        console.log('Saved', key, data);
-    });
-}
-
-function readNumberOfDays(callback){		
-	var myKey = "numberOfDays";
-	
-	chrome.storage.sync.get(myKey, function(items) {
-		if (typeof(items[myKey]) != 'undefined'){			
-			callback(items[myKey]);
-		} else{
-			callback(14);// default value
-		}
-		
-	});
-	
-}
-
-
 
 /**************** Niche Storage ****************/
 function saveShirtNiche(nicheName, parentASIN) {		
