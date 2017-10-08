@@ -558,23 +558,29 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
 			
 			getNicheDistribution(function(totalTally){
 				for(var key in rnicheArray){
-					normalization = (rnicheArray[key] / totalTally[key]);
+					if (key in totalTally){
+						loopTotalTally = totalTally[key];
+					} else {
+						loopTotalTally = 999; //Artifically Skew Unidentified shirts
+					}
+					
+					normalization = (rnicheArray[key] / loopTotalTally);
 					normalizedNicheArray[key] = normalization;
 				}
 				
 				var grandTotal = 0;
 				for(var key in normalizedNicheArray){ //Get Total of Normalized
-					grandTotal += parseFloat(normalizedNicheArray[key]);
+					numberToAdd = parseFloat(normalizedNicheArray[key]);
+					if (!isNaN(numberToAdd)){					
+						grandTotal += numberToAdd;
+					}
 				}
-				
-				console.log(rnicheArray);
-				
 				
 				for(var key in normalizedNicheArray){
 					percertangeValue = (normalizedNicheArray[key] / grandTotal * 100).toFixed(1);
 					normalizedPercentageArray[key] = percertangeValue;
 				}
-				
+											
 				var lineChartData1 = {
 					"datasets": [{
 						"data": salesData,
@@ -700,9 +706,9 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
 
 							
 					
-				for (var key in rnicheArray){
+				for (var key in normalizedPercentageArray){
 					lineChartData6.push({
-						"value": rnicheArray[key],
+						"value": normalizedPercentageArray[key],
 						"color": shirtNicheColors[colorIndex],
 						"label": key
 					})
