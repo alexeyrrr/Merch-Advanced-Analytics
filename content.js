@@ -110,13 +110,16 @@ function getShirtNiche(shirtASIN, func){
 	var myKey = String(shirtASIN);
 	
 	chrome.storage.sync.get(myKey, function(items) {
-		if(Object.keys(items).length == 0){ //If no matches, set to unknown
-			func("unknown niche");
+		if(Object.values(items).length == 0){ //If no matches, set to unknown
+			determinedNiche = "unknown niche";
 			
 		} else{
 			parsedJson = JSON.parse(items[myKey]);
-			func(parsedJson["niche"]);
+			determinedNiche = parsedJson["niche"];
 		}
+		
+		
+		func(determinedNiche); //Run Callback
 	});
 }
 				
@@ -419,25 +422,10 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
 
 					//Assemble Dynamic Blank Array For Niches
 					var nicheArray = {};
-					chrome.storage.sync.get(null, function(items) {
-						var allValues = Object.values(items);
-						
-						for (i = 0; i < allValues.length; i++){
-							allValues[i] =  JSON.parse(allValues[i]);
-							allValues[i] = allValues[i]["niche"]
-						}
-						
-						uniqueArray = allValues.filter(function(item, pos) {
-							return allValues.indexOf(item) == pos;
-						})
-
-						//Init count to 0
-						for (i = 0; i < uniqueArray.length; i++){
-							nicheArray[uniqueArray[i]] = 0;
-						}
+					assembleDynamicBlankArray(function(resultBlankArray){
+						nicheArray = resultBlankArray;
 					});
-					
-
+				
 					
 					var ts = JSON.parse(reqs.responseText);
 					
@@ -455,14 +443,11 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
 							
 							//Determine Shirt Niche
 							getShirtNiche(ts[i].id, function(shirtNiche){								
-								for (var key in nicheArray){
-									if (key.toString() == shirtNiche){
-										nicheArray[key] += 1;
-									}
+								if (shirtNiche in nicheArray){ //If niche tag mactches, incremeent count
+									nicheArray[shirtNiche] += 1;
+								} else {
+									nicheArray["unknown niche"] += 1;
 								}
-								
-								//console.log(nicheArray);
-
 							});
 						} else if (ts[i].isParentAsin == false) {
 							//Determine Gender And Count it 
@@ -499,16 +484,7 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
 						sizesData.push(sizesArray);
 						shirtColorsData.push(shirtColorsArray);
 
-						
-
-			
-		
-						//shirtNicheData = {}
-						shirtNicheData.push(nicheArray);
-						//console.log(shirtNicheData);
-						
-
-								
+						shirtNicheData.push(nicheArray);						
 					
 						chlabel.push(["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][today.adjustDate(-count)
 							.getUTCDay()
@@ -520,7 +496,7 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
 							
 						fetchsales(count - 1, m, salesData, cancelData, returnData, rev, roy, chlabel, ts, gendersData, sizesData, shirtColorsData, shirtNicheData);
 						
-					}, 200);
+					}, 250);
 					
 
 				
@@ -542,26 +518,11 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
 		
 		//Assemble Dynamic Blank Array For Niches
 		rnicheArray = {};
-		chrome.storage.sync.get(null, function(items) {
-			var allValues = Object.values(items);
-			
-			for (i = 0; i < allValues.length; i++){
-				allValues[i] =  JSON.parse(allValues[i]);
-				allValues[i] = allValues[i]["niche"]
-			}
-			
-			uniqueArray = allValues.filter(function(item, pos) {
-				return allValues.indexOf(item) == pos;
-			})
-
-			//Init count to 0
-			for (i = 0; i < uniqueArray.length; i++){
-				rnicheArray[uniqueArray[i]] = 0;
-			}
-		});
 		
-							
-		setTimeout(function(){ 
+		assembleDynamicBlankArray(function(resultBlankArray){
+			rnicheArray = resultBlankArray;
+			
+			
 						
 			for (i = 0; i < salesData.length; i++) {
 				unitsSold += salesData[i];
@@ -605,6 +566,8 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
 				for(var key in normalizedNicheArray){ //Get Total of Normalized
 					grandTotal += parseFloat(normalizedNicheArray[key]);
 				}
+				
+				console.log(rnicheArray);
 				
 				
 				for(var key in normalizedNicheArray){
@@ -717,9 +680,29 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
 				colorIndex = 0;
 				
 
-				for (var key in normalizedPercentageArray){
+				var options = {};
+				
+				//If want to display tooltips:
+				/*
+				var options = 
+				{
+					tooltipTemplate: "<%=label%>: <%= value %>",
+					onAnimationComplete: function()
+					{
+						this.showTooltip(this.segments, true);
+					},
+					tooltipEvents: [],
+					showTooltips: true
+				}
+				*/
+					
+				// change to normalizedPercentageArray
+
+							
+					
+				for (var key in rnicheArray){
 					lineChartData6.push({
-						"value": normalizedPercentageArray[key],
+						"value": rnicheArray[key],
 						"color": shirtNicheColors[colorIndex],
 						"label": key
 					})
@@ -731,7 +714,7 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
 					
 				var nicheChart = new Chart(document.getElementById("canvas6")
 					.getContext("2d"))
-				.Pie(lineChartData6);
+				.Pie(lineChartData6, options);
 				
 				
 				
@@ -879,8 +862,8 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
 				reqs.send();
 			
 			
-			});// End of Callback
-		}); //End of timer
+			});// End of Callback 1
+		}); //End of Callback 2 
 	};
 	
 };
@@ -1459,6 +1442,8 @@ function readShirtNiche(){
 			if (typeof(items[myKey]) != 'undefined'){
 				parsedJson = JSON.parse(items[myKey]);
 				that.val(parsedJson["niche"]);
+			} else{
+				that.siblings('input[type="submit"]').addClass("btn-danger");
 			}
 		});
 	});
@@ -1496,10 +1481,32 @@ function initSaveButtons(){ //Adds event listeners to all buttons
 			nicheName = $(this).closest('td').find('[name="nicheName"]').val();
 			parentASIN = $(this).closest('td').find('[name="parentASIN"]').val();
 			saveShirtNiche(nicheName, parentASIN);
+			
+			//Remove class than makes button red
+			$(this).removeClass("btn-danger");
 		});
 			
 		//Listener for reset button
 		document.getElementById('reset-button').addEventListener("click", function(){clearAllNicheData();}, false);
+		
+		//Enter key goes to next field
+		$('#shirtlist input[type="text"]').keydown(function(e) {
+			if (e.which == 13) { //Enter Key
+				e.preventDefault();
+				$(this).siblings('input[type="submit"]').click(); //Click Submit Button
+				$(this).closest("tr").next().find('input[type="text"]').focus(); //Focus on Next Field
+			}
+			
+			if (e.which == 38) { //Up Key
+				e.preventDefault();
+				$(this).closest("tr").prev().find('input[type="text"]').focus(); //Focus on Next Field
+			}
+			
+			if (e.which == 40) { //Down Key
+				e.preventDefault();
+				$(this).closest("tr").next().find('input[type="text"]').focus(); //Focus on Next Field
+			}
+		});
 		
 		
 		readShirtNiche();		
@@ -1507,7 +1514,31 @@ function initSaveButtons(){ //Adds event listeners to all buttons
 }
 
 
-
+function assembleDynamicBlankArray(callback){
+	chrome.storage.sync.get(null, function(items) {
+		var allValues = Object.values(items);
+		
+		for (i = 0; i < allValues.length; i++){
+			allValues[i] =  JSON.parse(allValues[i]);
+			allValues[i] = allValues[i]["niche"]
+		}
+		
+		uniqueArray = allValues.filter(function(item, pos) {
+			return allValues.indexOf(item) == pos;
+		})
+		
+		var resultBlankArray = {};
+		//Init count to 0
+		for (i = 0; i < uniqueArray.length; i++){
+			resultBlankArray[uniqueArray[i]] = 0;
+		}
+		
+		resultBlankArray["unknown niche"] = 0;
+		
+		
+		callback(resultBlankArray);
+	});
+}
 
 
 
