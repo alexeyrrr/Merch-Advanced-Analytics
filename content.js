@@ -1225,7 +1225,10 @@ function showallsins() {
 
 
 function qe() {
-    document.head.innerHTML = '<head><style></style></head><script src="jquery.js"></script>';
+    document.head.innerHTML = '<head><style></style></head><script src="jquery.js"></script>'
+				+ "<script src='tablesort.min.js'></script>"
+				+ "<script src='tablesort.number.js'></script>";
+				
 
 	bodyHTML = '<body ><br><div class="container"><br><div class="panel panel-default">';
 	bodyHTML += '<div class="alert alert-success"><strong> Use  CTRL + F (PC) or ⌘ + F (MAC) to open the search bar.</strong>';
@@ -1248,7 +1251,7 @@ function qe() {
                 var ts = JSON.parse(reqs.responseText);
                 var cp2 = '<h2>Live Listings:</h2><br>' +
 					'<div id="status"></div>' +
-                    '<table class="table table-striped"><thead><tr><th>#</th><th>Title</th><th class="text-center">Listing page</th><th class="text-center">Niche</th><th class="text-center">Price</th><th class="text-center">Edit</th></tr></thead><tbody>';
+                    '<table id="quickEditor" class="table table-striped"><thead><tr><th>#</th><th>Title</th><th class="text-center">Listing page</th><th class="text-center">Niche</th><th class="text-center">Price</th><th class="text-center">Edit</th></tr></thead><tbody>';
                 k = 0;
                 for (var i = 0; i < ts.length; i++) {
                     k++;
@@ -1265,6 +1268,8 @@ function qe() {
                 cp2 += '</tbody></table>';
                 document.getElementById("shirtlist")
                     .innerHTML = cp2;
+					
+				new Tablesort(document.getElementById('quickEditor'));
 					
 				initSaveButtons(); //initialize event listeners for buttons
             };
