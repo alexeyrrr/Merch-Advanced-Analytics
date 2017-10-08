@@ -464,10 +464,7 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
 								//console.log(nicheArray);
 
 							});
-							
-
-
-						}else if (ts[i].isParentAsin == false) {
+						} else if (ts[i].isParentAsin == false) {
 							//Determine Gender And Count it 
 							shirtGender = getShirtGender(ts[i].asinName);
 							for (var key in gendersArray){
@@ -565,7 +562,7 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
 		
 							
 		setTimeout(function(){ 
-			
+						
 			for (i = 0; i < salesData.length; i++) {
 				unitsSold += salesData[i];
 				rRoyalties += roy[i];
@@ -593,267 +590,296 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
 				}
 			}
 			
-					
-			var lineChartData1 = {
-				"datasets": [{
-					"data": salesData,
-					label: 'Sales',
-					"pointStrokeColor": "#fff",
-					"fillColor": "rgba(91, 185, 70, 0.75)",
-					"pointColor": "rgba(91, 185, 70,1)",
-					"strokeColor": "rgba(91, 185, 70,1)"
-				}, {
-					"data": cancelData,
-					label: 'Cancellations',
-					"pointStrokeColor": "#fff",
-					"fillColor": "rgba(255, 61, 61, 0.75)",
-					"pointColor": "rgba(255, 61, 61,1)",
-					"strokeColor": "rgba(255, 61, 61,1)"
-
-				}],
-				"labels": chlabel
-
-			};
-
-
-			var lineChartData2 = {
-				"datasets": [{
-					"data": rev,
-					label: 'Revenue',
-					"pointStrokeColor": "#fff",
-					"fillColor": "rgba(246, 145, 30, 0.75)",
-					"pointColor": "rgba(246, 145, 30,1)",
-					"strokeColor": "rgba(246, 145, 30,1)"
-				}, {
-					"data": roy,
-					label: 'Royalties',
-					"pointStrokeColor": "#fff",
-					"fillColor": "rgba(215, 45, 255, 0.5)",
-					"pointColor": "rgba(215, 45, 255,1)",
-					"strokeColor": "rgba(215, 45, 255,1)"
-
-				}],
-				"labels": chlabel
-
-			};
-				
-			/* New Gender Chart */
-			var genderColors = {"Mens": "#3498db", "Womens": "#e86dab", "Kids": "#84cb74"};
-			lineChartData3 = [];
-			for (var key in rgendersArray){
-				lineChartData3.push({
-					"value": rgendersArray[key],
-					"color": genderColors[key],
-					"label": key
-				})
-			}
-				
-			var genderChart = new Chart(document.getElementById("canvas3")
-				.getContext("2d"))
-			.Pie(lineChartData3);
-			/* End New Gender Chart */
-		
-			
-			/* New Sizes Chart */
-			var sizesColors = {'Small': '#ffab91', 'Medium': '#ff8a65', 'Large': '#ff7043', 'XL': '#ff5722', '2XL': '#e64a19', '3XL': '#d84315', 'Youth': '#ffccbc'};
-			lineChartData4 = [];
-			for (var key in rsizesArray){
-				lineChartData4.push({
-					"value": rsizesArray[key],
-					"color": sizesColors[key],
-					"label": key
-				})
-			}
-				
-			var sizesChart = new Chart(document.getElementById("canvas4")
-				.getContext("2d"))
-			.Pie(lineChartData4);
-			/* End New Sizes Chart */
 			
 			
-			/* New Shirt Colors Chart */
-			var shirtColorsColors = {'Dark Heather': "#454b4b", 'Heather Grey': "#d5d9da", 'Heather Blue': "#696c9c", 'Black': "#222", 
-				'Navy': "#15232b", 'Silver': "#cfd1d1", 'Royal Blue': "#1c4086", 'Brown': "#31261d", 'Slate': "#818189", 'Red': "#b71111", 'Asphalt': "#3f3e3c", 
-				'Grass': "#5e9444", 'Olive': "#4a4f26", 'Kelly Green': "#006136", 'Baby Blue': "#8fb8db", 'White': "#eeeeee", 'Lemon': "#f0e87b", 'Cranberry': "#6e0a25",
-				'Pink': "#f8a3bc", 'Orange': "#ff5c39", 'Purple': "#514689"};
-			lineChartData5 = [];
-			for (var key in rshirtColorsArray){
-				lineChartData5.push({
-					"value": rshirtColorsArray[key],
-					"color": shirtColorsColors[key],
-					"label": key
-				})
-			}
-				
-			var genderChart = new Chart(document.getElementById("canvas5")
-				.getContext("2d"))
-			.Pie(lineChartData5);
-			/* End Shirt Colors Chart */
-
-		
-		
-			/* New Shirt Niches Chart */
-			var shirtNicheColors = ["#e0f2f1", "#b2dfdb", "#80cbc4", "#4db6ac", "#26a69a", "#009688", "#00897b", "#00796b", "#00695c", "#004d40"];
-			lineChartData6 = [];
+			normalizedNicheArray = {};
+			normalizedPercentageArray = {};
 			
-			colorIndex = 0;
-			for (var key in rnicheArray){
-				lineChartData6.push({
-					"value": rnicheArray[key],
-					"color": shirtNicheColors[colorIndex],
-					"label": key
-				})
-				colorIndex ++;
-				if (colorIndex > 9){ //Reset and reloop over colors
-					colorIndex = 0;
+			getNicheDistribution(function(totalTally){
+				for(var key in rnicheArray){
+					normalization = (rnicheArray[key] / totalTally[key]);
+					normalizedNicheArray[key] = normalization;
 				}
-			}
 				
-			var nicheChart = new Chart(document.getElementById("canvas6")
-				.getContext("2d"))
-			.Pie(lineChartData6);
-			
-			
-			
-			/* End Shirt Niches Chart */
-		
-		
-		
-		
-			/*Generate Other Line Charts */
-			var sales = new Chart(document.getElementById("canvas1")
-					.getContext("2d"))
-				.Line(lineChartData1);
-			var royt = new Chart(document.getElementById("canvas2")
-					.getContext("2d"))
-				.Line(lineChartData2);
+				var grandTotal = 0;
+				for(var key in normalizedNicheArray){ //Get Total of Normalized
+					grandTotal += parseFloat(normalizedNicheArray[key]);
+				}
 				
 				
-			/*Stats on top for the page */
-			stats = '<center><h3>Statistics For The Past ' + (numberofDays + 1) + ' Days</h3></center><br>';	
-			stats += '<table class="table table-striped"><thead><tr><th class="text-center">Shirts Sold</th><th class="text-center">Shirts Cancelled</th><th class="text-center">Revenue</th><th class="text-center">Royalties</th>'
-					+ '<th class="text-center">Average Royalties / Shirt </th>'
-					+ '</tr></thead><tbody>'
-					+ '<tr class="success text-center"><td><b>' + unitsSold + '</b></td>'
-					+ '<td><b>' + unitsCancelled + '</b></td>'
-					+ '<td><b>' + rrev.toFixed(2) + '</b></td>'
-					+ '<td><b>' + rRoyalties.toFixed(2) + '</b></td>'
-					+ '<td><b>' + (rRoyalties /(unitsSold - unitsCancelled)).toFixed(2) + '</b></td>'
-					+ '</tr></tbody></table><br>'
-
-					+ '<div>'
-					+ '<span>Set Date Range </span>'
-					+ 	'<input type="text" name="numberOfDaysInput" />' 
-					+ 	'<input type="submit" value="Update & Refresh" class="btn btn-success" id="save-number-days"/>'
-					+ '</div>';
-		   
-						
-			document.getElementById("twoweeksstats")
-				.innerHTML = stats;
+				for(var key in normalizedNicheArray){
+					percertangeValue = (normalizedNicheArray[key] / grandTotal * 100).toFixed(1);
+					normalizedPercentageArray[key] = percertangeValue;
+				}
 				
-			if(m == 0 ){ //Hide Top 2 Charts if Days == 1, since they're useless.
-				document.getElementById('salesPanel').style.display = "none";
-				document.getElementById('revenuePanel').style.display = "none";
-			}
-			
-				
-			$('#save-number-days')
-				.on('click', function(e) {
-					numberOfDaysInput = parseInt($(this).closest("div").find('[name="numberOfDaysInput"]').val());
-										
-					if (numberOfDaysInput === parseInt(numberOfDaysInput, 10)){ //Check if integer
-						if(numberOfDaysInput <= 0){
-							alert('Enter a number greater than 0');
-						} else if (numberOfDaysInput > 90){
-							alert('Cannot get info for more than 90 days');
-							
-						} else{
-							numberOfDaysInput --; //Need to do this to get right info
-							saveNumberOfDays(numberOfDaysInput);
-							location.reload();
-						}
-						
-					} else{
-						alert("Please complete field with a number");
-					}
-				})
-				
-			/*Table Header */
-			var cp2 = '<table class="table table-striped" id="shirtListTable"><thead><tr><th>#</th><th>Shirt Name</th><th class="text-center">Listing page</th>'
-					+ '<th class="text-center">Units Sold</th>'
-					+ '<th class="text-center">Units Cancelled</th>'
-					+ '<th class="text-center">Revenue</th>'
-					+ '<th class="text-center">Royalties</th>'
-					+ '<th class="text-center">Average Royalties Per Shirt </th>'
-					+ '<th class="text-center">Edit Shirt</th>'
-					+ '</tr></thead><tbody>';
+				var lineChartData1 = {
+					"datasets": [{
+						"data": salesData,
+						label: 'Sales',
+						"pointStrokeColor": "#fff",
+						"fillColor": "rgba(91, 185, 70, 0.75)",
+						"pointColor": "rgba(91, 185, 70,1)",
+						"strokeColor": "rgba(91, 185, 70,1)"
+					}, {
+						"data": cancelData,
+						label: 'Cancellations',
+						"pointStrokeColor": "#fff",
+						"fillColor": "rgba(255, 61, 61, 0.75)",
+						"pointColor": "rgba(255, 61, 61,1)",
+						"strokeColor": "rgba(255, 61, 61,1)"
 
-
-			var today = new Date().setTimeZone();
-			today.setUTCHours(7,0,0,0) ; 
-
-			var sls = 'https://merch.amazon.com/salesAnalyticsRecord/all?fromDate=' + today.adjustDate(-m)
-				.getTime() + '&toDate=' + today.getTime();
-			var reqs = new XMLHttpRequest();
-			reqs.open("GET", sls, true);
-			reqs.onreadystatechange = function() {
-				if (reqs.readyState == 4) {
-					if ([200, 201, 202, 203, 204, 205, 206, 207, 226].indexOf(reqs.status) === -1) {
-						alert("error");
-
-					} else {
-						var ts = JSON.parse(reqs.responseText);
-						k = 0;
-						for (var i = 0; i < ts.length; i++) {					
-							if (ts[i].isParentAsin == true) {
-								k++;
-								if((ts[i].unitsSold - ts[i].unitsCancelled) != 0){
-									avgSaleValue = (ts[i].royaltyValue / (ts[i].unitsSold - ts[i].unitsCancelled)).toFixed(2)
-								} else {
-									avgSaleValue = 0;
-								}
-								
-								
-								cp2 += '<tr><th scope="row">' + k + '</th><td>' + ts[i].asinName + '</td><td class="text-center">' +
-									'<a target="_blank" href="https://www.amazon.com/dp/' + ts[i].id + '" class="btn btn-info">Preview</a>' +
-									'<td class="text-center">' + ts[i].unitsSold + '</td>' +
-									'<td class="text-center">' + ts[i].unitsCancelled + '</td>' +
-									'<td class="text-center">$' + ts[i].revenueValue + '</td>' +
-									'<td class="text-center">$' + ts[i].royaltyValue + '</td>' +
-									'<td class="text-center">$' + avgSaleValue + '</td>' +
-									'<td class="text-center">' + '<a target="_blank" href="http://merch.amazon.com/merch-tshirt/title-setup/' + ts[i].merchandiseId + '/add_details" class="btn btn-info">Edit</a>' + '</td></tr>';
-							}else if (ts[i].isParentAsin == false) {
-								/*
-								//Diplays shirts color, size and gender below each one.
-								cp2 += '<tr>';
-								cp2 += 		'<td>';
-								cp2 += 			getShirtColor(ts[i].asinName);
-								cp2 += 		'</td>';
-								cp2 += 		'<td>';
-								cp2 +=			getShirtSize(ts[i].asinName);
-								cp2 += 		'</td>';
-								cp2 += 		'<td>';
-								cp2 +=			getShirtGender(ts[i].asinName);
-								cp2 += 		'</td>';
-								cp2 += '</tr>';
-								*/
-								
-							};
-						}
-						cp2 += '</tbody></table>';
-						document.getElementById("shirtlist")
-							.innerHTML = cp2;
-							
-							
-						new Tablesort(document.getElementById('shirtListTable'));
-
-							
-					};
+					}],
+					"labels": chlabel
 
 				};
-			};
 
-			reqs.send();
+
+				var lineChartData2 = {
+					"datasets": [{
+						"data": rev,
+						label: 'Revenue',
+						"pointStrokeColor": "#fff",
+						"fillColor": "rgba(246, 145, 30, 0.75)",
+						"pointColor": "rgba(246, 145, 30,1)",
+						"strokeColor": "rgba(246, 145, 30,1)"
+					}, {
+						"data": roy,
+						label: 'Royalties',
+						"pointStrokeColor": "#fff",
+						"fillColor": "rgba(215, 45, 255, 0.5)",
+						"pointColor": "rgba(215, 45, 255,1)",
+						"strokeColor": "rgba(215, 45, 255,1)"
+
+					}],
+					"labels": chlabel
+
+				};
+					
+				/* New Gender Chart */
+				var genderColors = {"Mens": "#3498db", "Womens": "#e86dab", "Kids": "#84cb74"};
+				lineChartData3 = [];
+				for (var key in rgendersArray){
+					lineChartData3.push({
+						"value": rgendersArray[key],
+						"color": genderColors[key],
+						"label": key
+					})
+				}
+					
+				var genderChart = new Chart(document.getElementById("canvas3")
+					.getContext("2d"))
+				.Pie(lineChartData3);
+				/* End New Gender Chart */
+			
+				
+				/* New Sizes Chart */
+				var sizesColors = {'Small': '#ffab91', 'Medium': '#ff8a65', 'Large': '#ff7043', 'XL': '#ff5722', '2XL': '#e64a19', '3XL': '#d84315', 'Youth': '#ffccbc'};
+				lineChartData4 = [];
+				for (var key in rsizesArray){
+					lineChartData4.push({
+						"value": rsizesArray[key],
+						"color": sizesColors[key],
+						"label": key
+					})
+				}
+					
+				var sizesChart = new Chart(document.getElementById("canvas4")
+					.getContext("2d"))
+				.Pie(lineChartData4);
+				/* End New Sizes Chart */
+				
+				
+				/* New Shirt Colors Chart */
+				var shirtColorsColors = {'Dark Heather': "#454b4b", 'Heather Grey': "#d5d9da", 'Heather Blue': "#696c9c", 'Black': "#222", 
+					'Navy': "#15232b", 'Silver': "#cfd1d1", 'Royal Blue': "#1c4086", 'Brown': "#31261d", 'Slate': "#818189", 'Red': "#b71111", 'Asphalt': "#3f3e3c", 
+					'Grass': "#5e9444", 'Olive': "#4a4f26", 'Kelly Green': "#006136", 'Baby Blue': "#8fb8db", 'White': "#eeeeee", 'Lemon': "#f0e87b", 'Cranberry': "#6e0a25",
+					'Pink': "#f8a3bc", 'Orange': "#ff5c39", 'Purple': "#514689"};
+				lineChartData5 = [];
+				for (var key in rshirtColorsArray){
+					lineChartData5.push({
+						"value": rshirtColorsArray[key],
+						"color": shirtColorsColors[key],
+						"label": key
+					})
+				}
+					
+				var genderChart = new Chart(document.getElementById("canvas5")
+					.getContext("2d"))
+				.Pie(lineChartData5);
+				/* End Shirt Colors Chart */
+
+			
+			
+				/* New Shirt Niches Chart */
+				var shirtNicheColors = ["#e0f2f1", "#b2dfdb", "#80cbc4", "#4db6ac", "#26a69a", "#009688", "#00897b", "#00796b", "#00695c", "#004d40"];
+				lineChartData6 = [];
+				
+				colorIndex = 0;
+				
+
+				for (var key in normalizedPercentageArray){
+					lineChartData6.push({
+						"value": normalizedPercentageArray[key],
+						"color": shirtNicheColors[colorIndex],
+						"label": key
+					})
+					colorIndex ++;
+					if (colorIndex > 9){ //Reset and reloop over colors
+						colorIndex = 0;
+					}
+				}
+					
+				var nicheChart = new Chart(document.getElementById("canvas6")
+					.getContext("2d"))
+				.Pie(lineChartData6);
+				
+				
+				
+				/* End Shirt Niches Chart */
+			
+			
+			
+			
+				/*Generate Other Line Charts */
+				var sales = new Chart(document.getElementById("canvas1")
+						.getContext("2d"))
+					.Line(lineChartData1);
+				var royt = new Chart(document.getElementById("canvas2")
+						.getContext("2d"))
+					.Line(lineChartData2);
+					
+					
+				/*Stats on top for the page */
+				stats = '<center><h3>Statistics For The Past ' + (numberofDays + 1) + ' Days</h3></center><br>';	
+				stats += '<table class="table table-striped"><thead><tr><th class="text-center">Shirts Sold</th><th class="text-center">Shirts Cancelled</th><th class="text-center">Revenue</th><th class="text-center">Royalties</th>'
+						+ '<th class="text-center">Average Royalties / Shirt </th>'
+						+ '</tr></thead><tbody>'
+						+ '<tr class="success text-center"><td><b>' + unitsSold + '</b></td>'
+						+ '<td><b>' + unitsCancelled + '</b></td>'
+						+ '<td><b>' + rrev.toFixed(2) + '</b></td>'
+						+ '<td><b>' + rRoyalties.toFixed(2) + '</b></td>'
+						+ '<td><b>' + (rRoyalties /(unitsSold - unitsCancelled)).toFixed(2) + '</b></td>'
+						+ '</tr></tbody></table><br>'
+
+						+ '<div>'
+						+ '<span>Set Date Range </span>'
+						+ 	'<input type="text" name="numberOfDaysInput" />' 
+						+ 	'<input type="submit" value="Update & Refresh" class="btn btn-success" id="save-number-days"/>'
+						+ '</div>';
+			   
+							
+				document.getElementById("twoweeksstats")
+					.innerHTML = stats;
+					
+				if(m == 0 ){ //Hide Top 2 Charts if Days == 1, since they're useless.
+					document.getElementById('salesPanel').style.display = "none";
+					document.getElementById('revenuePanel').style.display = "none";
+				}
+				
+					
+				$('#save-number-days')
+					.on('click', function(e) {
+						numberOfDaysInput = parseInt($(this).closest("div").find('[name="numberOfDaysInput"]').val());
+											
+						if (numberOfDaysInput === parseInt(numberOfDaysInput, 10)){ //Check if integer
+							if(numberOfDaysInput <= 0){
+								alert('Enter a number greater than 0');
+							} else if (numberOfDaysInput > 90){
+								alert('Cannot get info for more than 90 days');
+								
+							} else{
+								numberOfDaysInput --; //Need to do this to get right info
+								saveNumberOfDays(numberOfDaysInput);
+								location.reload();
+							}
+							
+						} else{
+							alert("Please complete field with a number");
+						}
+					})
+					
+				/*Table Header */
+				var cp2 = '<table class="table table-striped" id="shirtListTable"><thead><tr><th>#</th><th>Shirt Name</th><th class="text-center">Listing page</th>'
+						+ '<th class="text-center">Units Sold</th>'
+						+ '<th class="text-center">Units Cancelled</th>'
+						+ '<th class="text-center">Revenue</th>'
+						+ '<th class="text-center">Royalties</th>'
+						+ '<th class="text-center">Average Royalties Per Shirt </th>'
+						+ '<th class="text-center">Edit Shirt</th>'
+						+ '</tr></thead><tbody>';
+
+
+				var today = new Date().setTimeZone();
+				today.setUTCHours(7,0,0,0) ; 
+
+				var sls = 'https://merch.amazon.com/salesAnalyticsRecord/all?fromDate=' + today.adjustDate(-m)
+					.getTime() + '&toDate=' + today.getTime();
+				var reqs = new XMLHttpRequest();
+				reqs.open("GET", sls, true);
+				reqs.onreadystatechange = function() {
+					if (reqs.readyState == 4) {
+						if ([200, 201, 202, 203, 204, 205, 206, 207, 226].indexOf(reqs.status) === -1) {
+							alert("error");
+
+						} else {
+							var ts = JSON.parse(reqs.responseText);
+							k = 0;
+							for (var i = 0; i < ts.length; i++) {					
+								if (ts[i].isParentAsin == true) {
+									k++;
+									if((ts[i].unitsSold - ts[i].unitsCancelled) != 0){
+										avgSaleValue = (ts[i].royaltyValue / (ts[i].unitsSold - ts[i].unitsCancelled)).toFixed(2)
+									} else {
+										avgSaleValue = 0;
+									}
+									
+									
+									cp2 += '<tr><th scope="row">' + k + '</th><td>' + ts[i].asinName + '</td><td class="text-center">' +
+										'<a target="_blank" href="https://www.amazon.com/dp/' + ts[i].id + '" class="btn btn-info">Preview</a>' +
+										'<td class="text-center">' + ts[i].unitsSold + '</td>' +
+										'<td class="text-center">' + ts[i].unitsCancelled + '</td>' +
+										'<td class="text-center">$' + ts[i].revenueValue + '</td>' +
+										'<td class="text-center">$' + ts[i].royaltyValue + '</td>' +
+										'<td class="text-center">$' + avgSaleValue + '</td>' +
+										'<td class="text-center">' + '<a target="_blank" href="http://merch.amazon.com/merch-tshirt/title-setup/' + ts[i].merchandiseId + '/add_details" class="btn btn-info">Edit</a>' + '</td></tr>';
+								}else if (ts[i].isParentAsin == false) {
+									/*
+									//Diplays shirts color, size and gender below each one.
+									cp2 += '<tr>';
+									cp2 += 		'<td>';
+									cp2 += 			getShirtColor(ts[i].asinName);
+									cp2 += 		'</td>';
+									cp2 += 		'<td>';
+									cp2 +=			getShirtSize(ts[i].asinName);
+									cp2 += 		'</td>';
+									cp2 += 		'<td>';
+									cp2 +=			getShirtGender(ts[i].asinName);
+									cp2 += 		'</td>';
+									cp2 += '</tr>';
+									*/
+									
+								};
+							}
+							cp2 += '</tbody></table>';
+							document.getElementById("shirtlist")
+								.innerHTML = cp2;
+								
+								
+							new Tablesort(document.getElementById('shirtListTable'));
+
+								
+						};
+
+					};
+				};
+				
+				
+				
+
+				reqs.send();
+			
+			
+			});// End of Callback
 		}); //End of timer
 	};
 	
@@ -901,7 +927,7 @@ function twoweekssales() {
 			'<center>' +
 				'<div class="canvas-wrapper" style="width: 100%;">'+
 					'<canvas id="canvas6" height="350" width="280" style="padding:10px"></canvas>'+
-					'<h3 class="canvas-title">Niche Distribution</h3>' +
+					'<h3 class="canvas-title">Normalized Niche Distribution (%)</h3>' +
 				'</div>' +
 			'</center>' +
 		'</div> </div>' +
@@ -1438,8 +1464,26 @@ function readShirtNiche(){
 	});
 }
 	
+function getNicheDistribution(callback){
+	chrome.storage.sync.get(null, function(items) {
+		var allValues = Object.values(items);
+		
+		parsedArray = [];
+		for(var i=0; i < allValues.length; i++ ) {
+			parsedArray.push(JSON.parse(allValues[i])['niche']);
+			
+		}
+		
+		var totalTally = {};
+		parsedArray.forEach(function(x) { totalTally[x] = (totalTally[x] || 0)+1; });
+		
+		
+		callback(totalTally);
+	});
 	
+}
 
+	
 function clearAllNicheData(){
 	 chrome.storage.sync.clear();
 	 alert("All previous data has been cleared");
