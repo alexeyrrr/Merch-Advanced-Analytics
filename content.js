@@ -787,6 +787,35 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
 						}
 					})
 					
+				/*Dump Sales Data */				
+				var nicheDistData = '<div class="col-xs-6">';
+				nicheDistData += '<h4>Total Number Of Shirts Available For Sale In Each Niche</h4>';
+				
+				
+				for(var key in totalTally){
+					nicheDistData += '<dl>'
+										+ '<dt>'
+										+ 		key + ":&nbsp;"
+										+ '</dt>'
+										+ '<dd>'
+										+ 		totalTally[key]
+										+ '</dd>'
+									+ '</dl>'
+				}
+				
+				nicheDistData += '</div>';
+				
+				
+				/*
+				document.getElementById("nichePanel")
+					.innerHTML = nicheDistData;
+				*/	
+					
+				
+				$("#nichePanel .panel-body").append(nicheDistData);
+				
+					
+					
 				/*Table Header */
 				var cp2 = '<table class="table table-striped" id="shirtListTable"><thead><tr><th>#</th><th>Shirt Name</th><th class="text-center">Listing page</th>'
 						+ '<th class="text-center">Units Sold</th>'
@@ -912,13 +941,15 @@ function twoweekssales() {
 			'</div>' +
 			'</div> </div>' +
 		'</center>' +
-		' <div class="panel panel-default">    <div class="panel-heading">Niche Analysis</div>    <div class="panel-body">'+
-			'<center>' +
-				'<div class="canvas-wrapper" style="width: 100%;">'+
-					'<canvas id="canvas6" height="350" width="280" style="padding:10px"></canvas>'+
-					'<h3 class="canvas-title">Normalized Niche Distribution (%)</h3>' +
-				'</div>' +
-			'</center>' +
+		' <div class="panel panel-default" id="nichePanel">    <div class="panel-heading">Niche Analysis</div>    <div class="panel-body">'+
+			'<div class="col-xs-6">' +
+				'<center>' +
+					'<div class="canvas-wrapper" style="width: 100%;">'+
+						'<canvas id="canvas6" height="350" width="280" style="padding:10px"></canvas>'+
+						'<h3 class="canvas-title">Normalized Niche Distribution (%)</h3>' +
+					'</div>' +
+				'</center>' +
+			'</div>' +
 		'</div> </div>' +
         '<br><div class="panel panel-default"><div class="panel-heading">Shirts Sold</div> <div class="panel-body" id="shirtlist"></div></div></div></body>';
 	

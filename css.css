@@ -95,3 +95,20 @@ table th:not(.no-sort):after {
     -moz-user-select: none;
     user-select: none;
 }
+
+dl{
+	font-size: 11pt;
+	display: block;
+    float: left;
+    width: 100%;
+	margin-bottom: 5px;
+	text-transform: capitalize;
+}
+
+dt, dd{
+	float:left;
+}
+
+
+
+
