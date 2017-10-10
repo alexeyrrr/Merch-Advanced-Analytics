@@ -109,6 +109,8 @@ dt, dd{
 	float:left;
 }
 
-
+[data-lifetime-sales="false"]{
+	background: #f2dede !important;
+}
 
 

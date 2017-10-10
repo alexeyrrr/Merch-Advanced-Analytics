@@ -126,6 +126,7 @@ function getShirtNiche(shirtASIN, func){
 	
 /*End Alexey's functions */
 
+
 function shirtlister() {
     cmd = window.location.href;
     vp = cmd.indexOf("/mt/") - cmd.indexOf("/page=");
@@ -203,25 +204,6 @@ function shirtlister() {
         }
     };
     req.send();
-};
-
-
-
-
-//*************************************************************************
-function drawtodaysales(tts) {
-    var tsales = '<h2>Today Sales</h2><br><table class="table table-striped"><thead><tr><th>#</th><th>Shirt Name</th><th class="text-center">Listing page</th><th class="text-center">UnitsSold</th><th class="text-center">Revenue</th><th class="text-center">Royalties</th><th class="text-center">Edit</th></tr></thead><tbody>';
-    k = 0;
-    for (var i = 0; i < tts.length; i++) {
-        if (tts[i].isParentAsin) {
-            k++;
-            tsales += '<tr><th scope="row">' + k + '</th><td>' + tts[i].asinName + '</td><td class="text-center">' + '<a target="_blank" href="https://www.amazon.com/dp/' + tts[i].id + '" class="btn btn-info">Preview</a><td class="text-center">' + tts[i].unitsSold + '</td><td class="text-center">$' + tts[i].revenueValue + '</td><td class="text-center">$' + tts[i].royaltyValue + '</td><td class="text-center">' + '<a target="_blank" href="http://merch.amazon.com/merch-tshirt/title-setup/' + tts[i].merchandiseId + '/add_details" class="btn btn-info">Edit Shirt </a>' + '</td></tr>';
-        };
-
-    }
-    tsales += '</tbody></table>';
-    document.getElementById("well2")
-        .innerHTML = tsales;
 };
 
 
@@ -403,7 +385,7 @@ function todayssales() {
 
 
 
-function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlabel, ts, gendersArray, sizesArray, shirtColorsArray, nicheArray) {
+function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlabel, ts, gendersArray, sizesArray, shirtColorsArray, nicheArray, specificASIN = null) {
     if (count >= 0) {
         var today = new Date().setTimeZone();
 		today.setUTCHours(7,0,0,0) ; 
@@ -863,7 +845,8 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
 									}
 									
 									
-									cp2 += '<tr><th scope="row">' + k + '</th><td>' + ts[i].asinName + '</td><td class="text-center">' +
+									cp2 += '<tr><th scope="row">' + k + '</th>' 
+										+ '<td><a href="/IndividualProductPage/?ASIN=' + ts[i].id + '">' + ts[i].asinName + '</a></td><td class="text-center">' +
 										'<a target="_blank" href="https://www.amazon.com/dp/' + ts[i].id + '" class="btn btn-info">Preview</a>' +
 										'<td class="text-center">' + ts[i].unitsSold + '</td>' +
 										'<td class="text-center">' + ts[i].unitsCancelled + '</td>' +
@@ -1274,7 +1257,7 @@ function qe() {
 	bodyHTML +=		'<div class="btn btn-info" id="reset-button">Clear All Niche Data</div>'
 	bodyHTML += '</div><div class="panel-body" id="shirtlist"></div></div></div></body>';
 	
-    document.body.innerHTML = bodyHTML
+    document.body.innerHTML = bodyHTML;
     document.title = "Quick Editor  - MerchTools ";
     document.body.style.backgroundColor = "#ecf1f2";  //"#D1F8CC";
 
@@ -1290,19 +1273,48 @@ function qe() {
                 var ts = JSON.parse(reqs.responseText);
                 var cp2 = '<h2>Live Listings:</h2><br>' +
 					'<div id="status"></div>' +
-                    '<table id="quickEditor" class="table table-striped"><thead><tr><th>#</th><th>Title</th><th class="text-center">Listing page</th><th class="text-center">Niche</th><th class="text-center">Price</th><th class="text-center">Edit</th></tr></thead><tbody>';
+                    '<table id="quickEditor" class="table table-striped"><thead><tr><th>#</th>'
+					+ '<th>Title</th>'
+					+ '<th class="text-center">Days Until Deletion</th>'
+					+ '<th class="text-center">Listing page</th>'
+					+ '<th class="text-center">Niche</th>'
+					+ '<th class="text-center">Price</th>' 
+					+ '<th class="text-center">Edit</th>'
+					+ '</tr></thead><tbody>';
                 k = 0;
                 for (var i = 0; i < ts.length; i++) {
                     k++;
-                    cp2 += '<tr><th scope="row">' + k + '</th><td>' + ts[i].name + '</td><td class="text-center">' +
-                        '<a target="_blank" href="https://www.amazon.com/dp/' + ts[i].marketplaceAsinMap.US + '" class="btn btn-info">Preview</a>' +
-						'<td class="text-center">' +
-							  '<input type="text" name="nicheName" class="niche-input"/>' +
-							  '<input type="hidden" name="parentASIN" value='+ ts[i].marketplaceAsinMap.US + '>' +
-							  '<input type="submit" value="Save" class="btn btn-info save"/>' +
-						'</td>' +
-                        '<td class="text-center">' + ts[i].listPrice + '</td>' +
-                        '<td class="text-center">' + '<a target="_blank" href="http://merch.amazon.com/merch-tshirt/title-setup/' + ts[i].id + '/add_details" class="btn btn-info">Edit</a>' + '</td></tr>';
+					
+					
+					
+					
+					if (ts[i].marketplaceAsinMap.US !== undefined){
+					
+						var hasLifetimeSales = false;
+						//Determine if a design has ever sold
+						if(ts[i].daysUntilDeletion.length === 0 || parseInt(ts[i].daysUntilDeletion) > 90){
+							hasLifetimeSales = true;
+						}
+					
+						cp2 += '<tr data-lifetime-sales="'+ hasLifetimeSales.toString() + '"><th scope="row">' + k + '</th>' + 
+							'<td><a href="/IndividualProductPage/?ASIN=' + ts[i].marketplaceAsinMap.US + '">' + ts[i].name + '</a></td>' + 
+								
+							'<td class="text-center">' +
+								ts[i].daysUntilDeletion + 
+							'</td>' +
+							
+							'<td class="text-center">' +
+								'<a target="_blank" href="https://www.amazon.com/dp/' + ts[i].marketplaceAsinMap.US + '" class="btn btn-info">Preview</a>' +
+							'</td>' +
+							
+							'<td class="text-center">' +
+								  '<input type="text" name="nicheName" class="niche-input"/>' +
+								  '<input type="hidden" name="parentASIN" value='+ ts[i].marketplaceAsinMap.US + '>' +
+								  '<input type="submit" value="Save" class="btn btn-info save"/>' +
+							'</td>' +
+							'<td class="text-center">' + ts[i].listPrice + '</td>' +
+							'<td class="text-center">' + '<a target="_blank" href="http://merch.amazon.com/merch-tshirt/title-setup/' + ts[i].id + '/add_details" class="btn btn-info">Edit</a>' + '</td></tr>';
+					}
                 }
                 cp2 += '</tbody></table>';
                 document.getElementById("shirtlist")
@@ -1322,11 +1334,28 @@ function qe() {
 }
 
 
+function individualProductPage(queryParams){
+	document.head.innerHTML = '<head><style></style></head><script src="jquery.js"></script>'
+				+ "<script src='tablesort.min.js'></script>"
+				+ "<script src='tablesort.number.js'></script>";
+				
 
-function logincheck(cmd) {
+	bodyHTML = '<body ><br><div class="container"><br><div class="panel panel-default">';
+	bodyHTML += '<div class="alert alert-success"><strong>' 
+			+  'Product ASIN= ' + queryParams["ASIN"] 
+			+ '</strong>';
+	bodyHTML += '</div><div class="panel-body" id="shirtlist"></div></div></div></body>';
+	
+    document.body.innerHTML = bodyHTML;
+    document.title = "Individual Product Page";
+    document.body.style.backgroundColor = "#ecf1f2";  //"#D1F8CC";
+	
+}
 
-//Disappointed but not surprised :)
 
+
+function logincheck(cmd, queryParams = null) {
+	//Disappointed but not surprised :)
     var sls = 'https://merch.amazon.com/accountSummary';
     var reqs = new XMLHttpRequest();
     reqs.open("GET", sls, true);
@@ -1383,6 +1412,9 @@ function logincheck(cmd) {
                         case "qe":
                             qe();
                             break;
+						case "individualProductPage":
+                            individualProductPage(queryParams);
+                            break;
                     };
                 };
             };
@@ -1394,9 +1426,27 @@ function logincheck(cmd) {
 
 };
 
+//Get Base Path
+var cmd = window.location.href.split('?')[0];
+
+// Get Query Params
+var queryString = window.location.search.substring(1);
+
+var parseQueryString = function( funcQueryString ) {
+    var params = {}, queries, temp, i, l;
+    // Split into key/value pairs
+    queries = funcQueryString.split("&");
+    // Convert the array of strings into an object
+    for ( i = 0, l = queries.length; i < l; i++ ) {
+        temp = queries[i].split('=');
+        params[temp[0]] = temp[1];
+    }
+    return params;
+};
+parsedParams = parseQueryString(queryString);
+//End Parsing Query Params
 
 
-var cmd = window.location.href;
 if (cmd.indexOf("MerchToolsShirtsLister") !== -1) {
     logincheck("shirts");
 };
@@ -1423,6 +1473,13 @@ if (cmd.indexOf("MerchToolsAllASINs") !== -1) {
 if (cmd.indexOf("MerchToolsEditor") !== -1) {
     logincheck("qe");
 };
+
+if (cmd.indexOf("IndividualProductPage") !== -1 && parsedParams) {
+    logincheck("individualProductPage", parsedParams);
+};
+
+
+
 
 /**************** Niche Storage ****************/
 function saveShirtNiche(nicheName, parentASIN) {		
