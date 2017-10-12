@@ -16,11 +16,16 @@ function allmonthssales(info, tab) {
 	chrome.tabs.create({ url: l2 });
 };
 
-
 function quickeditor(info, tab) {
 	l2 = "https://merch.amazon.com/MerchToolsEditor";
 	chrome.tabs.create({ url: l2 });
 };
+
+function settings(info, tab) {
+	l2 = "https://merch.amazon.com/MerchAnalyticsSettings";
+	chrome.tabs.create({ url: l2 });
+};
+
 	
 chrome.contextMenus.create({
 	"title": "Sales: Today", contexts:["browser_action"], onclick: function(info, tab) { 
@@ -46,6 +51,11 @@ chrome.contextMenus.create({
 	}
 });
 
+chrome.contextMenus.create({
+	"title":  "Settings", contexts:["browser_action"], onclick: function(info, tab) { 
+		settings(); 
+	}
+});
 /*		
 var b0p = chrome.contextMenus.create({
 	"title": "Other Tools" , contexts:["browser_action"], onclick: function(info, tab) { 

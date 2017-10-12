@@ -15,6 +15,7 @@ var sidebarHTML = '<nav id="sidebar">' +
 							'<li><a href="/MerchToolsTwoWeeksSales">14 Day Sales</a></li>' +
 							'<li><a href="/MerchToolsAllMonthsSales">Monthly Sales</a></li>' +
 							'<li><a href="/MerchToolsEditor">Manage Products</a></li>' +
+							'<li><a href="/MerchAnalyticsSettings">Settings</a></li>' +
 							/*'<li>' +
 								'<a href="#subMenu" data-toggle="collapse" aria-expanded="false">Other Tools</a>' +
 								'<ul class="collapse list-unstyled" id="subMenu">' +
@@ -33,7 +34,6 @@ function monthDiff(d1, d2) {
     months += d2.getMonth();
     return months <= 0 ? 0 : months;
 }
-
 
 function when(t) { //Converts Unix timestamp to human
     var dateVal = "/Date(" + t.toString() + ")/";
@@ -97,7 +97,6 @@ Date.prototype.adjustMonth = function(months) {
     }
     return date;
 };
-
 
 Date.prototype.getFirstDateOfMonth = function() {
     var date = new Date(this.getTime());
@@ -718,7 +717,7 @@ function twoweekssales(number) {
 function merchmonths(count, m, salesData, cancelData, returnData, rev, roy, chlabel, ts) {
     if (count >= 0) {
         var today = new Date().setTimeZone();
-      today.setUTCHours(7,0,0,0) ; 
+		today.setUTCHours(7,0,0,0) ; 
         var thatMonth = today.adjustMonth(-count);
         startDate = thatMonth.getFirstDateOfMonth();
         endDate = thatMonth.getLastDayOfMonth();
@@ -928,7 +927,7 @@ function merchmonthsall() {
     merchmonths(iio, iio, salesData, cancelData, returnData, rev, roy, chlabel);
 };
 
-function qe() {
+function productManager() {
     document.head.innerHTML = globalHeader;
 				
 	bodyHTML = '<body>' + 
@@ -1020,11 +1019,38 @@ function qe() {
 
 }
 
+function settingsPage (e) {
+   (e || window.event).preventDefault();
+   
+   document.head.innerHTML = globalHeader;
+   document.body.innerHTML = '<body>'+
+							'<div class="wrapper">' +
+							'</div>' +
+							'</body>';
+   
+   var pageContent = document.querySelector(".wrapper");
+	pageContent.innerHTML += sidebarHTML;
+   
+   
+   var con = document.querySelector('.wrapper')
+   ,   xhr = new XMLHttpRequest();
+
+   xhr.onreadystatechange = function (e) { 
+    if (xhr.readyState == 4 && xhr.status == 200) {
+     con.innerHTML += xhr.responseText;
+    }
+   }
+
+	xhr.open("GET", chrome.extension.getURL('options.html'), true);
+	xhr.setRequestHeader('Content-type', 'text/html');
+	xhr.send();
+}
+
+
 
 function individualProductPage(queryParams){
 	document.head.innerHTML = globalHeader;
 				
-
 	bodyHTML = '<body>' + 
 					'<div class="wrapper">' + 
 						'<div class="container"><br><div class="panel panel-default">' +
@@ -1243,7 +1269,6 @@ function logincheck(cmd, queryParams = null) {
 
 
                 } else {
-
                     switch (cmd) {
                         case "twoweekssales":
                             twoweekssales(14);
@@ -1254,11 +1279,14 @@ function logincheck(cmd, queryParams = null) {
                         case "merchall":
                             merchmonthsall();
                             break;
-                        case "qe":
-                            qe();
+                        case "productManager":
+                            productManager();
                             break;
 						case "individualProductPage":
                             individualProductPage(queryParams);
+                            break;
+						case "settings":
+                            settingsPage();
                             break;
                     };
                 };
@@ -1306,13 +1334,16 @@ if (cmd.indexOf("MerchToolsAllMonthsSales") !== -1) {
 };
 
 if (cmd.indexOf("MerchToolsEditor") !== -1) {
-    logincheck("qe");
+    logincheck("productManager");
 };
 
 if (cmd.indexOf("IndividualProductPage") !== -1 && parsedParams) {
     logincheck("individualProductPage", parsedParams);
 };
 
+if (cmd.indexOf("MerchAnalyticsSettings") !== -1) {
+    logincheck("settings");
+};
 
 
 

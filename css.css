@@ -64,7 +64,7 @@ a, a:hover, a:focus {
 
 #sidebar ul.components {
     padding: 20px 0;
-    border-bottom: 1px solid #adadad;
+    border-top: 1px solid #adadad;
 }
 
 #sidebar ul p {
