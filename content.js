@@ -15,12 +15,13 @@ var sidebarHTML = '<nav id="sidebar">' +
 							'<li><a href="/MerchToolsTwoWeeksSales">14 Day Sales</a></li>' +
 							'<li><a href="/MerchToolsAllMonthsSales">Monthly Sales</a></li>' +
 							'<li><a href="/MerchToolsEditor">Manage Products</a></li>' +
-							'<li>' +
+							/*'<li>' +
 								'<a href="#subMenu" data-toggle="collapse" aria-expanded="false">Other Tools</a>' +
 								'<ul class="collapse list-unstyled" id="subMenu">' +
 									'<li><a href="/MerchToolsAllASINs">Live ASINs</a></li>' +
 								'</ul>' +
 							'</li>' +
+							*/
 						'</ul>' +
 				'</nav>' +
 				'<script src="navscript.js"></script>';
@@ -130,113 +131,6 @@ Date.prototype.setUTC = function(reset) {
         new Date(Date.UTC(this.getFullYear(), this.getMonth(), this.getDate(), this.getHours(), this.getMinutes(), this.getSeconds(), this.getMilliseconds()));
 };
 /*** End Date Library */
-
-
-
-function todayssales() {
-    document.head.innerHTML = globalHeader;
-			
-    var d = new Date();
-    n = d.toString();
-    document.body.innerHTML = '<body>' +
-									'<div class="wrapper">' + 
-										'<div class="container">' + 
-											'<div class="panel panel-default">' + 
-												'<div class="panel-body" id="todaystats">Loading..' + 
-												'</div>'+
-											'</div>' + 
-											'<div class="panel panel-default">' + 
-												'<div class="panel-body" id="shirtlist">' + 
-												'</div>' + 
-											'</div>'+
-										'</div>'+
-									'</div>'+
-								'</body>';
-	var pageContent = document.querySelector(".wrapper");
-	pageContent.innerHTML += sidebarHTML;
-	
-    document.title = "Today's Sales - MerchTools ";
-    document.body.style.backgroundColor = "#ecf1f2";
-
-    tot = 0;
-    var today = new Date().setTimeZone();
-	today.setUTCHours(7,0,0,0) ; 
-    var sls = 'https://merch.amazon.com/salesAnalyticsRecord/all?fromDate=' + today.getTime() + '&toDate=' + today.getTime();
-    //var sls= 'https://merch.amazon.com/salesAnalyticsRecord/all?fromDate=1461999600000&toDate=1467270000000';
-    var reqs = new XMLHttpRequest();
-    reqs.open("GET", sls, true);
-    reqs.onreadystatechange = function() {
-        if (reqs.readyState == 4) {
-            if ([200, 201, 202, 203, 204, 205, 206, 207, 226].indexOf(reqs.status) === -1) {
-
-            } else {
-
-
-                var tots = 0;
-                var totr = 0;
-                var totc = 0;
-                var totrev = 0;
-                var totroy = 0;
-                var ts = JSON.parse(reqs.responseText);
-
-                for (i = 0; i < ts.length; i++) {
-
-                    if (ts[i].isParentAsin == true) {
-                        tots += parseInt(ts[i].unitsSold);
-                        totr += parseInt(ts[i].unitsReturned);
-                        totc += parseInt(ts[i].unitsCancelled);
-                        totrev += parseFloat(parseFloat(ts[i].revenueValue)
-                            .toFixed(2));
-                        totroy += parseFloat(parseFloat(ts[i].royaltyValue)
-                            .toFixed(2));
-                    };
-                };
-
-
-                document.getElementById("todaystats")
-                    .innerHTML = '<table class="table table-striped"><thead><tr><th class="text-center">Shirts Sold</th><th class="text-center">Shirts Cancelled</th><th class="text-center">Revenue</th><th class="text-center">Royalties</th></tr></thead><tbody>' +
-                    '<tr class="success text-center"><td><b>' + tots + '</b></td><td><b>' + totc + '</b></td><td><b>' + totrev.toFixed(2) + '</b></td><td><b>' + totroy.toFixed(2) + '</b></td></tr></tbody></table><br><button type="button" class="btn btn-success btn-block" id="refbutton">REFRESH</button>';
-
-                var cp2 = '<h2>Shirts Sold:</h2><br>' +
-                    '<table class="table table-striped" id="shirtsSoldToday"><thead><tr><th>#</th><th>Shirt Name</th><th class="text-center">Listing page</th><th class="text-center">Units Sold</th><th class="text-center">Units Cancelled</th><th class="text-center">Revenue</th><th class="text-center">Royalties</th><th class="text-center">Edit Shirt</th></tr></thead><tbody>';
-
-                k = 0;
-
-                for (var i = 0; i < ts.length; i++) {
-                    if (ts[i].isParentAsin) {
-                        k++;
-                        cp2 += '<tr><th scope="row">' + k + '</th><td>' + ts[i].asinName + '</td><td class="text-center">' +
-                            '<a target="_blank" href="https://www.amazon.com/dp/' + ts[i].id + '" class="btn btn-info">Preview</a>' +
-                            '<td class="text-center">' + ts[i].unitsSold + '</td>' +
-                            '<td class="text-center">' + ts[i].unitsCancelled + '</td>' +
-                            '<td class="text-center">$' + ts[i].revenueValue + '</td>' +
-                            '<td class="text-center">$' + ts[i].royaltyValue + '</td>' +
-                            '<td class="text-center">' + '<a target="_blank" href="http://merch.amazon.com/merch-tshirt/title-setup/' + ts[i].merchandiseId + '/add_details" class="btn btn-info">Edit</a>' + '</td></tr>';
-                    };
-
-                }
-                cp2 += '</tbody></table>';
-
-                document.getElementById("shirtlist")
-                    .innerHTML = cp2;
-                
-				new Tablesort(document.getElementById('shirtsSoldToday'));
-				
-				
-				$('#refbutton')
-                    .on('click', function(e) {
-                        location.reload();
-                    })
-
-            };
-
-        };
-    };
-
-    reqs.send();
-}
-
-
 
 
 function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlabel, ts, gendersArray, sizesArray, shirtColorsArray, nicheArray, specificASIN = null) {
@@ -751,7 +645,6 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
 
 
 function twoweekssales(number) {
-
     document.head.innerHTML = globalHeader;
 			
 			
@@ -1003,7 +896,6 @@ function merchmonths(count, m, salesData, cancelData, returnData, rev, roy, chla
 }
 
 function merchmonthsall() {
-
     document.head.innerHTML = globalHeader;
     var d = new Date();
     n = d.toString();
@@ -1034,76 +926,7 @@ function merchmonthsall() {
         new Date()
     );
     merchmonths(iio, iio, salesData, cancelData, returnData, rev, roy, chlabel);
-
-
 };
-
-
-
-
-function querryasins(myasins, p, l) {
-
-    if (l != "null") {
-
-        var mange1 = 'https://merch.amazon.com/merchandise/list?pageSize=100&pageNumber=' + p + '&statusFilters%5B%5D=LIVE&keywords=';
-        var req1 = new XMLHttpRequest();
-        req1.open("GET", mange1, true);
-        req1.onreadystatechange = function() {
-            if (req1.readyState == 4) {
-                if ([200, 201, 202, 203, 204, 205, 206, 207, 226].indexOf(req1.status) === -1) {
-                    logincheck("merchallasins");
-                } else {
-                    var t1 = JSON.parse(req1.responseText);
-                    az = t1.merchandiseList.length;
-                    document.getElementById("status")
-                        .innerHTML = "<b>" + t1.totalMerchandiseCount + " Live ASINs Found.</b>"
-                    for (i = 0; i < az; i++) {
-                        myasins.push(t1.merchandiseList[i].marketplaceAsinMap.US);
-                    };
-                    p += 1;
-                    l = t1.nextPageCursor;
-                    querryasins(myasins, p, l);
-
-                }
-            }
-        }
-        req1.send();
-
-    } else {
-
-        for (var i = 0; i < myasins.length; i++) {
-            document.getElementById("asintxt")
-                .value += myasins[i] + '\n';
-        }
-    }
-
-};
-
-
-
-function showallsins() {
-    document.head.innerHTML = globalHeader;
-    document.body.innerHTML = '<body>' + 
-									'<div class="wrapper">' +
-										'<div class="container"><div class="panel panel-default"></center><div class="panel-body" id="status"><center><h3>Loading..</h3></center></div></div>' +
-										' <div class="panel panel-default">    <div class="panel-heading">Live ASINs</div>    <div class="panel-body"><div class="form-group"><br><textarea class="form-control" rows="20" id="asintxt" onclick="this.select()"></textarea> </div></div> </div>' +
-									'</div>' +
-							'<br></div></body>';
-    document.title = "All ASINs - MerchTools ";
-    document.body.style.backgroundColor = "#ecf1f2";
-	
-	
-	var pageContent = document.querySelector(".wrapper");
-	pageContent.innerHTML += sidebarHTML;
-
-    myasins = [];
-    p = 1;
-    l = "notnull";
-    querryasins(myasins, p, l);
-
-};
-
-
 
 function qe() {
     document.head.innerHTML = globalHeader;
@@ -1426,13 +1249,10 @@ function logincheck(cmd, queryParams = null) {
                             twoweekssales(14);
                             break;
                         case "todaysales":
-                            todayssales();
+                            twoweekssales(0);
                             break;
                         case "merchall":
                             merchmonthsall();
-                            break;
-                        case "merchallasins":
-                            showallsins();
                             break;
                         case "qe":
                             qe();
@@ -1484,12 +1304,6 @@ if (cmd.indexOf("MerchToolsTwoWeeksSales") !== -1) {
 if (cmd.indexOf("MerchToolsAllMonthsSales") !== -1) {
     logincheck("merchall");
 };
-
-
-if (cmd.indexOf("MerchToolsAllASINs") !== -1) {
-    logincheck("merchallasins");
-};
-
 
 if (cmd.indexOf("MerchToolsEditor") !== -1) {
     logincheck("qe");

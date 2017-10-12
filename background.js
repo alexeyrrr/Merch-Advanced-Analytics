@@ -21,13 +21,6 @@ function quickeditor(info, tab) {
 	l2 = "https://merch.amazon.com/MerchToolsEditor";
 	chrome.tabs.create({ url: l2 });
 };
-
-
-function showasins(info, tab) {
-	l2 = "https://merch.amazon.com/MerchToolsAllASINs";
-	chrome.tabs.create({ url: l2 });
-};
-
 	
 chrome.contextMenus.create({
 	"title": "Sales: Today", contexts:["browser_action"], onclick: function(info, tab) { 
@@ -53,7 +46,7 @@ chrome.contextMenus.create({
 	}
 });
 
-		
+/*		
 var b0p = chrome.contextMenus.create({
 	"title": "Other Tools" , contexts:["browser_action"], onclick: function(info, tab) { 
 	}
@@ -63,6 +56,7 @@ chrome.contextMenus.create({"title":  "Live ASINs", contexts:["browser_action"],
 	showasins(); 
 }
 });
+*/
 
 
 var option = {
