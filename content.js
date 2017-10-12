@@ -1,5 +1,24 @@
-var header = '<!DOCTYPE html><html><head>' + '<style>div.img {    background-color: lightblue;  border: 1px solid #ccc;}div.img:hover {    border: 1px solid #777;}div.img img {    width: 100%;    height: auto;}div.desc {    padding: 15px;    text-align: left;}* {    box-sizing: border-box;}.responsive {    padding: 0 6px;    float: left;    width: 24.99999%;}@media only screen and (max-width: 700px){    .responsive {        width: 49.99999%;        margin: 6px 0;    }}@media only screen and (max-width: 500px){    .responsive {        width: 100%;    }}.clearfix:after {    content: "";    display: table;    clear: both;}</style>' + '</head><body margin: 100px 150px 100px 80px;>';
-var footer = '</div></body></html>';
+var sidebarHTML = '<nav id="sidebar">' +
+						'<div class="sidebar-header">' +
+							'<h3>Merch Analytics</div>' +
+						'</div>' +
+
+						'<ul class="list-unstyled components">' +
+							'<li class="active"><a href="#">Home</a></li>' +
+							'<li><a href="#">About</a></li>' +
+							'<li>' +
+								'<a href="#homeSubmenu" data-toggle="collapse" aria-expanded="false">Pages</a>' +
+								'<ul class="collapse list-unstyled" id="homeSubmenu">' +
+									'<li><a href="#">Page</a></li>' +
+									'<li><a href="#">Page</a></li>' +
+									'<li><a href="#">Page</a></li>' +
+								'</ul>' +
+							'<li><a href="#">Portfolio</a></li>' +
+							'<li><a href="#">Contact</a></li>' +
+						'</ul>' +
+				+	'</nav>';
+
+
 
 
 function when(t) { //Converts Unix timestamp to human
@@ -102,13 +121,36 @@ Date.prototype.setUTC = function(reset) {
 
 
 function todayssales() {
-    document.head.innerHTML = '<head><style></style></head>'
-				+ "<script src='tablesort.min.js'></script>"
-			+ "<script src='tablesort.number.js'></script>";
+    document.head.innerHTML = '<head><style></style></head>' + 
+								"<script src='tablesort.min.js'></script>" + 
+								"<script src='tablesort.number.js'></script>" +
+								'<script src="https://code.jquery.com/jquery-1.12.0.min.js"></script>' +    
+								'<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>';
 			
     var d = new Date();
     n = d.toString();
-    document.body.innerHTML = '<body ><br><div class="container"><div class="panel panel-default"><br><div class="panel-body" id="todaystats">Loading..</div></div><br><div class="panel panel-default"><div class="panel-body" id="shirtlist"></div></div></div></body>';
+    document.body.innerHTML = '<body>' +
+									'<div class="wrapper">' + 
+										'<div class="container">' + 
+											'<div class="panel panel-default">' + 
+												'<div class="panel-body" id="todaystats">Loading..' + 
+												'</div>'+
+											'</div>' + 
+											'<div class="panel panel-default">' + 
+												'<div class="panel-body" id="shirtlist">' + 
+												'</div>' + 
+											'</div>'+
+										'</div>'+
+									'</div>'+
+								'</body>';
+	var pageContent = document.querySelector(".wrapper");
+	pageContent.innerHTML += sidebarHTML;
+	
+	console.log(sidebarHTML);
+								
+								
+								
+								
     document.title = "Today's Sales - MerchTools ";
     document.body.style.backgroundColor = "#ecf1f2";
 
