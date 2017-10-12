@@ -125,21 +125,21 @@ div.desc {
 }
 
 .tc-chart-js-legend {
-  list-style-type: none;
-  padding-left: 0px;
+	list-style-type: none;
+	padding-left: 0px;
 }
 .tc-chart-js-legend li {
-  display: block;
-  float: left;
-  clear:both;
-  padding:10px;
+	display: block;
+	float: left;
+	clear:both;
+	padding:10px;
 }
 .tc-chart-js-legend li span {
-  width:25px;
-  height:25px;
-  display:block;
-  float:left;
-  margin-right:10px;
+	width:25px;
+	height:25px;
+	display:block;
+	float:left;
+	margin-right:10px;
 }
 
 .canvas-wrapper{
@@ -163,8 +163,12 @@ div.desc {
     margin: 4px;
 }
 
-table th{
+table th, table tr{
 	cursor: pointer;
+}
+
+table tbody > tr:hover{
+	background: #d0d0d0 !important;
 }
 
 table th:not(.no-sort):hover:after {

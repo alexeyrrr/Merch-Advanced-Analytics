@@ -589,15 +589,19 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
 									}
 									
 									
-									cp2 += '<tr><th scope="row">' + k + '</th>' 
-										+ '<td><a href="/IndividualProductPage/?ASIN=' + ts[i].id + '">' + ts[i].asinName + '</a></td><td class="text-center">' +
-										'<a target="_blank" href="https://www.amazon.com/dp/' + ts[i].id + '" class="btn btn-info">Preview</a>' +
+									cp2 += '<tr data-href="' + '/IndividualProductPage/?ASIN=' + ts[i].id + '">'  +
+										'<th scope="row">' + k + '</th>'  +
+										'<td>' + ts[i].asinName + '</td>' + 
+										'<td class="text-center">' +
+											'<a target="_blank" href="https://www.amazon.com/dp/' + ts[i].id + '" class="btn btn-info">Preview</a>' +
+										'</td>' +
 										'<td class="text-center">' + ts[i].unitsSold + '</td>' +
 										'<td class="text-center">' + ts[i].unitsCancelled + '</td>' +
 										'<td class="text-center">$' + ts[i].revenueValue + '</td>' +
 										'<td class="text-center">$' + ts[i].royaltyValue + '</td>' +
 										'<td class="text-center">$' + avgSaleValue + '</td>' +
-										'<td class="text-center">' + '<a target="_blank" href="http://merch.amazon.com/merch-tshirt/title-setup/' + ts[i].merchandiseId + '/add_details" class="btn btn-info">Edit</a>' + '</td></tr>';
+										'<td class="text-center">' + '<a target="_blank" href="http://merch.amazon.com/merch-tshirt/title-setup/' + ts[i].merchandiseId + '/add_details" class="btn btn-info">Edit</a>' + '</td>' +
+										'</tr>';
 								}else if (ts[i].isParentAsin == false) {
 									/*
 									//Diplays shirts color, size and gender below each one.
@@ -623,6 +627,14 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
 								
 							new Tablesort(document.getElementById('shirtListTable'));
 
+							//Make Entire Row Clickable
+							$(function(){
+								$('#shirtListTable tbody > tr[data-href!=""]').click(function() {
+									window.location = $(this).data("href");
+								});
+							});
+								
+								
 								
 						};
 
@@ -1053,11 +1065,13 @@ function individualProductPage(queryParams){
 				
 	bodyHTML = '<body>' + 
 					'<div class="wrapper">' + 
-						'<div class="container"><br><div class="panel panel-default">' +
-							'<div class="alert alert-success">' + 
-								'<strong>' + 'Product ASIN= ' + queryParams["ASIN"] + '</strong>' +
+						'<div class="container">' +
+							'<div class="panel panel-default">' +
+								'<div class="alert alert-success">' + 
+									'<strong>' + 'Product ASIN= ' + queryParams["ASIN"] + '</strong>' +
+								'</div>'+
+								'<div class="panel-body" id="individualShirtSales"></div>' +
 							'</div>'+
-							'<div class="panel-body" id="individualShirtSales"></div>' +
 							' <div class="panel panel-default" id="salesPanel">    <div class="panel-heading">Sales/Cancellations</div>    <div class="panel-body"><center><canvas id="canvas1" height="450" width="800" ></canvas></center></div> </div>' +
 							' <div class="panel panel-default" id="revenuePanel">    <div class="panel-heading">Revenue/Royalties</div>    <div class="panel-body"><center><canvas id="canvas2" height="450" width="800" ></canvas></center></div> </div>' +
 							'<div class="panel panel-default"><div class="panel-heading">Shirts Sold</div> <div class="panel-body" id="shirtlist"></div></div>' +
@@ -1122,7 +1136,7 @@ function fetchSalesDataCSV(queryParams){
 				console.log(infoAboutTargetASIN);
 				
 				
-                var cp2 = '<h2>Live Listings:</h2><br>' +
+                var cp2 = '<h2>Product Info:</h2><br>' +
 					'<div id="status"></div>' +
                     '<table class="table table-striped"><thead><tr><th>#</th>'
 					+ '<th>Date Sold</th>'
