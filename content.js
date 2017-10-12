@@ -1364,9 +1364,6 @@ function logincheck(cmd, queryParams = null) {
                 } else {
 
                     switch (cmd) {
-                        case "shirts":
-                            shirtlister();
-                            break;
                         case "twoweekssales":
                             twoweekssales(14);
                             break;
@@ -1416,10 +1413,6 @@ var parseQueryString = function( funcQueryString ) {
 parsedParams = parseQueryString(queryString);
 //End Parsing Query Params
 
-
-if (cmd.indexOf("MerchToolsShirtsLister") !== -1) {
-    logincheck("shirts");
-};
 
 if (cmd.indexOf("MerchToolsTodaySales") !== -1) {
     logincheck("todaysales");
