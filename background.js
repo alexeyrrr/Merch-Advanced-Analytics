@@ -1,25 +1,4 @@
 /*Created by Alexey Rom, Based on MerchTool by HandyTools */
-
-function gtmerchdbrd(selectedText) {
-	var webpagecall = 'https://merch.amazon.com/dashboard/' ;
-	chrome.tabs.create({url: webpagecall});
-}
-
-function gtcreat(selectedText) {
-	var webpagecall = 'https://merch.amazon.com/merch-tshirt/title-setup/new/upload_art' ;
-	chrome.tabs.create({url: webpagecall});
-}
-
-function gtmanage(selectedText) {
-	var webpagecall = 'https://merch.amazon.com/manage' ;
-	chrome.tabs.create({url: webpagecall});
-}
-
-function gtanalyze(selectedText) {
-	 var webpagecall = 'https://merch.amazon.com/analyze' ;
-	 chrome.tabs.create({url: webpagecall});
-}
-
 function gotodaysales(info, tab) {
 	l2 = "https://merch.amazon.com/MerchToolsTodaySales";
 	chrome.tabs.create({ url: l2 });
@@ -68,15 +47,15 @@ chrome.contextMenus.create({
 	}
 });
 
-		
-var b0p = chrome.contextMenus.create({
-	"title": "Other Tools" , contexts:["browser_action"], onclick: function(info, tab) { 
+chrome.contextMenus.create({
+	"title":  "Quick Editor", contexts:["browser_action"], onclick: function(info, tab) { 
+		quickeditor(); 
 	}
 });
 
-chrome.contextMenus.create({
-	"title":  "Quick Editor", contexts:["browser_action"], "parentId": b0p , onclick: function(info, tab) { 
-		quickeditor(); 
+		
+var b0p = chrome.contextMenus.create({
+	"title": "Other Tools" , contexts:["browser_action"], onclick: function(info, tab) { 
 	}
 });
 
@@ -84,32 +63,6 @@ chrome.contextMenus.create({"title":  "Live ASINs", contexts:["browser_action"],
 	showasins(); 
 }
 });
-
-
-
-
-/* Links to Merch Dashboard removing for now.
-var b1p = chrome.contextMenus.create({
-			"title": "Merch Dashboard" , contexts:["browser_action"], onclick: function(info, tab) { 
-				gtmerchdbrd(); 
-			}
-		});
-		chrome.contextMenus.create({
-			"title": "Create", contexts:["browser_action"], "parentId": b1p , onclick: function(info, tab){ 
-				gtcreat(); 
-			}
-		});
-		chrome.contextMenus.create({
-			"title": "Manage", contexts:["browser_action"], "parentId": b1p , onclick: function(info, tab) { 
-				gtmanage(); 
-			}
-		});
-		chrome.contextMenus.create({
-			"title": "Analyse", contexts:["browser_action"], "parentId": b1p , onclick: function(info, tab) { 
-				gtanalyze(); 
-			}
-		});
-*/
 
 
 var option = {

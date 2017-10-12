@@ -1,24 +1,37 @@
+var globalHeader = '<head><style></style></head>' + 
+					"<script src='tablesort.min.js'></script>" + 
+					"<script src='tablesort.number.js'></script>" +
+					'<script src="https://code.jquery.com/jquery-1.12.0.min.js"></script>' +    
+					'<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>';
+
+
 var sidebarHTML = '<nav id="sidebar">' +
 						'<div class="sidebar-header">' +
 							'<h3>Merch Analytics</div>' +
 						'</div>' +
 
 						'<ul class="list-unstyled components">' +
-							'<li class="active"><a href="#">Home</a></li>' +
-							'<li><a href="#">About</a></li>' +
+							'<li><a href="/MerchToolsTodaySales">Today\'s Sales</a></li>' +
+							'<li><a href="/MerchToolsTwoWeeksSales">14 Day Sales</a></li>' +
+							'<li><a href="/MerchToolsAllMonthsSales">Monthly Sales</a></li>' +
+							'<li><a href="/MerchToolsEditor">Manage Products</a></li>' +
 							'<li>' +
-								'<a href="#homeSubmenu" data-toggle="collapse" aria-expanded="false">Pages</a>' +
-								'<ul class="collapse list-unstyled" id="homeSubmenu">' +
-									'<li><a href="#">Page</a></li>' +
-									'<li><a href="#">Page</a></li>' +
-									'<li><a href="#">Page</a></li>' +
+								'<a href="#subMenu" data-toggle="collapse" aria-expanded="false">Other Tools</a>' +
+								'<ul class="collapse list-unstyled" id="subMenu">' +
+									'<li><a href="/MerchToolsAllASINs">Live ASINs</a></li>' +
 								'</ul>' +
-							'<li><a href="#">Portfolio</a></li>' +
-							'<li><a href="#">Contact</a></li>' +
+							'</li>' +
 						'</ul>' +
-				+	'</nav>';
-
-
+				'</nav>' +
+				'<script src="navscript.js"></script>';
+				
+function monthDiff(d1, d2) {
+    var months;
+    months = (d2.getFullYear() - d1.getFullYear()) * 12;
+    months -= d1.getMonth() + 1;
+    months += d2.getMonth();
+    return months <= 0 ? 0 : months;
+}
 
 
 function when(t) { //Converts Unix timestamp to human
@@ -121,11 +134,7 @@ Date.prototype.setUTC = function(reset) {
 
 
 function todayssales() {
-    document.head.innerHTML = '<head><style></style></head>' + 
-								"<script src='tablesort.min.js'></script>" + 
-								"<script src='tablesort.number.js'></script>" +
-								'<script src="https://code.jquery.com/jquery-1.12.0.min.js"></script>' +    
-								'<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>';
+    document.head.innerHTML = globalHeader;
 			
     var d = new Date();
     n = d.toString();
@@ -146,11 +155,6 @@ function todayssales() {
 	var pageContent = document.querySelector(".wrapper");
 	pageContent.innerHTML += sidebarHTML;
 	
-	console.log(sidebarHTML);
-								
-								
-								
-								
     document.title = "Today's Sales - MerchTools ";
     document.body.style.backgroundColor = "#ecf1f2";
 
@@ -748,51 +752,54 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
 
 function twoweekssales(number) {
 
-    document.head.innerHTML = "<head><style></style></head>"
-			+ "<script src='tablesort.min.js'></script>"
-			+ "<script src='tablesort.number.js'></script>";
+    document.head.innerHTML = globalHeader;
 			
 			
 	var style = document.createElement('link');
 	style.rel = 'stylesheet';
 	style.type = 'text/css';
 	style.href = chrome.extension.getURL('css.css');
-	//(document.head||document.documentElement).appendChild(style);
 
 
-			
     var d = new Date();
     n = d.toString();
-    document.body.innerHTML = '<body ><br><br><div class="container"><div class="panel panel-default"></center><div class="panel-body" id="twoweeksstats"><center><h3>Loading..</h3></center></div></div>' +
-        ' <div class="panel panel-default" id="salesPanel">    <div class="panel-heading">Sales/Cancellations</div>    <div class="panel-body"><center><canvas id="canvas1" height="450" width="800" ></canvas></center></div> </div>' +
-        ' <div class="panel panel-default" id="revenuePanel">    <div class="panel-heading">Revenue/Royalties</div>    <div class="panel-body"><center><canvas id="canvas2" height="450" width="800" ></canvas></center></div> </div>' +
-		' <div class="panel panel-default">    <div class="panel-heading">Advanced Analytics</div>    <div class="panel-body">'+
-		'<center>' +
-			'<div class="canvas-wrapper">' +
-				'<canvas id="canvas3" height="350" width="280" style="padding:10px"></canvas>' +
-				'<h3 class="canvas-title">Gender Distribution</h3>' +
-			'</div>' +
-			'<div class="canvas-wrapper">'+
-				'<canvas id="canvas4" height="350" width="280" style="padding:10px"></canvas>' +
-				'<h3 class="canvas-title">Size Distribution</h3>' +
-			'</div>'+
-			'<div class="canvas-wrapper">'+
-				'<canvas id="canvas5" height="350" width="280" style="padding:10px"></canvas>'+
-				'<h3 class="canvas-title">Color Distribution</h3>' +
-			'</div>' +
-			'</div> </div>' +
-		'</center>' +
-		' <div class="panel panel-default" id="nichePanel">    <div class="panel-heading">Niche Analysis</div>    <div class="panel-body">'+
-			'<div class="col-xs-6">' +
-				'<center>' +
-					'<div class="canvas-wrapper" style="width: 100%;">'+
-						'<canvas id="canvas6" height="350" width="280" style="padding:10px"></canvas>'+
-						'<h3 class="canvas-title">Normalized Niche Distribution (%)</h3>' +
-					'</div>' +
-				'</center>' +
-			'</div>' +
-		'</div> </div>' +
-        '<br><div class="panel panel-default"><div class="panel-heading">Shirts Sold</div> <div class="panel-body" id="shirtlist"></div></div></div></body>';
+    document.body.innerHTML = '<body>' +
+				'<div class="wrapper">' +
+					'<div class="container"><div class="panel panel-default"></center><div class="panel-body" id="twoweeksstats"><center><h3>Loading..</h3></center></div></div>' +
+					' <div class="panel panel-default" id="salesPanel">    <div class="panel-heading">Sales/Cancellations</div>    <div class="panel-body"><center><canvas id="canvas1" height="450" width="800" ></canvas></center></div> </div>' +
+					' <div class="panel panel-default" id="revenuePanel">    <div class="panel-heading">Revenue/Royalties</div>    <div class="panel-body"><center><canvas id="canvas2" height="450" width="800" ></canvas></center></div> </div>' +
+					' <div class="panel panel-default">    <div class="panel-heading">Advanced Analytics</div>    <div class="panel-body">'+
+					'<center>' +
+						'<div class="canvas-wrapper">' +
+							'<canvas id="canvas3" height="350" width="280" style="padding:10px"></canvas>' +
+							'<h3 class="canvas-title">Gender Distribution</h3>' +
+						'</div>' +
+						'<div class="canvas-wrapper">'+
+							'<canvas id="canvas4" height="350" width="280" style="padding:10px"></canvas>' +
+							'<h3 class="canvas-title">Size Distribution</h3>' +
+						'</div>'+
+						'<div class="canvas-wrapper">'+
+							'<canvas id="canvas5" height="350" width="280" style="padding:10px"></canvas>'+
+							'<h3 class="canvas-title">Color Distribution</h3>' +
+						'</div>' +
+						'</div> </div>' +
+					'</center>' +
+					' <div class="panel panel-default" id="nichePanel">    <div class="panel-heading">Niche Analysis</div>    <div class="panel-body">'+
+						'<div class="col-xs-6">' +
+							'<center>' +
+								'<div class="canvas-wrapper" style="width: 100%;">'+
+									'<canvas id="canvas6" height="350" width="280" style="padding:10px"></canvas>'+
+									'<h3 class="canvas-title">Normalized Niche Distribution (%)</h3>' +
+								'</div>' +
+							'</center>' +
+						'</div>' +
+					'</div> </div>' +
+					'<br><div class="panel panel-default"><div class="panel-heading">Shirts Sold</div> <div class="panel-body" id="shirtlist"></div></div></div>' + 
+				'</div>' +
+			'</body>';
+			
+	var pageContent = document.querySelector(".wrapper");
+	pageContent.innerHTML += sidebarHTML;
 	
 	numberofDays = number; //Reset scope of var
 		
@@ -995,25 +1002,24 @@ function merchmonths(count, m, salesData, cancelData, returnData, rev, roy, chla
     };
 }
 
-
-
-function monthDiff(d1, d2) {
-    var months;
-    months = (d2.getFullYear() - d1.getFullYear()) * 12;
-    months -= d1.getMonth() + 1;
-    months += d2.getMonth();
-    return months <= 0 ? 0 : months;
-}
-
 function merchmonthsall() {
 
-    document.head.innerHTML = '<head><style></style></head>';
+    document.head.innerHTML = globalHeader;
     var d = new Date();
     n = d.toString();
-    document.body.innerHTML = '<body ><br><br><div class="container"><div class="panel panel-default"></center><div class="panel-body" id="twoweeksstats"><center><h3>Loading..</h3></center></div></div>' +
-        ' <div class="panel panel-default">    <div class="panel-heading">Sales/Cancellations</div>    <div class="panel-body"><center><canvas id="canvas1" height="450" width="800" ></canvas></center></div> </div>' +
-        ' <div class="panel panel-default">    <div class="panel-heading">Revenue/Royalties</div>    <div class="panel-body"><center><canvas id="canvas2" height="450" width="800" ></canvas></center></div> </div>' +
-        '<br></div></body>';
+    document.body.innerHTML = '<body>' + 
+									'<div class="wrapper">' +
+										'<div class="container"><div class="panel panel-default"></center><div class="panel-body" id="twoweeksstats"><center><h3>Loading..</h3></center></div></div>' +
+										' <div class="panel panel-default">    <div class="panel-heading">Sales/Cancellations</div>    <div class="panel-body"><center><canvas id="canvas1" height="450" width="800" ></canvas></center></div> </div>' +
+										' <div class="panel panel-default">    <div class="panel-heading">Revenue/Royalties</div>    <div class="panel-body"><center><canvas id="canvas2" height="450" width="800" ></canvas></center></div> </div>' +
+										'<br></div>' + 
+									'</div>' +
+								'</body>';
+		
+	var pageContent = document.querySelector(".wrapper");
+	pageContent.innerHTML += sidebarHTML;
+		
+
     document.title = "Merch Months - MerchTools ";
     document.body.style.backgroundColor = "#ecf1f2";
     salesData = [];
@@ -1076,13 +1082,19 @@ function querryasins(myasins, p, l) {
 
 
 function showallsins() {
-
-    document.head.innerHTML = '<head><style></style></head>';
-    document.body.innerHTML = '<body ><br><br><div class="container"><div class="panel panel-default"></center><div class="panel-body" id="status"><center><h3>Loading..</h3></center></div></div>' +
-        ' <div class="panel panel-default">    <div class="panel-heading">Live ASINs</div>    <div class="panel-body"><div class="form-group"><br><textarea class="form-control" rows="20" id="asintxt" onclick="this.select()"></textarea> </div></div> </div>' +
-        '<br></div></body>';
+    document.head.innerHTML = globalHeader;
+    document.body.innerHTML = '<body>' + 
+									'<div class="wrapper">' +
+										'<div class="container"><div class="panel panel-default"></center><div class="panel-body" id="status"><center><h3>Loading..</h3></center></div></div>' +
+										' <div class="panel panel-default">    <div class="panel-heading">Live ASINs</div>    <div class="panel-body"><div class="form-group"><br><textarea class="form-control" rows="20" id="asintxt" onclick="this.select()"></textarea> </div></div> </div>' +
+									'</div>' +
+							'<br></div></body>';
     document.title = "All ASINs - MerchTools ";
     document.body.style.backgroundColor = "#ecf1f2";
+	
+	
+	var pageContent = document.querySelector(".wrapper");
+	pageContent.innerHTML += sidebarHTML;
 
     myasins = [];
     p = 1;
@@ -1094,19 +1106,24 @@ function showallsins() {
 
 
 function qe() {
-    document.head.innerHTML = '<head><style></style></head><script src="jquery.js"></script>'
-				+ "<script src='tablesort.min.js'></script>"
-				+ "<script src='tablesort.number.js'></script>";
+    document.head.innerHTML = globalHeader;
 				
-
-	bodyHTML = '<body ><br><div class="container"><br><div class="panel panel-default">';
-	bodyHTML += '<div class="alert alert-success"><strong> Use  CTRL + F (PC) or ⌘ + F (MAC) to open the search bar.</strong>';
-	bodyHTML +=		'<div class="btn btn-info" id="reset-button">Clear All Niche Data</div>'
-	bodyHTML += '</div><div class="panel-body" id="shirtlist"></div></div></div></body>';
+	bodyHTML = '<body>' + 
+					'<div class="wrapper">' +
+						'<div class="container"><br><div class="panel panel-default">' +
+						'<div class="alert alert-success"><strong> Use  CTRL + F (PC) or ⌘ + F (MAC) to open the search bar.</strong>' +
+						'<div class="btn btn-info" id="reset-button">Clear All Niche Data</div>' +
+						'</div><div class="panel-body" id="shirtlist"></div></div></div>' + 
+					'</div>' +
+				'</body>';
 	
     document.body.innerHTML = bodyHTML;
     document.title = "Quick Editor  - MerchTools ";
     document.body.style.backgroundColor = "#ecf1f2";  //"#D1F8CC";
+	
+	var pageContent = document.querySelector(".wrapper");
+	pageContent.innerHTML += sidebarHTML;
+	
 
 
     var sls = 'https://merch.amazon.com/merchandise/all';
@@ -1182,30 +1199,29 @@ function qe() {
 
 
 function individualProductPage(queryParams){
-	document.head.innerHTML = '<head><style></style></head><script src="jquery.js"></script>'
-				+ "<script src='tablesort.min.js'></script>"
-				+ "<script src='tablesort.number.js'></script>";
+	document.head.innerHTML = globalHeader;
 				
 
-	bodyHTML = '<body ><br><div class="container"><br><div class="panel panel-default">';
-	bodyHTML += '<div class="alert alert-success"><strong>' 
-			+  'Product ASIN= ' + queryParams["ASIN"] 
-			+ '</strong>';
-	bodyHTML += '</div><div class="panel-body" id="individualShirtSales"></div></div></div></body>';
+	bodyHTML = '<body>' + 
+					'<div class="wrapper">' + 
+						'<div class="container"><br><div class="panel panel-default">' +
+							'<div class="alert alert-success">' + 
+								'<strong>' + 'Product ASIN= ' + queryParams["ASIN"] + '</strong>' +
+							'</div>'+
+							'<div class="panel-body" id="individualShirtSales"></div>' +
+							' <div class="panel panel-default" id="salesPanel">    <div class="panel-heading">Sales/Cancellations</div>    <div class="panel-body"><center><canvas id="canvas1" height="450" width="800" ></canvas></center></div> </div>' +
+							' <div class="panel panel-default" id="revenuePanel">    <div class="panel-heading">Revenue/Royalties</div>    <div class="panel-body"><center><canvas id="canvas2" height="450" width="800" ></canvas></center></div> </div>' +
+							'<div class="panel panel-default"><div class="panel-heading">Shirts Sold</div> <div class="panel-body" id="shirtlist"></div></div>' +
+						'</div>' + 
+					'</div>' + 
+				'</body>';
 	
 			
-    var d = new Date();
-    n = d.toString();
-    document.body.innerHTML = '<body ><br><br><div class="container">' +
-		'<div class="panel panel-default"></center><div class="panel-body" id="twoweeksstats"><center><h3>Loading..</h3></center></div></div>' +
-		'<body ><br><div class="container"><br><div class="panel panel-default">' +
-		'<div class="alert alert-success"><strong>' +
-		'Product ASIN= ' + queryParams["ASIN"] +
-		'</strong>' +
-		'</div><div class="panel-body" id="individualShirtSales"></div></div></div></body>' +
-        ' <div class="panel panel-default" id="salesPanel">    <div class="panel-heading">Sales/Cancellations</div>    <div class="panel-body"><center><canvas id="canvas1" height="450" width="800" ></canvas></center></div> </div>' +
-        ' <div class="panel panel-default" id="revenuePanel">    <div class="panel-heading">Revenue/Royalties</div>    <div class="panel-body"><center><canvas id="canvas2" height="450" width="800" ></canvas></center></div> </div>' +
-		'<div class="panel panel-default"><div class="panel-heading">Shirts Sold</div> <div class="panel-body" id="shirtlist"></div></div></div></body>';
+    document.body.innerHTML = bodyHTML;
+		
+	var pageContent = document.querySelector(".wrapper");
+	pageContent.innerHTML += sidebarHTML;
+		
 	
 	/*
 	number = 14;
