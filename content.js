@@ -2,7 +2,7 @@ var header = '<!DOCTYPE html><html><head>' + '<style>div.img {    background-col
 var footer = '</div></body></html>';
 
 
-function when(t) {
+function when(t) { //Converts Unix timestamp to human
     var dateVal = "/Date(" + t.toString() + ")/";
     var a = new Date(parseFloat(dateVal.substr(6)));
     var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -15,198 +15,6 @@ function when(t) {
     var time = date + ' ' + month + ' ' + year + ' ' + hour + ':' + min + ':' + sec;
     return time;
 };
-
-function imgthis(url) {
-    f = "<img src=" + url + " class='img-rounded' alt='Cinque Terre' width='213' height='256'>";
-    return f;
-};
-
-function cardit(num, img, id, sname, asin, pric, stat, cdate, srank, pg, dud) {
-
-    if (dud === null) {
-        dud = "<font size='3' color='Green'>Proven Seller</font>"
-    } else {
-        dud = "<font size='3' color='red'>" + dud + "</font>"
-    };
-
-    cardcode = "<div class='img'>  <a target='_blank' href=https://www.amazon.com/dp/" + asin + "><img src=" + img + " alt=" + img + " width='213' height='256' class='img-thumbnail'>  </a>  <div class='desc'> <br><p > <b>Name :</b> " + sname + "(" + (num + (pg * 20)) + ")<br> <b>ASIN :</b> " + asin + "<br> <b>Price :</b> " + pric + "<br><b> State :</b> " + stat + "<br> <b>Creation Date :</b> " + when(cdate) + "<br>" + "<br><b> Days Until Deletion :</b> " + dud + "<br></p>";
-    revbutt = '';
-
-    chekrev = '<a target="_blank" href="https://www.amazon.com/gp/customer-reviews/widgets/average-customer-review/popover/ref=dpx_acr_pop_?contextId=gpx&asin=' + asin + '" class="btn btn-warning btn-sm">Check Reviews </a></div> </div>';
-    editsh = '<a target="_blank" href="http://merch.amazon.com/merch-tshirt/title-setup/' + id + '/add_details" class="btn btn-warning btn-sm">Edit Shirt </a>';
-    return cardcode + editsh + chekrev + revbutt;
-};
-
-function showshirt(t1, fr) {
-    for (i = 0; i < 20; i++) {
-        document.getElementById("shirts")
-            .innerHTML = document.getElementById("shirts")
-            .innerHTML + cardit(i, t1.merchandiseList[i].imageURL, t1.merchandiseList[i].id, t1.merchandiseList[i].name, t1.merchandiseList[i].marketplaceAsinMap.US, t1.merchandiseList[i].listPrice, t1.merchandiseList[i].status, t1.merchandiseList[i].createDate, 0, fr, t1.merchandiseList[i].daysUntilDeletion);
-        //document.getElementById("asintxt").value=document.getElementById("asintxt").value+t1.merchandiseList[i].marketplaceAsinMap.US+'\n';
-    };
-};
-
-/*Alexey's functions */
-function getShirtColor(shirtASIN){
-	knownColors = ["Dark Heather", "Heather Grey", "Heather Blue", "Black", "Navy", "Silver", "Royal Blue", "Brown", "Slate", "Red", "Asphalt", "Grass", "Olive", "Kelly Green", "Baby Blue", "White", "Lemon", "Cranberry", "Pink", "Orange", "Purple"];
-	for(var i = 0, len = knownColors.length; i < len; i++){
-		term = knownColors[i];
-		var index = shirtASIN.indexOf(term); 
-		if (index != -1) {
-			color =  knownColors[i];
-			break;
-		} else{
-			color = "Unknown Color";
-		}
-	}
-	return color;
-}
-
-function getShirtSize(shirtASIN){
-	adultSizes = ["Small", "Medium", "Large", "XL", "2XL", "3XL"];
-	youthSizes =  ["4", "6", "8", "10", "12"];
-	
-	for(var i = 0, len = adultSizes.length + youthSizes.length ; i < len; i++){
-		var indexAdult = shirtASIN.indexOf(adultSizes[i]); 
-		if (indexAdult != -1) {
-			size =  adultSizes[i];
-			break;
-		}
-		
-		var indexYouth = shirtASIN.indexOf(youthSizes[i]); 
-		if (indexYouth != -1) {
-			size = "Youth"
-			break
-		}	
-	}
-	
-	if (size == null){ //Just in case can't determine the size
-		size = "Unknown Size";
-	}
-	
-	return size;
-}
-
-function getShirtGender(shirtASIN){
-	knownGenders = ["Mens", "Womens", "Kids"];
-
-	for(var i = 0, len = knownGenders.length; i < len; i++){
-		term = knownGenders[i];
-		var index = shirtASIN.indexOf(term); 
-		if (index != -1) {
-			shirtGender =  knownGenders[i];
-			break;
-		} else{
-			shirtGender = "Unknown Gender";
-		}
-	}
-	return shirtGender;
-}
-
-
-
-
-function getShirtNiche(shirtASIN, func){
-	var myKey = String(shirtASIN);
-	
-	chrome.storage.sync.get(myKey, function(items) {
-		if(Object.values(items).length == 0){ //If no matches, set to unknown
-			determinedNiche = "unknown niche";
-			
-		} else{
-			parsedJson = JSON.parse(items[myKey]);
-			determinedNiche = parsedJson["niche"];
-		}
-		
-		
-		func(determinedNiche); //Run Callback
-	});
-}
-				
-	
-/*End Alexey's functions */
-
-
-function shirtlister() {
-    cmd = window.location.href;
-    vp = cmd.indexOf("/mt/") - cmd.indexOf("/page=");
-    var pg = parseInt(cmd.slice(cmd.indexOf("/page=") + 6, cmd.indexOf("/mt/")));
-
-    document.body.style.backgroundColor = "#ecf1f2";
-    document.body.innerHTML = header + "<div class='well'><div id ='nav'></div><div id ='shirts'></div>" + footer;
-    document.title = "My Shirts - MerchTools";
-
-    var mange = 'https://merch.amazon.com/publishedItemsSummary';
-    var req = new XMLHttpRequest();
-    req.open("GET", mange, true);
-    req.onreadystatechange = function() {
-        if (req.readyState == 4) {
-
-
-            if ([200, 201, 202, 203, 204, 205, 206, 207, 226].indexOf(req.status) === -1) {} else {
-                var x = JSON.parse(req.responseText);
-                var mm = parseInt(x.publishedItemCount) / parseInt(x.publishedItemCountLimit) * 100;
-                var mange1 = 'https://merch.amazon.com/merchandise/list?pageSize=20&pageNumber=' + pg + '&statusFilters%5B%5D=LIVE&statusFilters%5B%5D=NOT_DISCOVERABLE&statusFilters%5B%5D=PENDING&statusFilters%5B%5D=PROCESSING&statusFilters%5B%5D=STOPPED&keywords=';
-
-                var req1 = new XMLHttpRequest();
-                req1.open("GET", mange1, true);
-                req1.onreadystatechange = function() {
-                    if (req1.readyState == 4) {
-
-                        if ([200, 201, 202, 203, 204, 205, 206, 207, 226, 0].indexOf(req1.status) === -1) {
-
-
-                        } else {
-                            
-                            myasins = [];
-                            var t1 = JSON.parse(req1.responseText);
-                            az = parseInt(t1.totalMerchandiseCount);
-                            tn = 0;
-                            for (i = 0; tn * 20 < az; i++) {
-                                tn = i
-                            }
-
-	
-                            temp = "";
-                            //document.getElementById("page").innerHTML=asintxt;
-
-                            navbar = document.getElementById("nav");
-                            navbar.innerHTML = navbar.innerHTML + '<div class="left"><ul id ="pages" class="pagination pagination-sm" >';
-                            pp = document.getElementById("pages");
-
-                            for (i = 1; i < tn + 1; i++) {
-                                if (i == pg) {
-                                    pp.innerHTML = pp.innerHTML + '<li class="active"><a href="/MerchToolsShirtsLister/page=' + i + '/mt/">' + i + '</a></li>';
-                                } else {
-                                    pp.innerHTML = pp.innerHTML + '<li><a href="/MerchToolsShirtsLister/page=' + i + '/mt/">' + i + '</a></li>';
-                                };
-                            };
-
-
-
-                            pp.innerHTML = pp.innerHTML + '</ul></div>';
-
-
-
-                            showshirt(t1, pg);
-                            //document.getElementById("ovrl").innerHTML=x.publishedItemCount+" shirts Live ("+mm+"%)";
-                            //document.getElementById("ovrl").style="width:"+mm+"%";
-                            //document.getElementById("emp").innerHTML=parseInt(x.publishedItemCountLimit) - parseInt(x.publishedItemCount) +"("+(100-mm).toString()+"%) Slots Empty";
-                            // document.getElementById("emp").style="width:"+(100-mm).toString()+"%";
-
-                        };
-                    };
-                };
-                req1.send();
-
-            }
-
-        }
-    };
-    req.send();
-};
-
-
 
 //-----------------------thanks for the date lib ----------------------
 Date.prototype.adjustDate = function(days) {
@@ -710,9 +518,6 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
 				var nicheChart = new Chart(document.getElementById("canvas6")
 					.getContext("2d"))
 				.Pie(lineChartData6, options);
-				
-				
-				
 				/* End Shirt Niches Chart */
 			
 			
@@ -1344,12 +1149,177 @@ function individualProductPage(queryParams){
 	bodyHTML += '<div class="alert alert-success"><strong>' 
 			+  'Product ASIN= ' + queryParams["ASIN"] 
 			+ '</strong>';
-	bodyHTML += '</div><div class="panel-body" id="shirtlist"></div></div></div></body>';
+	bodyHTML += '</div><div class="panel-body" id="individualShirtSales"></div></div></div></body>';
 	
-    document.body.innerHTML = bodyHTML;
-    document.title = "Individual Product Page";
-    document.body.style.backgroundColor = "#ecf1f2";  //"#D1F8CC";
+			
+    var d = new Date();
+    n = d.toString();
+    document.body.innerHTML = '<body ><br><br><div class="container">' +
+		'<div class="panel panel-default"></center><div class="panel-body" id="twoweeksstats"><center><h3>Loading..</h3></center></div></div>' +
+		'<body ><br><div class="container"><br><div class="panel panel-default">' +
+		'<div class="alert alert-success"><strong>' +
+		'Product ASIN= ' + queryParams["ASIN"] +
+		'</strong>' +
+		'</div><div class="panel-body" id="individualShirtSales"></div></div></div></body>' +
+        ' <div class="panel panel-default" id="salesPanel">    <div class="panel-heading">Sales/Cancellations</div>    <div class="panel-body"><center><canvas id="canvas1" height="450" width="800" ></canvas></center></div> </div>' +
+        ' <div class="panel panel-default" id="revenuePanel">    <div class="panel-heading">Revenue/Royalties</div>    <div class="panel-body"><center><canvas id="canvas2" height="450" width="800" ></canvas></center></div> </div>' +
+		'<div class="panel panel-default"><div class="panel-heading">Shirts Sold</div> <div class="panel-body" id="shirtlist"></div></div></div></body>';
 	
+	/*
+	number = 14;
+	numberofDays = number; //Reset scope of var
+		
+	document.title = "Past " + numberofDays +"  Days Sales - Merch Analytics ";
+	document.body.style.backgroundColor = "#ecf1f2";
+	salesData = [];
+	cancelData = [];
+	returnData = [];
+	gendersData = [];
+	sizesData = [];
+	shirtColorsData = [];
+	shirtNicheData = [];
+	rev = [];
+	roy = [];
+	chlabel = [];
+	
+	fetchsales(numberofDays, numberofDays, salesData, cancelData, returnData, rev, roy, chlabel, gendersData, sizesData, shirtColorsData, shirtNicheData, queryParams["ASIN"]);	
+	*/
+	
+	fetchSalesDataCSV(queryParams);
+}
+
+
+function fetchSalesDataCSV(queryParams){
+	var today = new Date().setTimeZone();
+	today.setUTCHours(7,0,0,0); 
+	
+	var targetASIN = queryParams["ASIN"];
+	
+	var sls = 'https://merch.amazon.com/product-purchases-report?fromDate=' + today.adjustDate(-89).getTime() + '&toDate=' + today.getTime();
+    var reqs = new XMLHttpRequest();
+    reqs.open("GET", sls, true);
+    reqs.onreadystatechange = function() {
+        if (reqs.readyState == 4) {
+            if ([200, 201, 202, 203, 204, 205, 206, 207, 226].indexOf(reqs.status) === -1) {
+
+            } else {
+                var responseArray = csvToJSON(reqs.responseText);
+				
+				infoAboutTargetASIN = []
+				for (i=0; i < responseArray.length; i++){
+					if (responseArray[i]["ASIN"] == targetASIN){
+						infoAboutTargetASIN.push(responseArray[i]);
+					}
+				}
+				
+				console.log(infoAboutTargetASIN);
+				
+				
+                var cp2 = '<h2>Live Listings:</h2><br>' +
+					'<div id="status"></div>' +
+                    '<table class="table table-striped"><thead><tr><th>#</th>'
+					+ '<th>Date Sold</th>'
+					+ '<th class="text-center">Units</th>'
+					+ '<th class="text-center">Revenue</th>'
+					+ '<th class="text-center">Royalty</th>'
+					+ '<th class="text-center">Gender</th>' 
+					+ '<th class="text-center">Size</th>'
+					+ '<th class="text-center">Color</th>'
+					+ '</tr></thead><tbody>';
+
+			
+			
+				for (i=0; i < infoAboutTargetASIN.length; i++){
+										
+						cp2 += '<tr><th scope="row">' + (i + 1) + '</th>' + 
+							'<td class="text-center">' + 
+								infoAboutTargetASIN[i]["Date"]  + 
+							'</td>' + 
+							
+							'<td class="text-center">' +
+								infoAboutTargetASIN[i]["Units"]  +
+							'</td>' +
+							
+							'<td class="text-center">' +
+								infoAboutTargetASIN[i]["Revenue"]  +
+							'</td>' +
+								
+							'<td class="text-center">' +
+								infoAboutTargetASIN[i]["Royalty"]  +
+							'</td>' +
+							
+							'<td class="text-center">' +
+								infoAboutTargetASIN[i]["Category 1"]  +
+							'</td>' +
+							
+							
+							'<td class="text-center">' +
+								infoAboutTargetASIN[i]["Category 2"]  +
+							'</td>' +
+							
+							'<td class="text-center">' +
+								infoAboutTargetASIN[i]["Category 3"]  +
+							'</td>';
+				}
+							
+									
+                cp2 += '</tbody></table>';
+                document.getElementById("individualShirtSales")
+                    .innerHTML = cp2;
+            };
+
+        };
+    };
+
+    reqs.send();
+	
+}
+
+function csvToJSON(csv) {
+  var lines=csv.split("\n");
+  var result = [];
+  var headers = lines[0].split(",");
+
+  for(var i=1; i<lines.length; i++) {
+    var obj = {};
+
+    var row = lines[i],
+      queryIdx = 0,
+      startValueIdx = 0,
+      idx = 0;
+
+    if (row.trim() === '') { continue; }
+
+    while (idx < row.length) {
+      /* if we meet a double quote we skip until the next one */
+      var c = row[idx];
+
+      if (c === '"') {
+        do { c = row[++idx]; } while (c !== '"' && idx < row.length - 1);
+      }
+
+      if (c === ',' || /* handle end of line with no comma */ idx === row.length - 1) {
+        /* we've got a value */
+        var value = row.substr(startValueIdx, idx - startValueIdx).trim();
+
+        /* skip first double quote */
+        if (value[0] === '"') { value = value.substr(1); }
+        /* skip last comma */
+        if (value[value.length - 1] === ',') { value = value.substr(0, value.length - 1); }
+        /* skip last double quote */
+        if (value[value.length - 1] === '"') { value = value.substr(0, value.length - 1); }
+
+        var key = headers[queryIdx++];
+        obj[key] = value;
+        startValueIdx = idx + 1;
+      }
+
+      ++idx;
+    }
+
+    result.push(obj);
+  }
+  return result;
 }
 
 
@@ -1477,6 +1447,88 @@ if (cmd.indexOf("MerchToolsEditor") !== -1) {
 if (cmd.indexOf("IndividualProductPage") !== -1 && parsedParams) {
     logincheck("individualProductPage", parsedParams);
 };
+
+
+
+
+
+/*Alexey's functions */
+function getShirtColor(shirtASIN){
+	knownColors = ["Dark Heather", "Heather Grey", "Heather Blue", "Black", "Navy", "Silver", "Royal Blue", "Brown", "Slate", "Red", "Asphalt", "Grass", "Olive", "Kelly Green", "Baby Blue", "White", "Lemon", "Cranberry", "Pink", "Orange", "Purple"];
+	for(var i = 0, len = knownColors.length; i < len; i++){
+		term = knownColors[i];
+		var index = shirtASIN.indexOf(term); 
+		if (index != -1) {
+			color =  knownColors[i];
+			break;
+		} else{
+			color = "Unknown Color";
+		}
+	}
+	return color;
+}
+
+function getShirtSize(shirtASIN){
+	adultSizes = ["Small", "Medium", "Large", "XL", "2XL", "3XL"];
+	youthSizes =  ["4", "6", "8", "10", "12"];
+	
+	for(var i = 0, len = adultSizes.length + youthSizes.length ; i < len; i++){
+		var indexAdult = shirtASIN.indexOf(adultSizes[i]); 
+		if (indexAdult != -1) {
+			size =  adultSizes[i];
+			break;
+		}
+		
+		var indexYouth = shirtASIN.indexOf(youthSizes[i]); 
+		if (indexYouth != -1) {
+			size = "Youth"
+			break
+		}	
+	}
+	
+	if (size == null){ //Just in case can't determine the size
+		size = "Unknown Size";
+	}
+	
+	return size;
+}
+
+function getShirtGender(shirtASIN){
+	knownGenders = ["Mens", "Womens", "Kids"];
+
+	for(var i = 0, len = knownGenders.length; i < len; i++){
+		term = knownGenders[i];
+		var index = shirtASIN.indexOf(term); 
+		if (index != -1) {
+			shirtGender =  knownGenders[i];
+			break;
+		} else{
+			shirtGender = "Unknown Gender";
+		}
+	}
+	return shirtGender;
+}
+
+
+function getShirtNiche(shirtASIN, func){
+	var myKey = String(shirtASIN);
+	
+	chrome.storage.sync.get(myKey, function(items) {
+		if(Object.values(items).length == 0){ //If no matches, set to unknown
+			determinedNiche = "unknown niche";
+			
+		} else{
+			parsedJson = JSON.parse(items[myKey]);
+			determinedNiche = parsedJson["niche"];
+		}
+		
+		
+		func(determinedNiche); //Run Callback
+	});
+}
+				
+	
+/*End Alexey's functions */
 
 
 
