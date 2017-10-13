@@ -1,3 +1,297 @@
+/***************************************************************/
+/*************** Date & Global Helper Functions ******************/
+/***************************************************************/
+function csvToJSON(csv) {
+  var lines=csv.split("\n");
+  var result = [];
+  var headers = lines[0].split(",");
+
+  for(var i=1; i<lines.length; i++) {
+    var obj = {};
+
+    var row = lines[i],
+      queryIdx = 0,
+      startValueIdx = 0,
+      idx = 0;
+
+    if (row.trim() === '') { continue; }
+
+    while (idx < row.length) {
+      /* if we meet a double quote we skip until the next one */
+      var c = row[idx];
+
+      if (c === '"') {
+        do { c = row[++idx]; } while (c !== '"' && idx < row.length - 1);
+      }
+
+      if (c === ',' || /* handle end of line with no comma */ idx === row.length - 1) {
+        /* we've got a value */
+        var value = row.substr(startValueIdx, idx - startValueIdx).trim();
+
+        /* skip first double quote */
+        if (value[0] === '"') { value = value.substr(1); }
+        /* skip last comma */
+        if (value[value.length - 1] === ',') { value = value.substr(0, value.length - 1); }
+        /* skip last double quote */
+        if (value[value.length - 1] === '"') { value = value.substr(0, value.length - 1); }
+
+        var key = headers[queryIdx++];
+        obj[key] = value;
+        startValueIdx = idx + 1;
+      }
+
+      ++idx;
+    }
+
+    result.push(obj);
+  }
+  return result;
+}
+
+function assembleDynamicBlankArray(callback){
+	chrome.storage.sync.get(null, function(items) {
+		var allValues = Object.values(items);
+		
+		for (i = 0; i < allValues.length; i++){
+			allValues[i] =  JSON.parse(allValues[i]);
+			allValues[i] = allValues[i]["niche"]
+		}
+		
+		uniqueArray = allValues.filter(function(item, pos) {
+			return allValues.indexOf(item) == pos;
+		})
+		
+		var resultBlankArray = {};
+		//Init count to 0
+		for (i = 0; i < uniqueArray.length; i++){
+			resultBlankArray[uniqueArray[i]] = 0;
+		}
+		
+		resultBlankArray["unknown niche"] = 0;
+		
+		
+		callback(resultBlankArray);
+	});
+}
+
+/******** More Date Related Stuff ********/				
+function monthDiff(d1, d2) {
+    var months;
+    months = (d2.getFullYear() - d1.getFullYear()) * 12;
+    months -= d1.getMonth() + 1;
+    months += d2.getMonth();
+    return months <= 0 ? 0 : months;
+}
+
+function when(t) { //Converts Unix timestamp to human
+    var dateVal = "/Date(" + t.toString() + ")/";
+    var a = new Date(parseFloat(dateVal.substr(6)));
+    var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    var year = a.getFullYear();
+    var month = months[a.getMonth()];
+    var date = a.getDate();
+    var hour = a.getHours();
+    var min = a.getMinutes();
+    var sec = a.getSeconds();
+    var time = date + ' ' + month + ' ' + year + ' ' + hour + ':' + min + ':' + sec;
+    return time;
+};
+
+Date.prototype.adjustDate = function(days) {
+    var date;
+
+    days = days || 0;
+
+    if (days === 0) {
+        date = new Date(this.getTime());
+    } else if (days > 0) {
+        date = new Date(this.getTime());
+        date.setDate(date.getDate() + days);
+    } else {
+        date = new Date(
+            this.getFullYear(),
+            this.getMonth(),
+            this.getDate() - Math.abs(days),
+            this.getHours(),
+            this.getMinutes(),
+            this.getSeconds(),
+            this.getMilliseconds()
+        );
+    }
+    return date;
+};
+Date.prototype.adjustMonth = function(months) {
+    var date;
+
+    months = months || 0;
+
+    if (months === 0) {
+        date = new Date(this.getTime());
+    } else if (months > 0) {
+        date = new Date(this.getTime());
+        date.setMonth(date.getMonth() + months);
+    } else {
+        date = new Date(
+            this.getFullYear(),
+            this.getMonth() - Math.abs(months),
+            this.getDate(),
+            this.getHours(),
+            this.getMinutes(),
+            this.getSeconds(),
+            this.getMilliseconds()
+        );
+    }
+    return date;
+};
+Date.prototype.getFirstDateOfMonth = function() {
+    var date = new Date(this.getTime());
+    date.setDate(1);
+    return new Date(date.getTime());
+};
+Date.prototype.getLastDayOfMonth = function() {
+    var nextMonthDate = new Date(this.getTime());
+    nextMonthDate.setMonth(this.getMonth() + 1);
+    nextMonthDate.setDate(1);
+    var date = new Date(nextMonthDate.getTime());
+    date.setDate(nextMonthDate.getDate() - 1);
+    return date;
+};
+Date.prototype.setTimeZone = function(zone) {
+    zone = zone || "America/Los_Angeles";
+    return new Date(this.toLocaleString("en-US", {
+        timeZone: zone
+    }));
+};
+Date.prototype.getUTC = function(reset) {
+    return true === reset ? new Date(Date.UTC(this.getFullYear(), this.getMonth(), this.getDate())) :
+        new Date(Date.UTC(this.getFullYear(), this.getMonth(), this.getDate(), this.getHours(), this.getMinutes(), this.getSeconds(), this.getMilliseconds()));
+};
+Date.prototype.setUTC = function(reset) {
+    return true === reset ? new Date(Date.UTC(this.getFullYear(), this.getMonth(), this.getDate())) :
+        new Date(Date.UTC(this.getFullYear(), this.getMonth(), this.getDate(), this.getHours(), this.getMinutes(), this.getSeconds(), this.getMilliseconds()));
+};
+
+
+
+/***************************************************************/
+/************************* Login Functions *********************/
+/***************************************************************/
+function logincheck(cmd, queryParams = null) {
+	//Disappointed but not surprised :)
+    var sls = 'https://merch.amazon.com/accountSummary';
+    var reqs = new XMLHttpRequest();
+    reqs.open("GET", sls, true);
+    reqs.onreadystatechange = function() {
+        if (reqs.readyState == 4) {
+
+            if ([200, 201, 202, 203, 204, 205, 206, 207, 226].indexOf(reqs.status) === -1) {
+
+            } else {
+                if (reqs.responseText.indexOf('AuthenticationPortal') != -1) {
+
+                    loginerr = '<div id="myModal" class="modal fade" role="dialog">' +
+                        '<div class="modal-dialog">' +
+                        '<div class="modal-content">' +
+                        '<div class="modal-header">' +
+                        '<h4 class="modal-title">Please Login </h4>' +
+                        ' </div>' +
+                        '<div class="modal-body">' +
+                        '<h6><a href="https://merch.amazon.com/dashboard" target="_blank"><p>>>Click here to open Merch by Amazon Login<<</p></a></h6>' +
+                        '</div>' +
+                        '<div class="modal-footer">' +
+                        '<button type="button" class="btn btn-success" data-dismiss="modal">Done, Reload The Page ! .</button>' +
+                        '</div></div></div></div>';
+
+                    document.body.innerHTML = loginerr;
+
+                    $('#myModal')
+                        .modal('show');
+
+                    $(document)
+                        .on('hide.bs.modal', '#myModal', function() {
+                            location.reload();
+                        });
+
+
+                } else {
+                    switch (cmd) {
+                        case "twoweekssales":
+                            twoweekssales(14);
+                            break;
+                        case "todaysales":
+                            twoweekssales(0);
+                            break;
+                        case "merchall":
+                            merchmonthsall();
+                            break;
+                        case "productManager":
+                            productManager();
+                            break;
+						case "individualProductPage":
+                            individualProductPage(queryParams);
+                            break;
+						case "settings":
+                            settingsPage();
+                            break;
+                    };
+                };
+            };
+
+        };
+    };
+
+    reqs.send();
+
+};
+
+//Get Base Path
+var cmd = window.location.href.split('?')[0];
+
+// Get Query Params
+var queryString = window.location.search.substring(1);
+
+var parseQueryString = function( funcQueryString ) {
+    var params = {}, queries, temp, i, l;
+    // Split into key/value pairs
+    queries = funcQueryString.split("&");
+    // Convert the array of strings into an object
+    for ( i = 0, l = queries.length; i < l; i++ ) {
+        temp = queries[i].split('=');
+        params[temp[0]] = temp[1];
+    }
+    return params;
+};
+parsedParams = parseQueryString(queryString);
+//End Parsing Query Params
+
+if (cmd.indexOf("MerchToolsTodaySales") !== -1) {
+    logincheck("todaysales");
+};
+
+if (cmd.indexOf("MerchToolsTwoWeeksSales") !== -1) {
+    logincheck("twoweekssales");
+};
+
+
+if (cmd.indexOf("MerchToolsAllMonthsSales") !== -1) {
+    logincheck("merchall");
+};
+
+if (cmd.indexOf("MerchToolsEditor") !== -1) {
+    logincheck("productManager");
+};
+
+if (cmd.indexOf("IndividualProductPage") !== -1 && parsedParams) {
+    logincheck("individualProductPage", parsedParams);
+};
+
+if (cmd.indexOf("MerchAnalyticsSettings") !== -1) {
+    logincheck("settings");
+};
+
+/***************************************************************/
+/************************** Global HTML ************************/
+/***************************************************************/
 var globalHeader = '<head><style></style></head>' + 
 					"<script src='tablesort.min.js'></script>" + 
 					"<script src='tablesort.number.js'></script>" +
@@ -27,109 +321,61 @@ var sidebarHTML = '<nav id="sidebar">' +
 				'</nav>' +
 				'<script src="navscript.js"></script>';
 				
-function monthDiff(d1, d2) {
-    var months;
-    months = (d2.getFullYear() - d1.getFullYear()) * 12;
-    months -= d1.getMonth() + 1;
-    months += d2.getMonth();
-    return months <= 0 ? 0 : months;
+			
+/***************************************************************/
+/********* Global Fetch Function (Sales & Live List) ***********/
+/***************************************************************/	
+function fetchSalesDataCSV(fromDate, toDate, callback){
+	var sls = 'https://merch.amazon.com/product-purchases-report?fromDate=' + fromDate + '&toDate=' + toDate ;
+    var reqs = new XMLHttpRequest();
+    reqs.open("GET", sls, true);
+    reqs.onreadystatechange = function() {
+        if (reqs.readyState == 4) {
+            if ([200, 201, 202, 203, 204, 205, 206, 207, 226].indexOf(reqs.status) === -1) {
+            } else {
+                var responseArray = csvToJSON(reqs.responseText);
+				//Run Callback
+				callback(responseArray);
+            };
+
+        };
+    };
+    reqs.send();
 }
 
-function when(t) { //Converts Unix timestamp to human
-    var dateVal = "/Date(" + t.toString() + ")/";
-    var a = new Date(parseFloat(dateVal.substr(6)));
-    var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    var year = a.getFullYear();
-    var month = months[a.getMonth()];
-    var date = a.getDate();
-    var hour = a.getHours();
-    var min = a.getMinutes();
-    var sec = a.getSeconds();
-    var time = date + ' ' + month + ' ' + year + ' ' + hour + ':' + min + ':' + sec;
-    return time;
-};
+function fetchAllLiveProducts(callback){
+    var sls = 'https://merch.amazon.com/merchandise/all';
+    var reqs = new XMLHttpRequest();
+    reqs.open("GET", sls, true);
+    reqs.onreadystatechange = function() {
+        if (reqs.readyState == 4) {
+            if ([200, 201, 202, 203, 204, 205, 206, 207, 226].indexOf(reqs.status) === -1) {
 
-//-----------------------thanks for the date lib ----------------------
-Date.prototype.adjustDate = function(days) {
-    var date;
+            } else {
+                var result = JSON.parse(reqs.responseText);
+				callback(result);
+            };
+        };
+    };
+    reqs.send();
+}
+	
+/***************************************************************/
+/********************** Daily Sales Page ***********************/
+/***************************************************************/	
+function fetchDaySales(numberOfDays, callback){ /* Todo, not implemented */
+	var today = new Date().setTimeZone();
+	today.setUTCHours(7,0,0,0); 
+	var fromDate = today.adjustDate(-numberOfDays).getTime();
+	var toDate = today.getTime();
+	
+	fetchSalesDataCSV(fromDate, toDate, function(responseArray){
+		console.log(responseArray);
+		
+	});
+	
+}
 
-    days = days || 0;
-
-    if (days === 0) {
-        date = new Date(this.getTime());
-    } else if (days > 0) {
-        date = new Date(this.getTime());
-        date.setDate(date.getDate() + days);
-    } else {
-        date = new Date(
-            this.getFullYear(),
-            this.getMonth(),
-            this.getDate() - Math.abs(days),
-            this.getHours(),
-            this.getMinutes(),
-            this.getSeconds(),
-            this.getMilliseconds()
-        );
-    }
-    return date;
-};
-
-Date.prototype.adjustMonth = function(months) {
-    var date;
-
-    months = months || 0;
-
-    if (months === 0) {
-        date = new Date(this.getTime());
-    } else if (months > 0) {
-        date = new Date(this.getTime());
-        date.setMonth(date.getMonth() + months);
-    } else {
-        date = new Date(
-            this.getFullYear(),
-            this.getMonth() - Math.abs(months),
-            this.getDate(),
-            this.getHours(),
-            this.getMinutes(),
-            this.getSeconds(),
-            this.getMilliseconds()
-        );
-    }
-    return date;
-};
-
-Date.prototype.getFirstDateOfMonth = function() {
-    var date = new Date(this.getTime());
-    date.setDate(1);
-    return new Date(date.getTime());
-};
-
-Date.prototype.getLastDayOfMonth = function() {
-    var nextMonthDate = new Date(this.getTime());
-    nextMonthDate.setMonth(this.getMonth() + 1);
-    nextMonthDate.setDate(1);
-    var date = new Date(nextMonthDate.getTime());
-    date.setDate(nextMonthDate.getDate() - 1);
-    return date;
-};
-
-Date.prototype.setTimeZone = function(zone) {
-    zone = zone || "America/Los_Angeles";
-    return new Date(this.toLocaleString("en-US", {
-        timeZone: zone
-    }));
-};
-
-Date.prototype.getUTC = function(reset) {
-    return true === reset ? new Date(Date.UTC(this.getFullYear(), this.getMonth(), this.getDate())) :
-        new Date(Date.UTC(this.getFullYear(), this.getMonth(), this.getDate(), this.getHours(), this.getMinutes(), this.getSeconds(), this.getMilliseconds()));
-};
-
-Date.prototype.setUTC = function(reset) {
-    return true === reset ? new Date(Date.UTC(this.getFullYear(), this.getMonth(), this.getDate())) :
-        new Date(Date.UTC(this.getFullYear(), this.getMonth(), this.getDate(), this.getHours(), this.getMinutes(), this.getSeconds(), this.getMilliseconds()));
-};
-/*** End Date Library */
 
 
 function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlabel, ts, gendersArray, sizesArray, shirtColorsArray, nicheArray, specificASIN = null) {
@@ -726,6 +972,9 @@ function twoweekssales(number) {
 
 
 
+/***************************************************************/
+/********************* Monthly Sales Page **********************/
+/***************************************************************/	
 function merchmonths(count, m, salesData, cancelData, returnData, rev, roy, chlabel, ts) {
     if (count >= 0) {
         var today = new Date().setTimeZone();
@@ -939,6 +1188,10 @@ function merchmonthsall() {
     merchmonths(iio, iio, salesData, cancelData, returnData, rev, roy, chlabel);
 };
 
+
+/***************************************************************/
+/******************* Product Manager Page **********************/
+/***************************************************************/
 function productManager() {
     document.head.innerHTML = globalHeader;
 				
@@ -959,19 +1212,10 @@ function productManager() {
 	pageContent.innerHTML += sidebarHTML;
 	
 
-
-    var sls = 'https://merch.amazon.com/merchandise/all';
-    var reqs = new XMLHttpRequest();
-    reqs.open("GET", sls, true);
-    reqs.onreadystatechange = function() {
-        if (reqs.readyState == 4) {
-            if ([200, 201, 202, 203, 204, 205, 206, 207, 226].indexOf(reqs.status) === -1) {
-
-            } else {
-                var ts = JSON.parse(reqs.responseText);
-                var cp2 = '<h2>Live Listings:</h2><br>' +
+	fetchAllLiveProducts(function(ts){
+		var cp2 = '<h2>Live Listings:</h2><br>' +
 					'<div id="status"></div>' +
-                    '<table id="quickEditor" class="table table-striped"><thead><tr><th>#</th>'
+					'<table id="quickEditor" class="table table-striped"><thead><tr><th>#</th>'
 					+ '<th>Title</th>'
 					+ '<th class="text-center">Days Until Deletion</th>'
 					+ '<th class="text-center">Listing page</th>'
@@ -979,87 +1223,57 @@ function productManager() {
 					+ '<th class="text-center">Price</th>' 
 					+ '<th class="text-center">Edit</th>'
 					+ '</tr></thead><tbody>';
-                k = 0;
-                for (var i = 0; i < ts.length; i++) {
-                    k++;
+		k = 0;
+		for (var i = 0; i < ts.length; i++) {
+			k++;
+			
+			
+			
+			
+			if (ts[i].marketplaceAsinMap.US !== undefined){
+			
+				var hasLifetimeSales = false;
+				//Determine if a design has ever sold
+				if(ts[i].daysUntilDeletion.length === 0 || parseInt(ts[i].daysUntilDeletion) > 90){
+					hasLifetimeSales = true;
+				}
+			
+				cp2 += '<tr data-lifetime-sales="'+ hasLifetimeSales.toString() + '"><th scope="row">' + k + '</th>' + 
+					'<td><a href="/IndividualProductPage/?ASIN=' + ts[i].marketplaceAsinMap.US + '">' + ts[i].name + '</a></td>' + 
+						
+					'<td class="text-center">' +
+						ts[i].daysUntilDeletion + 
+					'</td>' +
 					
+					'<td class="text-center">' +
+						'<a target="_blank" href="https://www.amazon.com/dp/' + ts[i].marketplaceAsinMap.US + '" class="btn btn-info">Preview</a>' +
+					'</td>' +
 					
-					
-					
-					if (ts[i].marketplaceAsinMap.US !== undefined){
-					
-						var hasLifetimeSales = false;
-						//Determine if a design has ever sold
-						if(ts[i].daysUntilDeletion.length === 0 || parseInt(ts[i].daysUntilDeletion) > 90){
-							hasLifetimeSales = true;
-						}
-					
-						cp2 += '<tr data-lifetime-sales="'+ hasLifetimeSales.toString() + '"><th scope="row">' + k + '</th>' + 
-							'<td><a href="/IndividualProductPage/?ASIN=' + ts[i].marketplaceAsinMap.US + '">' + ts[i].name + '</a></td>' + 
-								
-							'<td class="text-center">' +
-								ts[i].daysUntilDeletion + 
-							'</td>' +
-							
-							'<td class="text-center">' +
-								'<a target="_blank" href="https://www.amazon.com/dp/' + ts[i].marketplaceAsinMap.US + '" class="btn btn-info">Preview</a>' +
-							'</td>' +
-							
-							'<td class="text-center">' +
-								  '<input type="text" name="nicheName" class="niche-input"/>' +
-								  '<input type="hidden" name="parentASIN" value='+ ts[i].marketplaceAsinMap.US + '>' +
-								  '<input type="submit" value="Save" class="btn btn-info save"/>' +
-							'</td>' +
-							'<td class="text-center">' + ts[i].listPrice + '</td>' +
-							'<td class="text-center">' + '<a target="_blank" href="http://merch.amazon.com/merch-tshirt/title-setup/' + ts[i].id + '/add_details" class="btn btn-info">Edit</a>' + '</td></tr>';
-					}
-                }
-                cp2 += '</tbody></table>';
-                document.getElementById("shirtlist")
-                    .innerHTML = cp2;
-					
-				new Tablesort(document.getElementById('quickEditor'));
-					
-				initSaveButtons(); //initialize event listeners for buttons
-            };
-
-        };
-    };
-
-    reqs.send();
-
-
-}
-
-function settingsPage (e) {
-   (e || window.event).preventDefault();
-   
-   document.head.innerHTML = globalHeader;
-   document.body.innerHTML = '<body>'+
-							'<div class="wrapper">' +
-							'</div>' +
-							'</body>';
-   
-   var pageContent = document.querySelector(".wrapper");
-	pageContent.innerHTML += sidebarHTML;
-   
-   
-   var con = document.querySelector('.wrapper')
-   ,   xhr = new XMLHttpRequest();
-
-   xhr.onreadystatechange = function (e) { 
-    if (xhr.readyState == 4 && xhr.status == 200) {
-     con.innerHTML += xhr.responseText;
-    }
-   }
-
-	xhr.open("GET", chrome.extension.getURL('options.html'), true);
-	xhr.setRequestHeader('Content-type', 'text/html');
-	xhr.send();
+					'<td class="text-center">' +
+						  '<input type="text" name="nicheName" class="niche-input"/>' +
+						  '<input type="hidden" name="parentASIN" value='+ ts[i].marketplaceAsinMap.US + '>' +
+						  '<input type="submit" value="Save" class="btn btn-info save"/>' +
+					'</td>' +
+					'<td class="text-center">' + ts[i].listPrice + '</td>' +
+				'<td class="text-center">' + '<a target="_blank" href="http://merch.amazon.com/merch-tshirt/title-setup/' + ts[i].id + '/add_details" class="btn btn-info">Edit</a>' + '</td></tr>';
+			}
+		}
+			
+		cp2 += '</tbody></table>';
+		document.getElementById("shirtlist")
+			.innerHTML = cp2;
+			
+		new Tablesort(document.getElementById('quickEditor'));
+			
+		initSaveButtons(); //initialize event listeners for buttons
+		
+		});
 }
 
 
-
+/***************************************************************/
+/**************** Individual Product Page **********************/
+/***************************************************************/
 function individualProductPage(queryParams){
 	document.head.innerHTML = globalHeader;
 				
@@ -1078,291 +1292,122 @@ function individualProductPage(queryParams){
 						'</div>' + 
 					'</div>' + 
 				'</body>';
-	
-			
+		
     document.body.innerHTML = bodyHTML;
 		
 	var pageContent = document.querySelector(".wrapper");
 	pageContent.innerHTML += sidebarHTML;
-		
-	
-	/*
-	number = 14;
-	numberofDays = number; //Reset scope of var
-		
-	document.title = "Past " + numberofDays +"  Days Sales - Merch Analytics ";
-	document.body.style.backgroundColor = "#ecf1f2";
-	salesData = [];
-	cancelData = [];
-	returnData = [];
-	gendersData = [];
-	sizesData = [];
-	shirtColorsData = [];
-	shirtNicheData = [];
-	rev = [];
-	roy = [];
-	chlabel = [];
-	
-	fetchsales(numberofDays, numberofDays, salesData, cancelData, returnData, rev, roy, chlabel, gendersData, sizesData, shirtColorsData, shirtNicheData, queryParams["ASIN"]);	
-	*/
-	
-	fetchSalesDataCSV(queryParams);
+			
+	renderIndividualProductSales(queryParams);
 }
 
 
-function fetchSalesDataCSV(queryParams){
-	var today = new Date().setTimeZone();
-	today.setUTCHours(7,0,0,0); 
-	
+function renderIndividualProductSales(queryParams){
 	var targetASIN = queryParams["ASIN"];
 	
-	var sls = 'https://merch.amazon.com/product-purchases-report?fromDate=' + today.adjustDate(-89).getTime() + '&toDate=' + today.getTime();
-    var reqs = new XMLHttpRequest();
-    reqs.open("GET", sls, true);
-    reqs.onreadystatechange = function() {
-        if (reqs.readyState == 4) {
-            if ([200, 201, 202, 203, 204, 205, 206, 207, 226].indexOf(reqs.status) === -1) {
+	fetchIndividualProductSales(targetASIN, function(responseArray){	
+		var cp2 = '<h2>Product Info:</h2><br>' +
+			'<div id="status"></div>' +
+			'<table class="table table-striped"><thead><tr><th>#</th>'
+			+ '<th>Date Sold</th>'
+			+ '<th class="text-center">Units</th>'
+			+ '<th class="text-center">Revenue</th>'
+			+ '<th class="text-center">Royalty</th>'
+			+ '<th class="text-center">Gender</th>' 
+			+ '<th class="text-center">Size</th>'
+			+ '<th class="text-center">Color</th>'
+			+ '</tr></thead><tbody>';
 
-            } else {
-                var responseArray = csvToJSON(reqs.responseText);
+		for (i=0; i < responseArray.length; i++){
+			cp2 += '<tr><th scope="row">' + (i + 1) + '</th>' + 
+				'<td class="text-center">' + 
+					responseArray[i]["Date"]  + 
+				'</td>' + 
 				
-				infoAboutTargetASIN = []
-				for (i=0; i < responseArray.length; i++){
-					if (responseArray[i]["ASIN"] == targetASIN){
-						infoAboutTargetASIN.push(responseArray[i]);
-					}
-				}
+				'<td class="text-center">' +
+					responseArray[i]["Units"]  +
+				'</td>' +
 				
-				console.log(infoAboutTargetASIN);
+				'<td class="text-center">' +
+					responseArray[i]["Revenue"]  +
+				'</td>' +
+					
+				'<td class="text-center">' +
+					responseArray[i]["Royalty"]  +
+				'</td>' +
 				
+				'<td class="text-center">' +
+					responseArray[i]["Category 1"]  +
+				'</td>' +
 				
-                var cp2 = '<h2>Product Info:</h2><br>' +
-					'<div id="status"></div>' +
-                    '<table class="table table-striped"><thead><tr><th>#</th>'
-					+ '<th>Date Sold</th>'
-					+ '<th class="text-center">Units</th>'
-					+ '<th class="text-center">Revenue</th>'
-					+ '<th class="text-center">Royalty</th>'
-					+ '<th class="text-center">Gender</th>' 
-					+ '<th class="text-center">Size</th>'
-					+ '<th class="text-center">Color</th>'
-					+ '</tr></thead><tbody>';
+				'<td class="text-center">' +
+					responseArray[i]["Category 2"]  +
+				'</td>' +
+				
+				'<td class="text-center">' +
+					responseArray[i]["Category 3"]  +
+				'</td>';
+		}
+					
+							
+		cp2 += '</tbody></table>';
+		document.getElementById("individualShirtSales")
+			.innerHTML = cp2;
+		
+		
+	});	
+}
 
+
+function fetchIndividualProductSales(targetASIN, callback){
+	var today = new Date().setTimeZone();
+	today.setUTCHours(7,0,0,0); 
+	var fromDate = today.adjustDate(-90).getTime();
+	var toDate = today.getTime();
+	
+	fetchSalesDataCSV(fromDate, toDate, function(responseArray){
+		infoAboutTargetASIN = []
+		for (i=0; i < responseArray.length; i++){
+			if (responseArray[i]["ASIN"] == targetASIN){
+				infoAboutTargetASIN.push(responseArray[i]);
+			}
+		}
 			
-			
-				for (i=0; i < infoAboutTargetASIN.length; i++){
-										
-						cp2 += '<tr><th scope="row">' + (i + 1) + '</th>' + 
-							'<td class="text-center">' + 
-								infoAboutTargetASIN[i]["Date"]  + 
-							'</td>' + 
-							
-							'<td class="text-center">' +
-								infoAboutTargetASIN[i]["Units"]  +
-							'</td>' +
-							
-							'<td class="text-center">' +
-								infoAboutTargetASIN[i]["Revenue"]  +
-							'</td>' +
-								
-							'<td class="text-center">' +
-								infoAboutTargetASIN[i]["Royalty"]  +
-							'</td>' +
-							
-							'<td class="text-center">' +
-								infoAboutTargetASIN[i]["Category 1"]  +
-							'</td>' +
-							
-							
-							'<td class="text-center">' +
-								infoAboutTargetASIN[i]["Category 2"]  +
-							'</td>' +
-							
-							'<td class="text-center">' +
-								infoAboutTargetASIN[i]["Category 3"]  +
-							'</td>';
-				}
-							
-									
-                cp2 += '</tbody></table>';
-                document.getElementById("individualShirtSales")
-                    .innerHTML = cp2;
-            };
-
-        };
-    };
-
-    reqs.send();
+		callback(infoAboutTargetASIN);
+	});
 	
 }
 
-function csvToJSON(csv) {
-  var lines=csv.split("\n");
-  var result = [];
-  var headers = lines[0].split(",");
+/***************************************************************/
+/*********************** Settings Page *************************/
+/***************************************************************/
+function settingsPage (e) {
+   (e || window.event).preventDefault();
+   document.head.innerHTML = globalHeader;
+   document.body.innerHTML = '<body>'+
+								'<div class="wrapper">' +
+								'</div>' +
+							'</body>';
+   var pageContent = document.querySelector(".wrapper");
+	pageContent.innerHTML += sidebarHTML;
+   
+   var con = document.querySelector('.wrapper'), xhr = new XMLHttpRequest();
 
-  for(var i=1; i<lines.length; i++) {
-    var obj = {};
+   xhr.onreadystatechange = function (e) { 
+		if (xhr.readyState == 4 && xhr.status == 200) {
+			con.innerHTML += xhr.responseText;
+		}
+   }
 
-    var row = lines[i],
-      queryIdx = 0,
-      startValueIdx = 0,
-      idx = 0;
-
-    if (row.trim() === '') { continue; }
-
-    while (idx < row.length) {
-      /* if we meet a double quote we skip until the next one */
-      var c = row[idx];
-
-      if (c === '"') {
-        do { c = row[++idx]; } while (c !== '"' && idx < row.length - 1);
-      }
-
-      if (c === ',' || /* handle end of line with no comma */ idx === row.length - 1) {
-        /* we've got a value */
-        var value = row.substr(startValueIdx, idx - startValueIdx).trim();
-
-        /* skip first double quote */
-        if (value[0] === '"') { value = value.substr(1); }
-        /* skip last comma */
-        if (value[value.length - 1] === ',') { value = value.substr(0, value.length - 1); }
-        /* skip last double quote */
-        if (value[value.length - 1] === '"') { value = value.substr(0, value.length - 1); }
-
-        var key = headers[queryIdx++];
-        obj[key] = value;
-        startValueIdx = idx + 1;
-      }
-
-      ++idx;
-    }
-
-    result.push(obj);
-  }
-  return result;
+	xhr.open("GET", chrome.extension.getURL('options.html'), true);
+	xhr.setRequestHeader('Content-type', 'text/html');
+	xhr.send();
 }
 
 
-
-function logincheck(cmd, queryParams = null) {
-	//Disappointed but not surprised :)
-    var sls = 'https://merch.amazon.com/accountSummary';
-    var reqs = new XMLHttpRequest();
-    reqs.open("GET", sls, true);
-    reqs.onreadystatechange = function() {
-        if (reqs.readyState == 4) {
-
-            if ([200, 201, 202, 203, 204, 205, 206, 207, 226].indexOf(reqs.status) === -1) {
-
-            } else {
-                if (reqs.responseText.indexOf('AuthenticationPortal') != -1) {
-
-                    loginerr = '<div id="myModal" class="modal fade" role="dialog">' +
-                        '<div class="modal-dialog">' +
-                        '<div class="modal-content">' +
-                        '<div class="modal-header">' +
-                        '<h4 class="modal-title">Please Login </h4>' +
-                        ' </div>' +
-                        '<div class="modal-body">' +
-                        '<h6><a href="https://merch.amazon.com/dashboard" target="_blank"><p>>>Click here to open Merch by Amazon Login<<</p></a></h6>' +
-                        '</div>' +
-                        '<div class="modal-footer">' +
-                        '<button type="button" class="btn btn-success" data-dismiss="modal">Done, Reload The Page ! .</button>' +
-                        '</div></div></div></div>';
-
-                    document.body.innerHTML = loginerr;
-
-                    $('#myModal')
-                        .modal('show');
-
-                    $(document)
-                        .on('hide.bs.modal', '#myModal', function() {
-                            location.reload();
-                        });
-
-
-                } else {
-                    switch (cmd) {
-                        case "twoweekssales":
-                            twoweekssales(14);
-                            break;
-                        case "todaysales":
-                            twoweekssales(0);
-                            break;
-                        case "merchall":
-                            merchmonthsall();
-                            break;
-                        case "productManager":
-                            productManager();
-                            break;
-						case "individualProductPage":
-                            individualProductPage(queryParams);
-                            break;
-						case "settings":
-                            settingsPage();
-                            break;
-                    };
-                };
-            };
-
-        };
-    };
-
-    reqs.send();
-
-};
-
-//Get Base Path
-var cmd = window.location.href.split('?')[0];
-
-// Get Query Params
-var queryString = window.location.search.substring(1);
-
-var parseQueryString = function( funcQueryString ) {
-    var params = {}, queries, temp, i, l;
-    // Split into key/value pairs
-    queries = funcQueryString.split("&");
-    // Convert the array of strings into an object
-    for ( i = 0, l = queries.length; i < l; i++ ) {
-        temp = queries[i].split('=');
-        params[temp[0]] = temp[1];
-    }
-    return params;
-};
-parsedParams = parseQueryString(queryString);
-//End Parsing Query Params
-
-
-if (cmd.indexOf("MerchToolsTodaySales") !== -1) {
-    logincheck("todaysales");
-};
-
-if (cmd.indexOf("MerchToolsTwoWeeksSales") !== -1) {
-    logincheck("twoweekssales");
-};
-
-
-if (cmd.indexOf("MerchToolsAllMonthsSales") !== -1) {
-    logincheck("merchall");
-};
-
-if (cmd.indexOf("MerchToolsEditor") !== -1) {
-    logincheck("productManager");
-};
-
-if (cmd.indexOf("IndividualProductPage") !== -1 && parsedParams) {
-    logincheck("individualProductPage", parsedParams);
-};
-
-if (cmd.indexOf("MerchAnalyticsSettings") !== -1) {
-    logincheck("settings");
-};
-
-
-
-
-/*Alexey's functions */
+/***************************************************************/
+/************* Shirt Determination Functions *******************/
+/***************************************************************/
 function getShirtColor(shirtASIN){
 	knownColors = ["Dark Heather", "Heather Grey", "Heather Blue", "Black", "Navy", "Silver", "Royal Blue", "Brown", "Slate", "Red", "Asphalt", "Grass", "Olive", "Kelly Green", "Baby Blue", "White", "Lemon", "Cranberry", "Pink", "Orange", "Purple"];
 	for(var i = 0, len = knownColors.length; i < len; i++){
@@ -1420,7 +1465,7 @@ function getShirtGender(shirtASIN){
 }
 
 
-function getShirtNiche(shirtASIN, func){
+function getShirtNiche(shirtASIN, callback){
 	var myKey = String(shirtASIN);
 	
 	chrome.storage.sync.get(myKey, function(items) {
@@ -1433,17 +1478,14 @@ function getShirtNiche(shirtASIN, func){
 		}
 		
 		
-		func(determinedNiche); //Run Callback
+		callback(determinedNiche); //Run Callback
 	});
 }
 				
-	
-/*End Alexey's functions */
 
-
-
-
-/**************** Niche Storage ****************/
+/***************************************************************/
+/************************ Niche Storage ************************/
+/***************************************************************/
 function saveShirtNiche(nicheName, parentASIN) {		
 	//Assemble Stringified JSON	
 	var key = parentASIN,
@@ -1459,7 +1501,6 @@ function saveShirtNiche(nicheName, parentASIN) {
         console.log('Saved', key, data);
     });
 }
-
 
 
 function readShirtNiche(){	
@@ -1544,60 +1585,3 @@ function initSaveButtons(){ //Adds event listeners to all buttons
 		readShirtNiche();		
 	})
 }
-
-
-function assembleDynamicBlankArray(callback){
-	chrome.storage.sync.get(null, function(items) {
-		var allValues = Object.values(items);
-		
-		for (i = 0; i < allValues.length; i++){
-			allValues[i] =  JSON.parse(allValues[i]);
-			allValues[i] = allValues[i]["niche"]
-		}
-		
-		uniqueArray = allValues.filter(function(item, pos) {
-			return allValues.indexOf(item) == pos;
-		})
-		
-		var resultBlankArray = {};
-		//Init count to 0
-		for (i = 0; i < uniqueArray.length; i++){
-			resultBlankArray[uniqueArray[i]] = 0;
-		}
-		
-		resultBlankArray["unknown niche"] = 0;
-		
-		
-		callback(resultBlankArray);
-	});
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

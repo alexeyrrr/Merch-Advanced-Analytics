@@ -12,19 +12,27 @@ Adds new data visualization tools for merch.
 ### How do I get set up? ###
 
 * Summary of set up
-* Configuration
-* Dependencies
-* Database configuration
-* How to run tests
-* Deployment instructions
+
 
 ### Contribution guidelines ###
 
 * Writing tests
-* Code review
-* Other guidelines
+
 
 ### Who do I talk to? ###
 
-* Repo owner or admin
-* Other community or team contact
+
+### Functions Summary ###
+
+
+func1: need a function that gets 90 days of data,
+		inputs: startDate, EndDate
+
+func 2: calls Func1, returns all data
+		inputs: # of days or # months
+		
+		
+func 3 : Parses data for necessary info, processes
+		inputs: from func2
+
+
