@@ -9,6 +9,7 @@ var checkExist = setInterval(function() {
 		   	   
 		   if (element.getAttribute("href") == location) {
 			   element.parentElement.className += "active";
+			   element.parentElement.setAttribute("style", "display: block;");
 		   }
 		}
 

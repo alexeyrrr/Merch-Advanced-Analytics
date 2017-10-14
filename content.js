@@ -309,7 +309,9 @@ var sidebarHTML = '<nav id="sidebar">' +
 							'<li><a href="/MerchToolsTwoWeeksSales">14 Day Sales</a></li>' +
 							'<li><a href="/MerchToolsAllMonthsSales">Monthly Sales</a></li>' +
 							'<li><a href="/MerchToolsEditor">Manage Products</a></li>' +
+							'<li style="display:none;"><a href="/IndividualProductPage/">Individual Product Info</a></li>' +
 							'<li><a href="/MerchAnalyticsSettings">Settings</a></li>' +
+
 							/*'<li>' +
 								'<a href="#subMenu" data-toggle="collapse" aria-expanded="false">Other Tools</a>' +
 								'<ul class="collapse list-unstyled" id="subMenu">' +
@@ -375,7 +377,6 @@ function fetchDaySales(numberOfDays, callback){ /* Todo, not implemented */
 	});
 	
 }
-
 
 
 function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlabel, ts, gendersArray, sizesArray, shirtColorsArray, nicheArray, specificASIN = null) {
@@ -475,12 +476,15 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
 						roy.push(totalRoyalties);
 						document.getElementById("twoweeksstats")
 							.innerHTML = "<center><h3>Loading Day [" + (m - count) + "/" + m + "]</h3></center>";
-							
+												
 						fetchsales(count - 1, m, salesData, cancelData, returnData, rev, roy, chlabel, ts, gendersData, sizesData, shirtColorsData, shirtNicheData);
+						
+						
+						
 						
 					}, 250);
 					
-
+					
 				
                 };
 
@@ -581,7 +585,6 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
 
 					}],
 					"labels": chlabel
-
 				};
 
 
@@ -603,7 +606,6 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
 
 					}],
 					"labels": chlabel
-
 				};
 					
 				/* New Gender Chart */
@@ -876,7 +878,9 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
 							//Make Entire Row Clickable
 							$(function(){
 								$('#shirtListTable tbody > tr[data-href!=""]').click(function() {
-									window.location = $(this).data("href");
+									var url = $(this).data("href");
+									window.open(url, '_blank');
+									
 								});
 							});
 								
@@ -898,7 +902,6 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
 	};
 	
 };
-
 
 
 function twoweekssales(number) {
@@ -969,7 +972,6 @@ function twoweekssales(number) {
 	
 	fetchsales(numberofDays, numberofDays, salesData, cancelData, returnData, rev, roy, chlabel, gendersData, sizesData, shirtColorsData, shirtNicheData);
 };
-
 
 
 /***************************************************************/
@@ -1281,14 +1283,27 @@ function individualProductPage(queryParams){
 					'<div class="wrapper">' + 
 						'<div class="container">' +
 							'<div class="panel panel-default">' +
-								'<div class="alert alert-success">' + 
-									'<strong>' + 'Product ASIN= ' + queryParams["ASIN"] + '</strong>' +
+								'<div class="alert alert-success" id="status">' + 
+									'<strong> Loading ... </strong>' +
 								'</div>'+
-								'<div class="panel-body" id="individualShirtSales"></div>' +
+								'<div class="panel-body" id="individualShirtSummary"></div>' +
 							'</div>'+
-							' <div class="panel panel-default" id="salesPanel">    <div class="panel-heading">Sales/Cancellations</div>    <div class="panel-body"><center><canvas id="canvas1" height="450" width="800" ></canvas></center></div> </div>' +
-							' <div class="panel panel-default" id="revenuePanel">    <div class="panel-heading">Revenue/Royalties</div>    <div class="panel-body"><center><canvas id="canvas2" height="450" width="800" ></canvas></center></div> </div>' +
-							'<div class="panel panel-default"><div class="panel-heading">Shirts Sold</div> <div class="panel-body" id="shirtlist"></div></div>' +
+							' <div class="panel panel-default" id="salesPanel">' + 
+								'<div class="panel-heading">Sales/Cancellations</div>' + 
+								'<div class="panel-body">' + 
+									'<center><canvas id="canvas1" height="450" width="800" ></canvas></center>' + 
+								'</div>' + 
+							'</div>' +
+							'<div class="panel panel-default" id="revenuePanel">'+ 
+								'<div class="panel-heading">Revenue/Royalties</div>' + 
+								'<div class="panel-body">' + 
+									'<center><canvas id="canvas2" height="450" width="800" ></canvas></center>' + 
+								'</div>' + 
+							'</div>' +
+							'<div class="panel panel-default">' + 
+								'<div class="panel-heading">Sales History</div>' + 
+								'<div class="panel-body" id="individualShirtSales"></div>' +
+							'</div>' +
 						'</div>' + 
 					'</div>' + 
 				'</body>';
@@ -1306,55 +1321,206 @@ function renderIndividualProductSales(queryParams){
 	var targetASIN = queryParams["ASIN"];
 	
 	fetchIndividualProductSales(targetASIN, function(responseArray){	
-		var cp2 = '<h2>Product Info:</h2><br>' +
-			'<div id="status"></div>' +
-			'<table class="table table-striped"><thead><tr><th>#</th>'
-			+ '<th>Date Sold</th>'
-			+ '<th class="text-center">Units</th>'
-			+ '<th class="text-center">Revenue</th>'
-			+ '<th class="text-center">Royalty</th>'
-			+ '<th class="text-center">Gender</th>' 
-			+ '<th class="text-center">Size</th>'
-			+ '<th class="text-center">Color</th>'
-			+ '</tr></thead><tbody>';
+		// Assemble Data for Graphs 
+		
+		// Need To get First Publication Date
+		fetchAllLiveProducts(function (liveProductsArray){
+			var firstPublishDate = "";
+			var today = new Date().setTimeZone();
+			today.setUTCHours(7,0,0,0); 
+			
+			for ( i =0; i < liveProductsArray.length; i++){
+				if(liveProductsArray[i]["marketplaceAsinMap"]["US"] == targetASIN){
+					var firstPublishDate = new Date(parseInt(liveProductsArray[i]["firstPublishDate"]));
+					var imgURL = liveProductsArray[i]["imageURL"];
+					var firstPublishDateString = firstPublishDate.toDateString();
+					var shirtName = liveProductsArray[i]["name"];					
+				}
+			
+			}
+										
+			//Generate Axis Labels
+			var axisLabels = [];
+			while (firstPublishDate <= today.getTime()) {
+				var dd = firstPublishDate.getDate();
+				var mm = firstPublishDate.getMonth()+1;
 
-		for (i=0; i < responseArray.length; i++){
-			cp2 += '<tr><th scope="row">' + (i + 1) + '</th>' + 
-				'<td class="text-center">' + 
-					responseArray[i]["Date"]  + 
-				'</td>' + 
-				
-				'<td class="text-center">' +
-					responseArray[i]["Units"]  +
-				'</td>' +
-				
-				'<td class="text-center">' +
-					responseArray[i]["Revenue"]  +
-				'</td>' +
+				var yyyy = firstPublishDate.getFullYear();
+				if(dd<10){
+					dd='0'+dd;
+				} 
+				if(mm<10){
+					mm='0'+mm;
+				} 
+				var stringifiedDate = mm+'-'+dd+'-'+yyyy;
+				axisLabels.push(stringifiedDate);
+				firstPublishDate = firstPublishDate.adjustDate(1);
+			}
+			
+			
+			//Extract Dates of Sales
+			var datesArray = [];
+			for ( i =0; i < responseArray.length; i++){
+				datesArray.push(responseArray[i]["Date"]);
+			}
+			
+			var salesData = new Array(axisLabels.length).fill(0);
+			var cancelData = new Array(axisLabels.length).fill(0);
+			var revenueData = new Array(axisLabels.length).fill(0);
+			var royaltyData = new Array(axisLabels.length).fill(0);
+			
+			//Sales Data (Not Very Efficient)
+			for (i = 0; i < axisLabels.length; i++) {
+				for ( i2 = 0; i2 < responseArray.length; i2++){
+					if(axisLabels[i] == responseArray[i2]["Date"]){
+						salesData[i] += 1;
+						revenueData[i] += parseFloat(responseArray[i2]["Revenue"]);
+						royaltyData[i] += parseFloat(responseArray[i2]["Royalty"]);
+					} 
 					
-				'<td class="text-center">' +
-					responseArray[i]["Royalty"]  +
-				'</td>' +
-				
-				'<td class="text-center">' +
-					responseArray[i]["Category 1"]  +
-				'</td>' +
-				
-				'<td class="text-center">' +
-					responseArray[i]["Category 2"]  +
-				'</td>' +
-				
-				'<td class="text-center">' +
-					responseArray[i]["Category 3"]  +
-				'</td>';
-		}
+					if(axisLabels[i] == responseArray[i2]["Date"] && parseInt(responseArray[i2]["Revenue"]) == 0){
+						cancelData[i] += 1;
+					} 
 					
-							
-		cp2 += '</tbody></table>';
-		document.getElementById("individualShirtSales")
-			.innerHTML = cp2;
+				}
+			}
+			
+			var lifetimeSales = salesData.reduce(function(a, b) { return a + b; }, 0) - cancelData.reduce(function(a, b) { return a + b; }, 0) ;
+			var lifetimeRevenue = revenueData.reduce(function(a, b) { return a + b; }, 0).toFixed(2);
+			var lifetimeRoyalties = royaltyData.reduce(function(a, b) { return a + b; }, 0).toFixed(2);
+			
+					
+			var lineChartData1 = {
+				"datasets": [{
+					"data": salesData,
+					label: 'Sales',
+					"pointStrokeColor": "#fff",
+					"fillColor": "rgba(91, 185, 70, 0.75)",
+					"pointColor": "rgba(91, 185, 70,1)",
+					"strokeColor": "rgba(91, 185, 70,1)"
+				} , {
+					"data": cancelData,
+					label: 'Cancellations',
+					"pointStrokeColor": "#fff",
+					"fillColor": "rgba(255, 61, 61, 0.75)",
+					"pointColor": "rgba(255, 61, 61,1)",
+					"strokeColor": "rgba(255, 61, 61,1)"
+
+				}],
+				"labels": axisLabels
+			};
+						
+			var lineChartData2 = {
+				"datasets": [{
+					"data": revenueData,
+					label: 'Revenue',
+					"pointStrokeColor": "#fff",
+					"fillColor": "rgba(246, 145, 30, 0.75)",
+					"pointColor": "rgba(246, 145, 30,1)",
+					"strokeColor": "rgba(246, 145, 30,1)"
+				}, {
+					"data": royaltyData,
+					label: 'Royalties',
+					"pointStrokeColor": "#fff",
+					"fillColor": "rgba(215, 45, 255, 0.5)",
+					"pointColor": "rgba(215, 45, 255,1)",
+					"strokeColor": "rgba(215, 45, 255,1)"
+
+				}],
+				"labels": axisLabels
+			};
+			
+			
+			var sales = new Chart(document.getElementById("canvas1")
+					.getContext("2d"))
+				.Line(lineChartData1);
+				
+			
+			var royt = new Chart(document.getElementById("canvas2")
+					.getContext("2d"))
+				.Line(lineChartData2);
 		
-		
+			/*Assemble Sales History Table */
+			var cp2 = '<div id="status"></div>' +
+				'<table class="table table-striped"><thead><tr><th>#</th>'
+				+ '<th class="text-center">Date Sold</th>'
+				+ '<th class="text-center">Units</th>'
+				+ '<th class="text-center">Revenue</th>'
+				+ '<th class="text-center">Royalty</th>'
+				+ '<th class="text-center">Gender</th>' 
+				+ '<th class="text-center">Size</th>'
+				+ '<th class="text-center">Color</th>'
+				+ '</tr></thead><tbody>';
+
+			for (i=0; i < responseArray.length; i++){
+				cp2 += '<tr><th scope="row">' + (i + 1) + '</th>' + 
+					'<td class="text-center">' + 
+						responseArray[i]["Date"]  + 
+					'</td>' + 
+					
+					'<td class="text-center">' +
+						responseArray[i]["Units"]  +
+					'</td>' +
+					
+					'<td class="text-center">' +
+						responseArray[i]["Revenue"]  +
+					'</td>' +
+						
+					'<td class="text-center">' +
+						responseArray[i]["Royalty"]  +
+					'</td>' +
+					
+					'<td class="text-center">' +
+						responseArray[i]["Category 1"]  +
+					'</td>' +
+					
+					'<td class="text-center">' +
+						responseArray[i]["Category 2"]  +
+					'</td>' +
+					
+					'<td class="text-center">' +
+						responseArray[i]["Category 3"]  +
+					'</td>';
+			}
+						
+								
+			cp2 += '</tbody></table>';
+			document.getElementById("individualShirtSales")
+				.innerHTML = cp2;
+			
+			
+			var shirtInfo = '<dl>'+
+								'<dt>Shirt Name:&nbsp;</dt>' +
+								'<dd>' + shirtName + '</dd>' +
+							'</dl><dl>' +
+								'<dt>First Published Date:&nbsp;</dt>' +
+								'<dd>' + firstPublishDateString + '</dd>' +
+							'</dl><dl>' +
+								'<dt>ASIN:&nbsp; </dt>' +
+								'<dd>' + targetASIN + '</dd>' +
+							'</dl><dl>' +
+								'<dt>Lifetime Sales:&nbsp; </dt>' +
+								'<dd>' + lifetimeSales + '</dd>' +
+							'</dl><dl>' +
+								'<dt>Lifetime Revenue:&nbsp; </dt>' +
+								'<dd>$' + lifetimeRevenue + '</dd>' +
+							'</dl><dl>' +
+								'<dt>Lifetime Royalties:&nbsp; </dt>' +
+								'<dd>$' + lifetimeRoyalties + '</dd>' +
+							'</dl>';
+			
+			document.getElementById("status").innerHTML = '<strong>Individual Product Information</strong>';			
+			document.getElementById("individualShirtSummary").innerHTML += '<img src='+ imgURL +'/>';
+			document.getElementById("individualShirtSummary").innerHTML += shirtInfo;
+			
+			console.log(imgURL);
+			
+
+			 
+			
+			
+					
+		});
 	});	
 }
 
