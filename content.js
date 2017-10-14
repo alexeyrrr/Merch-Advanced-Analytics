@@ -1332,7 +1332,7 @@ function renderIndividualProductSales(queryParams){
 			for ( i =0; i < liveProductsArray.length; i++){
 				if(liveProductsArray[i]["marketplaceAsinMap"]["US"] == targetASIN){
 					var firstPublishDate = new Date(parseInt(liveProductsArray[i]["firstPublishDate"]));
-					var imgURL = liveProductsArray[i]["imageURL"];
+					var imgURL = liveProductsArray[i]["imageURL"]; //Not working ATM
 					var firstPublishDateString = firstPublishDate.toDateString();
 					var shirtName = liveProductsArray[i]["name"];					
 				}
@@ -1510,16 +1510,9 @@ function renderIndividualProductSales(queryParams){
 							'</dl>';
 			
 			document.getElementById("status").innerHTML = '<strong>Individual Product Information</strong>';			
-			document.getElementById("individualShirtSummary").innerHTML += '<img src='+ imgURL +'/>';
+			//document.getElementById("individualShirtSummary").innerHTML += '<img src='+ imgURL +'/>'; //Not working ATM
 			document.getElementById("individualShirtSummary").innerHTML += shirtInfo;
-			
-			console.log(imgURL);
-			
-
-			 
-			
-			
-					
+							
 		});
 	});	
 }
