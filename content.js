@@ -216,10 +216,10 @@ function logincheck(cmd, queryParams = null) {
                 } else {
                     switch (cmd) {
                         case "twoweekssales":
-                            twoweekssales(14);
+                            dailySalesPage(14);
                             break;
                         case "todaysales":
-                            twoweekssales(0);
+                            dailySalesPage(0);
                             break;
                         case "merchall":
                             merchmonthsall();
@@ -271,7 +271,6 @@ if (cmd.indexOf("MerchToolsTodaySales") !== -1) {
 if (cmd.indexOf("MerchToolsTwoWeeksSales") !== -1) {
     logincheck("twoweekssales");
 };
-
 
 if (cmd.indexOf("MerchToolsAllMonthsSales") !== -1) {
     logincheck("merchall");
@@ -365,18 +364,281 @@ function fetchAllLiveProducts(callback){
 /***************************************************************/
 /********************** Daily Sales Page ***********************/
 /***************************************************************/	
-function fetchDaySales(numberOfDays, callback){ /* Todo, not implemented */
+function dailySalesPage(numberOfDays){
+	document.head.innerHTML = globalHeader;
+
+	var style = document.createElement('link');
+	style.rel = 'stylesheet';
+	style.type = 'text/css';
+	style.href = chrome.extension.getURL('css.css');
+
+	document.body.innerHTML = '<body>' +
+			'<div class="wrapper">' +
+				'<div class="container"><div class="panel panel-default"></center><div class="panel-body" id="twoweeksstats"><center><h3>Loading..</h3></center></div></div>' +
+				' <div class="panel panel-default" id="salesPanel">    <div class="panel-heading">Sales/Cancellations</div>    <div class="panel-body"><center><canvas id="canvas1" height="450" width="800" ></canvas></center></div> </div>' +
+				' <div class="panel panel-default" id="revenuePanel">    <div class="panel-heading">Revenue/Royalties</div>    <div class="panel-body"><center><canvas id="canvas2" height="450" width="800" ></canvas></center></div> </div>' +
+				' <div class="panel panel-default">    <div class="panel-heading">Advanced Analytics</div>    <div class="panel-body">'+
+				'<center>' +
+					'<div class="canvas-wrapper">' +
+						'<canvas id="canvas3" height="350" width="280" style="padding:10px"></canvas>' +
+						'<h3 class="canvas-title">Gender Distribution</h3>' +
+					'</div>' +
+					'<div class="canvas-wrapper">'+
+						'<canvas id="canvas4" height="350" width="280" style="padding:10px"></canvas>' +
+						'<h3 class="canvas-title">Size Distribution</h3>' +
+					'</div>'+
+					'<div class="canvas-wrapper">'+
+						'<canvas id="canvas5" height="350" width="280" style="padding:10px"></canvas>'+
+						'<h3 class="canvas-title">Color Distribution</h3>' +
+					'</div>' +
+					'</div> </div>' +
+				'</center>' +
+				' <div class="panel panel-default" id="nichePanel">    <div class="panel-heading">Niche Analysis</div>    <div class="panel-body">'+
+					'<div class="col-xs-6">' +
+						'<center>' +
+							'<div class="canvas-wrapper" style="width: 100%;">'+
+								'<canvas id="canvas6" height="350" width="280" style="padding:10px"></canvas>'+
+								'<h3 class="canvas-title">Normalized Niche Distribution (%)</h3>' +
+							'</div>' +
+						'</center>' +
+					'</div>' +
+				'</div> </div>' +
+				'<br><div class="panel panel-default"><div class="panel-heading">Shirts Sold</div> <div class="panel-body" id="shirtlist"></div></div></div>' + 
+			'</div>' +
+		'</body>';
+			
+	var pageContent = document.querySelector(".wrapper");
+	pageContent.innerHTML += sidebarHTML;
+
+	renderDailyView(14);
+}
+
+
+function renderDailyView(numberOfDays, callback){
 	var today = new Date().setTimeZone();
 	today.setUTCHours(7,0,0,0); 
 	var fromDate = today.adjustDate(-numberOfDays).getTime();
 	var toDate = today.getTime();
 	
 	fetchSalesDataCSV(fromDate, toDate, function(responseArray){
-		console.log(responseArray);
+		//console.log(responseArray);
 		
+		//Generate Axis Labels
+		var axisLabels = [];
+		var stopDate = today.adjustDate(-numberOfDays); //Same as fromDate, but not UNIX time
+		
+		while (stopDate <= toDate) {
+			var dd = stopDate.getDate();
+			var mm = stopDate.getMonth()+1;
+
+			var yyyy = stopDate.getFullYear();
+			if(dd<10){
+				dd='0'+dd;
+			} 
+			if(mm<10){
+				mm='0'+mm;
+			} 
+			var stringifiedDate = mm+'-'+dd+'-'+yyyy;
+			axisLabels.push(stringifiedDate);
+			stopDate = stopDate.adjustDate(1);
+		}
+		
+		
+		//Extract Dates of Sales
+		var datesArray = [];
+		for ( i =0; i < responseArray.length; i++){
+			datesArray.push(responseArray[i]["Date"]);
+		}
+			
+		var salesData = new Array(axisLabels.length).fill(0);
+		var cancelData = new Array(axisLabels.length).fill(0);
+		var revenueData = new Array(axisLabels.length).fill(0);
+		var royaltyData = new Array(axisLabels.length).fill(0);
+		
+		//Tally Numbers
+		var gendersArray = {'Men': 0, 'Women': 0, 'Youth': 0};
+		var sizesArray = {'Small': 0, 'Medium': 0, 'Large': 0, 'XL': 0, '2XL': 0, '3XL': 0, '4': 0, '6': 0, '8': 0, '10': 0, '12': 0};
+		var shirtColorsArray = {'Dark Heather': 0, 'Heather Grey': 0, 'Heather Blue': 0, 'Black': 0, 'Navy': 0, 'Silver': 0, 'Royal Blue': 0, 'Brown': 0, 'Slate': 0, 'Red': 0, 'Asphalt': 0, 'Grass': 0, 'Olive': 0, 'Kelly Green': 0, 'Baby Blue': 0, 'White': 0, 'Lemon': 0, 'Cranberry': 0, 'Pink': 0, 'Orange': 0, 'Purple': 0};
+					
+		//Assemble Dynamic Blank Array For Niches
+		var nicheArray = {};
+		assembleDynamicBlankArray(function(resultBlankArray){
+			nicheArray = resultBlankArray;
+		
+		
+			//Sales Data (Not Very Efficient)
+			for (i = 0; i < axisLabels.length; i++) {
+				for ( i2 = 0; i2 < responseArray.length; i2++){
+					if(axisLabels[i] == responseArray[i2]["Date"]){	
+						getShirtNiche(responseArray[i2]["ASIN"], function(shirtNiche){								
+							//If niche tag matches, incremeent count
+							if (shirtNiche in nicheArray){ 
+								nicheArray[shirtNiche] += 1;
+							} else {
+								nicheArray["unknown niche"] += 1;
+							}
+							
+							
+							
+							salesData[i] += parseInt(responseArray[i2]["Units"]);
+							cancelData[i] += parseInt(responseArray[i2]["Cancellations"]);
+							revenueData[i] += parseFloat(responseArray[i2]["Revenue"]);
+							royaltyData[i] += parseFloat(responseArray[i2]["Royalty"]);
+
+							//Determine Gender And Count it 
+							for (var key in gendersArray){
+								if (key.toString() == responseArray[i2]["Category 1"]){
+									gendersArray[key] += 1;
+								}
+							}
+							
+							//Determine Size And Count it 
+							for (var key in sizesArray){
+								if (key.toString() == responseArray[i2]["Category 2"]){
+									sizesArray[key] += 1;
+								}
+							}
+							
+							//Determine Color And Count it 
+							for (var key in shirtColorsArray){
+								if (key.toString() == responseArray[i2]["Category 3"]){
+									shirtColorsArray[key] += 1;
+								}
+							}
+							
+						}.bind( {i2: i2, responseArray: responseArray} ));
+								
+					} 
+				}
+			}
+		
+		
+			/*
+			setTimeout(function(){     
+			
+			}, 250);
+			*/
+				
+				
+			/*
+			console.log(shirtColorsArray);
+			console.log(sizesArray);
+			console.log(gendersArray);
+			console.log(nicheArray);
+			
+			console.log(salesData);
+			*/
+				
+			var lineChartData1 = {
+				"datasets": [{
+					"data": salesData,
+					label: 'Sales',
+					"pointStrokeColor": "#fff",
+					"fillColor": "rgba(91, 185, 70, 0.75)",
+					"pointColor": "rgba(91, 185, 70,1)",
+					"strokeColor": "rgba(91, 185, 70,1)"
+				} , {
+					"data": cancelData,
+					label: 'Cancellations',
+					"pointStrokeColor": "#fff",
+					"fillColor": "rgba(255, 61, 61, 0.75)",
+					"pointColor": "rgba(255, 61, 61,1)",
+					"strokeColor": "rgba(255, 61, 61,1)"
+
+				}],
+				"labels": axisLabels
+			};
+						
+			var lineChartData2 = {
+				"datasets": [{
+					"data": revenueData,
+					label: 'Revenue',
+					"pointStrokeColor": "#fff",
+					"fillColor": "rgba(246, 145, 30, 0.75)",
+					"pointColor": "rgba(246, 145, 30,1)",
+					"strokeColor": "rgba(246, 145, 30,1)"
+				}, {
+					"data": royaltyData,
+					label: 'Royalties',
+					"pointStrokeColor": "#fff",
+					"fillColor": "rgba(215, 45, 255, 0.5)",
+					"pointColor": "rgba(215, 45, 255,1)",
+					"strokeColor": "rgba(215, 45, 255,1)"
+
+				}],
+				"labels": axisLabels
+			};
+			
+			
+			var sales = new Chart(document.getElementById("canvas1")
+					.getContext("2d"))
+				.Line(lineChartData1);
+				
+			
+			var royt = new Chart(document.getElementById("canvas2")
+					.getContext("2d"))
+				.Line(lineChartData2);
+			
+			
+			
+			//Need to redo and sum up
+			/*
+			// Assemble Sales History Table
+			var cp2 = '<div id="status"></div>' +
+				'<table class="table table-striped"><thead><tr><th>#</th>'
+				+ '<th class="text-center">Date Sold</th>'
+				+ '<th class="text-center">Units</th>'
+				+ '<th class="text-center">Revenue</th>'
+				+ '<th class="text-center">Royalty</th>'
+				+ '<th class="text-center">Gender</th>' 
+				+ '<th class="text-center">Size</th>'
+				+ '<th class="text-center">Color</th>'
+				+ '</tr></thead><tbody>';
+
+			for (i=0; i < responseArray.length; i++){
+				cp2 += '<tr><th scope="row">' + (i + 1) + '</th>' + 
+					'<td class="text-center">' + 
+						responseArray[i]["Date"]  + 
+					'</td>' + 
+					
+					'<td class="text-center">' +
+						responseArray[i]["Units"]  +
+					'</td>' +
+					
+					'<td class="text-center">' +
+						responseArray[i]["Revenue"]  +
+					'</td>' +
+						
+					'<td class="text-center">' +
+						responseArray[i]["Royalty"]  +
+					'</td>' +
+					
+					'<td class="text-center">' +
+						responseArray[i]["Category 1"]  +
+					'</td>' +
+					
+					'<td class="text-center">' +
+						responseArray[i]["Category 2"]  +
+					'</td>' +
+					
+					'<td class="text-center">' +
+						responseArray[i]["Category 3"]  +
+					'</td>';
+			}
+						
+								
+			cp2 += '</tbody></table>';
+			document.getElementById("shirtlist")
+				.innerHTML = cp2;
+			*/
+		
+		}); //Callback end
 	});
 	
 }
+
+
+
 
 
 function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlabel, ts, gendersArray, sizesArray, shirtColorsArray, nicheArray, specificASIN = null) {
@@ -449,7 +711,7 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
 								}
 							}
 							
-							//Determine Size And Count it 
+							//Determine Color And Count it 
 							shirtColor = getShirtColor(ts[i].asinName);
 							for (var key in shirtColorsArray){
 								if (key.toString() == shirtColor){
@@ -906,16 +1168,13 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
 
 function twoweekssales(number) {
     document.head.innerHTML = globalHeader;
-			
-			
+				
 	var style = document.createElement('link');
 	style.rel = 'stylesheet';
 	style.type = 'text/css';
 	style.href = chrome.extension.getURL('css.css');
 
-
-    var d = new Date();
-    n = d.toString();
+	
     document.body.innerHTML = '<body>' +
 				'<div class="wrapper">' +
 					'<div class="container"><div class="panel panel-default"></center><div class="panel-body" id="twoweeksstats"><center><h3>Loading..</h3></center></div></div>' +
@@ -1373,15 +1632,11 @@ function renderIndividualProductSales(queryParams){
 			for (i = 0; i < axisLabels.length; i++) {
 				for ( i2 = 0; i2 < responseArray.length; i2++){
 					if(axisLabels[i] == responseArray[i2]["Date"]){
-						salesData[i] += 1;
+						salesData[i] += parseInt(responseArray[i2]["Units"]);
+						cancelData[i] += parseInt(responseArray[i2]["Cancellations"]);
 						revenueData[i] += parseFloat(responseArray[i2]["Revenue"]);
 						royaltyData[i] += parseFloat(responseArray[i2]["Royalty"]);
 					} 
-					
-					if(axisLabels[i] == responseArray[i2]["Date"] && parseInt(responseArray[i2]["Revenue"]) == 0){
-						cancelData[i] += 1;
-					} 
-					
 				}
 			}
 			
@@ -1635,7 +1890,6 @@ function getShirtNiche(shirtASIN, callback){
 			parsedJson = JSON.parse(items[myKey]);
 			determinedNiche = parsedJson["niche"];
 		}
-		
 		
 		callback(determinedNiche); //Run Callback
 	});
