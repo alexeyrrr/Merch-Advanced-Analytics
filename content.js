@@ -666,6 +666,7 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
 				/* New Shirt Niches Chart */
 				var shirtNicheColors = ["#e0f2f1", "#b2dfdb", "#80cbc4", "#4db6ac", "#26a69a", "#009688", "#00897b", "#00796b", "#00695c", "#004d40"];
 				lineChartData6 = [];
+				lineChartData7 = [];
 				
 				colorIndex = 0;
 				
@@ -690,9 +691,10 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
 
 							
 					
-				for (var key in normalizedPercentageArray){
+					
+				for (var key in rnicheArray){
 					lineChartData6.push({
-						"value": normalizedPercentageArray[key],
+						"value": rnicheArray[key],
 						"color": shirtNicheColors[colorIndex],
 						"label": key
 					})
@@ -702,9 +704,27 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
 					}
 				}
 					
+				for (var key in normalizedPercentageArray){
+					lineChartData7.push({
+						"value": normalizedPercentageArray[key],
+						"color": shirtNicheColors[colorIndex],
+						"label": key
+					})
+					colorIndex ++;
+					if (colorIndex > 9){ //Reset and reloop over colors
+						colorIndex = 0;
+					}
+				}
+				
+
 				var nicheChart = new Chart(document.getElementById("canvas6")
 					.getContext("2d"))
 				.Pie(lineChartData6, options);
+
+				
+				var nicheChart = new Chart(document.getElementById("canvas7")
+					.getContext("2d"))
+				.Pie(lineChartData7, options);
 				/* End Shirt Niches Chart */
 			
 			
@@ -942,10 +962,20 @@ function twoweekssales(number) {
 							'<center>' +
 								'<div class="canvas-wrapper" style="width: 100%;">'+
 									'<canvas id="canvas6" height="350" width="280" style="padding:10px"></canvas>'+
+									'<h3 class="canvas-title">Niche Distribution (%)</h3>' +
+								'</div>' +
+							'</center>' +
+						'</div>' +
+						
+						'<div class="col-xs-6">' +
+							'<center>' +
+								'<div class="canvas-wrapper" style="width: 100%;">'+
+									'<canvas id="canvas7" height="350" width="280" style="padding:10px"></canvas>'+
 									'<h3 class="canvas-title">Normalized Niche Distribution (%)</h3>' +
 								'</div>' +
 							'</center>' +
 						'</div>' +
+						
 					'</div> </div>' +
 					'<br><div class="panel panel-default"><div class="panel-heading">Shirts Sold</div> <div class="panel-body" id="shirtlist"></div></div></div>' + 
 				'</div>' +
