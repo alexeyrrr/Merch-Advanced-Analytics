@@ -794,31 +794,42 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
 					
 				/*Dump Sales Data */				
 				var nicheDistData = '<div class="col-xs-6">';
-				nicheDistData += '<h4>Total Number Of Shirts Available For Sale In Each Niche</h4>';
+				nicheDistData += '<h4>Total Number Of Shirts Available For Sale In Each Niche</h4>' +
+								'<div class="niche-list-area">';
 				
 				
-				for(var key in totalTally){
+				//Have to sort by descending, this is ugly
+				var sortableTotalTally = [];
+				for (var number in totalTally) {
+					sortableTotalTally.push([number, totalTally[number]]);
+				}
+
+				sortableTotalTally.sort(function(a, b) {
+					return b[1] - a[1];
+				});
+							
+				for(i=0; i < sortableTotalTally.length; i++){
 					nicheDistData += '<dl>'
 										+ '<dt>'
-										+ 		key + ":&nbsp;"
+										+ 		sortableTotalTally[i][0] + ":&nbsp;"
 										+ '</dt>'
 										+ '<dd>'
-										+ 		totalTally[key]
+										+ 		sortableTotalTally[i][1]
 										+ '</dd>'
 									+ '</dl>'
 				}
 				
-				nicheDistData += '</div>';
+				nicheDistData += '</div>' + 
+								'<a class="more-btn">Display All</a>' +
+								'</div>';
 				
-				
-				/*
-				document.getElementById("nichePanel")
-					.innerHTML = nicheDistData;
-				*/	
-					
-				
+							
 				$("#nichePanel .panel-body").append(nicheDistData);
 				
+				$(".more-btn").click(function(){
+					$('.niche-list-area').toggleClass('expanded');
+				});
+								
 					
 					
 				/*Table Header */
@@ -962,7 +973,7 @@ function twoweekssales(number) {
 							'<center>' +
 								'<div class="canvas-wrapper" style="width: 100%;">'+
 									'<canvas id="canvas6" height="350" width="280" style="padding:10px"></canvas>'+
-									'<h3 class="canvas-title">Niche Distribution (%)</h3>' +
+									'<h3 class="canvas-title">Niche Distribution (Number Sold)</h3>' +
 								'</div>' +
 							'</center>' +
 						'</div>' +
