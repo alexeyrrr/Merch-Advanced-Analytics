@@ -251,7 +251,6 @@ dt, dd{
 }
 
 
-
 .niche-list-area.expanded{
 	max-height: none;
 }
@@ -266,3 +265,14 @@ dt, dd{
     float: left;
 }
 
+.number-of-days-wrapper{
+	float:left; 
+	width: 100%;
+	display: block;
+	font-weight: 700;
+}
+
+[name="numberOfDaysInput"]{
+	max-width: 36px;
+    margin: 0 5px;	
+}

@@ -755,11 +755,13 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
 						+ '<td><b>' + (rRoyalties /(numberofDays + 1)).toFixed(2) + '</b></td>'
 						+ '</tr></tbody></table><br>'
 
-						+ '<div>'
-						+ '<span>Set Date Range </span>'
+						+ '<div class="number-of-days-wrapper">'
+						+ '<span>Adjust date range to the last</span>'
 						+ 	'<input type="text" name="numberOfDaysInput" />' 
-						+ 	'<input type="submit" value="Update & Refresh" class="btn btn-success" id="save-number-days"/>'
-						+ '</div>';
+						+    'days'
+						+ '</div>'
+						+ 	'<input type="submit" value="Update & Refresh" class="btn btn-success" id="save-number-days"/>';
+						
 			   
 							
 				document.getElementById("twoweeksstats")
