@@ -928,6 +928,7 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
 				/* New Shirt Niches Chart */
 				var shirtNicheColors = ["#e0f2f1", "#b2dfdb", "#80cbc4", "#4db6ac", "#26a69a", "#009688", "#00897b", "#00796b", "#00695c", "#004d40"];
 				lineChartData6 = [];
+				lineChartData7 = [];
 				
 				colorIndex = 0;
 				
@@ -952,9 +953,10 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
 
 							
 					
-				for (var key in normalizedPercentageArray){
+					
+				for (var key in rnicheArray){
 					lineChartData6.push({
-						"value": normalizedPercentageArray[key],
+						"value": rnicheArray[key],
 						"color": shirtNicheColors[colorIndex],
 						"label": key
 					})
@@ -964,9 +966,27 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
 					}
 				}
 					
+				for (var key in normalizedPercentageArray){
+					lineChartData7.push({
+						"value": normalizedPercentageArray[key],
+						"color": shirtNicheColors[colorIndex],
+						"label": key
+					})
+					colorIndex ++;
+					if (colorIndex > 9){ //Reset and reloop over colors
+						colorIndex = 0;
+					}
+				}
+				
+
 				var nicheChart = new Chart(document.getElementById("canvas6")
 					.getContext("2d"))
 				.Pie(lineChartData6, options);
+
+				
+				var nicheChart = new Chart(document.getElementById("canvas7")
+					.getContext("2d"))
+				.Pie(lineChartData7, options);
 				/* End Shirt Niches Chart */
 			
 			
@@ -997,11 +1017,13 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
 						+ '<td><b>' + (rRoyalties /(numberofDays + 1)).toFixed(2) + '</b></td>'
 						+ '</tr></tbody></table><br>'
 
-						+ '<div>'
-						+ '<span>Set Date Range </span>'
+						+ '<div class="number-of-days-wrapper">'
+						+ '<span>Adjust date range to the last</span>'
 						+ 	'<input type="text" name="numberOfDaysInput" />' 
-						+ 	'<input type="submit" value="Update & Refresh" class="btn btn-success" id="save-number-days"/>'
-						+ '</div>';
+						+    'days'
+						+ '</div>'
+						+ 	'<input type="submit" value="Update & Refresh" class="btn btn-success" id="save-number-days"/>';
+						
 			   
 							
 				document.getElementById("twoweeksstats")
@@ -1036,31 +1058,42 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
 					
 				/*Dump Sales Data */				
 				var nicheDistData = '<div class="col-xs-6">';
-				nicheDistData += '<h4>Total Number Of Shirts Available For Sale In Each Niche</h4>';
+				nicheDistData += '<h4>Total Number Of Shirts Available For Sale In Each Niche</h4>' +
+								'<div class="niche-list-area">';
 				
 				
-				for(var key in totalTally){
+				//Have to sort by descending, this is ugly
+				var sortableTotalTally = [];
+				for (var number in totalTally) {
+					sortableTotalTally.push([number, totalTally[number]]);
+				}
+
+				sortableTotalTally.sort(function(a, b) {
+					return b[1] - a[1];
+				});
+							
+				for(i=0; i < sortableTotalTally.length; i++){
 					nicheDistData += '<dl>'
 										+ '<dt>'
-										+ 		key + ":&nbsp;"
+										+ 		sortableTotalTally[i][0] + ":&nbsp;"
 										+ '</dt>'
 										+ '<dd>'
-										+ 		totalTally[key]
+										+ 		sortableTotalTally[i][1]
 										+ '</dd>'
 									+ '</dl>'
 				}
 				
-				nicheDistData += '</div>';
+				nicheDistData += '</div>' + 
+								'<a class="more-btn">Display All</a>' +
+								'</div>';
 				
-				
-				/*
-				document.getElementById("nichePanel")
-					.innerHTML = nicheDistData;
-				*/	
-					
-				
+							
 				$("#nichePanel .panel-body").append(nicheDistData);
 				
+				$(".more-btn").click(function(){
+					$('.niche-list-area').toggleClass('expanded');
+				});
+								
 					
 					
 				/*Table Header */
@@ -1201,10 +1234,20 @@ function twoweekssales(number) {
 							'<center>' +
 								'<div class="canvas-wrapper" style="width: 100%;">'+
 									'<canvas id="canvas6" height="350" width="280" style="padding:10px"></canvas>'+
+									'<h3 class="canvas-title">Niche Distribution (Number Sold)</h3>' +
+								'</div>' +
+							'</center>' +
+						'</div>' +
+						
+						'<div class="col-xs-6">' +
+							'<center>' +
+								'<div class="canvas-wrapper" style="width: 100%;">'+
+									'<canvas id="canvas7" height="350" width="280" style="padding:10px"></canvas>'+
 									'<h3 class="canvas-title">Normalized Niche Distribution (%)</h3>' +
 								'</div>' +
 							'</center>' +
 						'</div>' +
+						
 					'</div> </div>' +
 					'<br><div class="panel panel-default"><div class="panel-heading">Shirts Sold</div> <div class="panel-body" id="shirtlist"></div></div></div>' + 
 				'</div>' +
@@ -1458,10 +1501,17 @@ function productManager() {
 				
 	bodyHTML = '<body>' + 
 					'<div class="wrapper">' +
-						'<div class="container"><br><div class="panel panel-default">' +
-						'<div class="alert alert-success"><strong> Use  CTRL + F (PC) or ⌘ + F (MAC) to open the search bar.</strong>' +
-						'<div class="btn btn-info" id="reset-button">Clear All Niche Data</div>' +
-						'</div><div class="panel-body" id="shirtlist"></div></div></div>' + 
+						'<div class="container">' + 
+							'<div class="panel panel-default">' +
+								'<div class="alert alert-success"><strong> Use  CTRL + F (PC) or ⌘ + F (MAC) to open the search bar.</strong>' +
+									'<div class="btn btn-info" id="reset-button">Clear All Niche Data</div>' +
+								'</div>' + 
+								'<div class="panel-body" id="manager-stats"></div>' + 
+							'</div>'+ 
+							'<div class="panel panel-default">' +
+							'<div class="panel-body" id="shirtlist"></div>' + 
+							'</div>'+ 
+						'</div>' + 
 					'</div>' +
 				'</body>';
 	
@@ -1485,20 +1535,24 @@ function productManager() {
 					+ '<th class="text-center">Edit</th>'
 					+ '</tr></thead><tbody>';
 		k = 0;
+		
+		//Setup counter variables
+		var lifetimesSalesCounter = 0;
+		var liveDesignsCounter = 0;
+		
 		for (var i = 0; i < ts.length; i++) {
 			k++;
 			
-			
-			
-			
-			if (ts[i].marketplaceAsinMap.US !== undefined){
-			
+			if (ts[i].marketplaceAsinMap.US !== undefined && ts[i].status == "LIVE"){
 				var hasLifetimeSales = false;
+				liveDesignsCounter++;
+				
 				//Determine if a design has ever sold
 				if(ts[i].daysUntilDeletion.length === 0 || parseInt(ts[i].daysUntilDeletion) > 90){
 					hasLifetimeSales = true;
+					lifetimesSalesCounter++;
 				}
-			
+							
 				cp2 += '<tr data-lifetime-sales="'+ hasLifetimeSales.toString() + '"><th scope="row">' + k + '</th>' + 
 					'<td><a href="/IndividualProductPage/?ASIN=' + ts[i].marketplaceAsinMap.US + '">' + ts[i].name + '</a></td>' + 
 						
@@ -1524,6 +1578,33 @@ function productManager() {
 		document.getElementById("shirtlist")
 			.innerHTML = cp2;
 			
+			
+		console.log(lifetimesSalesCounter);
+			
+		managerStats = '<table class="table table-striped"><thead>' + 
+			'<tr>' +
+				'<th class="text-center">Shirts With Any Lifetime Sales</th>'+
+				'<th class="text-center">Total Live Shirts</th>' + 
+				'<th class="text-center">% Of Designs that Have Ever Sold</th>' + 
+				//'<th class="text-center">Royalties</th>' + 
+				//'<th class="text-center">% Of Designs that Have Ever Sold</th>' + 
+				//'<th class="text-center">Average Sales / Day </th>' + 
+				//'<th class="text-center">Average Royalties / Day </th>' +
+			'</tr></thead><tbody>' + 
+			'<tr class="success text-center">' + 
+				'<td><b>' + lifetimesSalesCounter + '</b></td>' + 
+				'<td><b>' + liveDesignsCounter + '</b></td>' + 
+				'<td><b>' + (lifetimesSalesCounter/liveDesignsCounter*100).toFixed(2) +'</b></td>' + 
+				//'<td><b>' + "test" +'</b></td>' + 
+				//'<td><b>' + "test" + '</b></td>' + 
+				//'<td><b>' + "test" +'</b></td>' + 
+				//'<td><b>' + "test" + '</b></td>' + 
+			'</tr></tbody></table>';
+						
+			
+		document.getElementById("manager-stats")
+			.innerHTML = managerStats;
+					
 		new Tablesort(document.getElementById('quickEditor'));
 			
 		initSaveButtons(); //initialize event listeners for buttons
