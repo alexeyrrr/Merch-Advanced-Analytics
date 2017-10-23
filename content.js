@@ -391,7 +391,7 @@ function dailySalesPage(numberOfDays){
 
 	document.body.innerHTML = '<body>' +
 			'<div class="wrapper">' +
-				'<div class="container"><div class="panel panel-default"></center><div class="panel-body" id="twoweeksstats"><center><h3>Loading..</h3></center></div></div>' +
+				'<div class="container"><div class="panel panel-default"></center><div class="panel-body" id="dailystats"><center><h3>Loading..</h3></center></div></div>' +
 				' <div class="panel panel-default" id="salesPanel">    <div class="panel-heading">Sales/Cancellations</div>    <div class="panel-body"><center><canvas id="canvas1" height="450" width="800" ></canvas></center></div> </div>' +
 				' <div class="panel panel-default" id="revenuePanel">    <div class="panel-heading">Revenue/Royalties</div>    <div class="panel-body"><center><canvas id="canvas2" height="450" width="800" ></canvas></center></div> </div>' +
 				' <div class="panel panel-default">    <div class="panel-heading">Advanced Analytics</div>    <div class="panel-body">'+
@@ -445,9 +445,7 @@ function renderDailyView(numberOfDays, callback){
 	var fromDate = today.adjustDate(-numberOfDays).getTime();
 	var toDate = today.getTime();
 	
-	fetchSalesDataCSV(fromDate, toDate, function(responseArray){
-		//console.log(responseArray);
-		
+	fetchSalesDataCSV(fromDate, toDate, function(responseArray){		
 		//Generate Axis Labels
 		var axisLabels = [];
 		var stopDate = today.adjustDate(-numberOfDays); //Same as fromDate, but not UNIX time
@@ -467,8 +465,7 @@ function renderDailyView(numberOfDays, callback){
 			axisLabels.push(stringifiedDate);
 			stopDate = stopDate.adjustDate(1);
 		}
-		
-		
+						
 		//Extract Dates of Sales
 		var datesArray = [];
 		for ( i =0; i < responseArray.length; i++){
@@ -492,6 +489,8 @@ function renderDailyView(numberOfDays, callback){
 		
 			//Sales Data (Not Very Efficient)
 			getAllShirtNiches(function(nichesLookupArray){		
+				var numberofDaysInner = axisLabels.length; //Janky Way to recover number of days with proper scope
+				
 				for (i = 0; i < axisLabels.length; i++) {
 					for ( i2 = 0; i2 < responseArray.length; i2++){
 						if(axisLabels[i] == responseArray[i2]["Date"]){	
@@ -502,7 +501,7 @@ function renderDailyView(numberOfDays, callback){
 							} else {
 								nicheArray["unknown niche"] += 1;
 							}
-														
+											
 							salesData[i] += parseInt(responseArray[i2]["Units"]);
 							cancelData[i] += parseInt(responseArray[i2]["Cancellations"]);
 							revenueData[i] += parseFloat(responseArray[i2]["Revenue"]);
@@ -528,8 +527,7 @@ function renderDailyView(numberOfDays, callback){
 									shirtColorsArray[key] += 1;
 								}
 							}
-									
-						} 
+						}
 					}
 				}
 				
@@ -545,8 +543,6 @@ function renderDailyView(numberOfDays, callback){
 				}
 				
 				
-				
-				
 				//Make sure colors are in correct order												
 				var shirtColorsColorsLUT = {'Dark Heather': "#454b4b", 'Heather Grey': "#d5d9da", 'Heather Blue': "#696c9c", 'Black': "#222", 
 					'Navy': "#15232b", 'Silver': "#cfd1d1", 'Royal Blue': "#1c4086", 'Brown': "#31261d", 'Slate': "#818189", 'Red': "#b71111", 'Asphalt': "#3f3e3c", 
@@ -557,9 +553,7 @@ function renderDailyView(numberOfDays, callback){
 					finalShirtColorsLUT.push(shirtColorsColorsLUT[key]);
 				}
 				
-				
 				var shirtNicheColorsLUT = ["#e0f2f1", "#b2dfdb", "#80cbc4", "#4db6ac", "#26a69a", "#009688", "#00897b", "#00796b", "#00695c", "#004d40"];
-				
 				
 				//Assemble Chart Info																	
 				var lineChartData1 = {
@@ -656,13 +650,9 @@ function renderDailyView(numberOfDays, callback){
 					options: globalLineChartOptions,
 				};
 				
-				
-				
-										
 				var ctxSales = document.getElementById("canvas1").getContext("2d");	
 				var myChart = new Chart(ctxSales, lineChartData1);
 					
-				
 				var ctxRevenue = document.getElementById("canvas2").getContext("2d");	
 				var myChart = new Chart(ctxRevenue, lineChartData2);
 				
@@ -677,7 +667,6 @@ function renderDailyView(numberOfDays, callback){
 				
 				var ctxNiches = document.getElementById("canvas6").getContext("2d");	
 				var myChart = new Chart(ctxNiches, lineChartData6);
-				
 				
 				//Summing up all values
 				var allASINValues = [];
@@ -771,6 +760,73 @@ function renderDailyView(numberOfDays, callback){
 						window.open(url, '_blank');
 					});
 				});
+				
+				
+				/******* Render Top Page Stats *****************/
+				var totals = {};				
+				totals.sales = salesData.reduce(function(a, b) { return a + b; }, 0);
+				totals.cancelled = cancelData.reduce(function(a, b) { return a + b; }, 0);
+				totals.revenue = revenueData.reduce(function(a, b) { return a + b; }, 0).toFixed(2);				
+				totals.royalty = royaltyData.reduce(function(a, b) { return a + b; }, 0).toFixed(2);
+				
+				stats = '<center><h3>Statistics For The Past ' + numberofDaysInner + ' Days</h3></center><br>';	
+				stats += '<table class="table table-striped"><thead><tr>' +
+						'<th class="text-center">Shirts Sold</th>' + 
+						'<th class="text-center">Shirts Cancelled</th>' + 
+						'<th class="text-center">Revenue</th>' + 
+						'<th class="text-center">Royalties</th>'
+						+ '<th class="text-center">Average Royalties / Shirt </th>'
+						+ '<th class="text-center">Average Sales / Day </th>'
+						+ '<th class="text-center">Average Royalties / Day </th>'
+						+ '</tr></thead><tbody>'
+						+ '<tr class="success text-center"><td><b>' + totals.sales + '</b></td>'
+						+ '<td><b>' + totals.cancelled + '</b></td>'
+						+ '<td><b>' + totals.revenue + '</b></td>'
+						+ '<td><b>' + totals.royalty + '</b></td>'
+						+ '<td><b>' + (totals.royalty /(totals.sales - totals.cancelled)).toFixed(2) + '</b></td>'
+						+ '<td><b>' + (totals.sales /(numberofDaysInner)).toFixed(2) + '</b></td>'
+						+ '<td><b>' + (totals.royalty /(numberofDaysInner)).toFixed(2) + '</b></td>'
+						+ '</tr></tbody></table><br>'
+
+						+ '<div class="number-of-days-wrapper">'
+						+ '<span>Adjust date range to the last</span>'
+						+ 	'<input type="text" name="numberOfDaysInput" />' 
+						+    'days'
+						+ '</div>'
+						+ 	'<input type="submit" value="Update & Refresh" class="btn btn-success" id="save-number-days"/>';
+						
+			   
+							
+				document.getElementById("dailystats")
+					.innerHTML = stats;
+					
+				if(numberofDaysInner == 1){ //Hide Top 2 Charts if Days == 1, since they're useless.
+					document.getElementById('salesPanel').style.display = "none";
+					document.getElementById('revenuePanel').style.display = "none";
+				}
+				
+				
+				$('#save-number-days')
+					.on('click', function(e) {
+						numberOfDaysInput = parseInt($(this).closest("div").find('[name="numberOfDaysInput"]').val());
+											
+						if (numberOfDaysInput === parseInt(numberOfDaysInput, 10)){ //Check if integer
+							if(numberOfDaysInput <= 0){
+								alert('Enter a number greater than 0');
+							} else if (numberOfDaysInput > 90){
+								alert('Cannot get info for more than 90 days');
+								
+							} else{
+								dailySalesPage(numberOfDaysInput);
+								//location.reload();
+							}
+							
+						} else{
+							alert("Please complete field with a number");
+						}
+					})
+					
+					
 				
 
 			}); //Callback 2 end
