@@ -1160,8 +1160,8 @@ function productManager() {
 					'<div class="wrapper">' +
 						'<div class="container">' + 
 							'<div class="panel panel-default">' +
-								'<div class="alert alert-success"><strong> Use  CTRL + F (PC) or ⌘ + F (MAC) to open the search bar.</strong>' +
-									'<div class="btn btn-info" id="reset-button">Clear All Niche Data</div>' +
+								'<div class="alert alert-success clear"><strong> Use  CTRL + F (PC) or ⌘ + F (MAC) to open the search bar.</strong>' +
+									'<div class="btn btn-default" id="reset-button">Clear All Niche Data</div>' +
 								'</div>' + 
 								'<div class="panel-body" id="manager-stats"><center><h3>Loading...</h3></center></div>' + 
 							'</div>'+ 
@@ -1211,7 +1211,7 @@ function productManager() {
 				}
 							
 				cp2 += '<tr data-lifetime-sales="'+ hasLifetimeSales.toString() + '"><th scope="row">' + k + '</th>' + 
-					'<td><a href="/IndividualProductPage/?ASIN=' + ts[i].marketplaceAsinMap.US + '">' + ts[i].name + '</a></td>' + 
+					'<td class="product-name"><span>' + ts[i].name + '</span></td>' + 
 						
 					'<td class="text-center">' +
 						ts[i].daysUntilDeletion + 

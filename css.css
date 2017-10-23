@@ -22,6 +22,12 @@
     float: left;
 }
 
+.clear::after { 
+	content: "";
+	display: block; 
+	clear: both;
+}
+
 a[data-toggle="collapse"] {
     position: relative;
 }
@@ -53,6 +59,9 @@ a, a:hover, a:focus {
     transition: all 0.3s;
 }
 
+#reset-button{
+	float: right;
+}
 
 #sidebar .sidebar-header {
     padding: 20px 20px 20px 10px;
@@ -211,8 +220,23 @@ dt, dd{
 	float:left;
 }
 
-[data-lifetime-sales="false"]{
-	background: #f2dede !important;
+[data-lifetime-sales="false"] td.product-name{
+	color: #d9534f;
+}
+
+[data-lifetime-sales="false"] td.product-name span{
+	float:left;
+	display: block;
+	clear:both;
+}
+
+[data-lifetime-sales="false"] td.product-name:after{
+	float: left;
+	display:block;
+	content: " (NEVER SOLD)";
+	font-weight: 700;
+	color: #d9534f;
+	clear:both;
 }
 
 .niche-list-area{
