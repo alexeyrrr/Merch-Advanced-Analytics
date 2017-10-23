@@ -467,19 +467,18 @@ function renderDailyView(numberOfDays, callback){
 		
 		
 			//Sales Data (Not Very Efficient)
-			for (i = 0; i < axisLabels.length; i++) {
-				for ( i2 = 0; i2 < responseArray.length; i2++){
-					if(axisLabels[i] == responseArray[i2]["Date"]){	
-						getShirtNiche(responseArray[i2]["ASIN"], function(shirtNiche){								
+			getAllShirtNiches(function(nichesLookupArray){		
+				for (i = 0; i < axisLabels.length; i++) {
+					for ( i2 = 0; i2 < responseArray.length; i2++){
+						if(axisLabels[i] == responseArray[i2]["Date"]){	
 							//If niche tag matches, incremeent count
-							if (shirtNiche in nicheArray){ 
+							if (responseArray[i2]["ASIN"] in nichesLookupArray){ 
+								var shirtNiche = JSON.parse(nichesLookupArray[responseArray[i2]["ASIN"]])["niche"];
 								nicheArray[shirtNiche] += 1;
 							} else {
 								nicheArray["unknown niche"] += 1;
 							}
-							
-							
-							
+														
 							salesData[i] += parseInt(responseArray[i2]["Units"]);
 							cancelData[i] += parseInt(responseArray[i2]["Cancellations"]);
 							revenueData[i] += parseFloat(responseArray[i2]["Revenue"]);
@@ -505,133 +504,115 @@ function renderDailyView(numberOfDays, callback){
 									shirtColorsArray[key] += 1;
 								}
 							}
-							
-						}.bind( {i2: i2, responseArray: responseArray} ));
-								
-					} 
+									
+						} 
+					}
 				}
-			}
-		
-		
-			/*
-			setTimeout(function(){     
-			
-			}, 250);
-			*/
-				
-				
-			/*
-			console.log(shirtColorsArray);
-			console.log(sizesArray);
-			console.log(gendersArray);
-			console.log(nicheArray);
-			
-			console.log(salesData);
-			*/
-				
-			var lineChartData1 = {
-				"datasets": [{
-					"data": salesData,
-					label: 'Sales',
-					"pointStrokeColor": "#fff",
-					"fillColor": "rgba(91, 185, 70, 0.75)",
-					"pointColor": "rgba(91, 185, 70,1)",
-					"strokeColor": "rgba(91, 185, 70,1)"
-				} , {
-					"data": cancelData,
-					label: 'Cancellations',
-					"pointStrokeColor": "#fff",
-					"fillColor": "rgba(255, 61, 61, 0.75)",
-					"pointColor": "rgba(255, 61, 61,1)",
-					"strokeColor": "rgba(255, 61, 61,1)"
+													
+				var lineChartData1 = {
+					"datasets": [{
+						"data": salesData,
+						label: 'Sales',
+						"pointStrokeColor": "#fff",
+						"fillColor": "rgba(91, 185, 70, 0.75)",
+						"pointColor": "rgba(91, 185, 70,1)",
+						"strokeColor": "rgba(91, 185, 70,1)"
+					} , {
+						"data": cancelData,
+						label: 'Cancellations',
+						"pointStrokeColor": "#fff",
+						"fillColor": "rgba(255, 61, 61, 0.75)",
+						"pointColor": "rgba(255, 61, 61,1)",
+						"strokeColor": "rgba(255, 61, 61,1)"
 
-				}],
-				"labels": axisLabels
-			};
-						
-			var lineChartData2 = {
-				"datasets": [{
-					"data": revenueData,
-					label: 'Revenue',
-					"pointStrokeColor": "#fff",
-					"fillColor": "rgba(246, 145, 30, 0.75)",
-					"pointColor": "rgba(246, 145, 30,1)",
-					"strokeColor": "rgba(246, 145, 30,1)"
-				}, {
-					"data": royaltyData,
-					label: 'Royalties',
-					"pointStrokeColor": "#fff",
-					"fillColor": "rgba(215, 45, 255, 0.5)",
-					"pointColor": "rgba(215, 45, 255,1)",
-					"strokeColor": "rgba(215, 45, 255,1)"
+					}],
+					"labels": axisLabels
+				};
+							
+				var lineChartData2 = {
+					"datasets": [{
+						"data": revenueData,
+						label: 'Revenue',
+						"pointStrokeColor": "#fff",
+						"fillColor": "rgba(246, 145, 30, 0.75)",
+						"pointColor": "rgba(246, 145, 30,1)",
+						"strokeColor": "rgba(246, 145, 30,1)"
+					}, {
+						"data": royaltyData,
+						label: 'Royalties',
+						"pointStrokeColor": "#fff",
+						"fillColor": "rgba(215, 45, 255, 0.5)",
+						"pointColor": "rgba(215, 45, 255,1)",
+						"strokeColor": "rgba(215, 45, 255,1)"
 
-				}],
-				"labels": axisLabels
-			};
-			
-			
-			var sales = new Chart(document.getElementById("canvas1")
-					.getContext("2d"))
-				.Line(lineChartData1);
+					}],
+					"labels": axisLabels
+				};
 				
-			
-			var royt = new Chart(document.getElementById("canvas2")
-					.getContext("2d"))
-				.Line(lineChartData2);
-			
-			
-			
-			//Need to redo and sum up
-			/*
-			// Assemble Sales History Table
-			var cp2 = '<div id="status"></div>' +
-				'<table class="table table-striped"><thead><tr><th>#</th>'
-				+ '<th class="text-center">Date Sold</th>'
-				+ '<th class="text-center">Units</th>'
-				+ '<th class="text-center">Revenue</th>'
-				+ '<th class="text-center">Royalty</th>'
-				+ '<th class="text-center">Gender</th>' 
-				+ '<th class="text-center">Size</th>'
-				+ '<th class="text-center">Color</th>'
-				+ '</tr></thead><tbody>';
+				
+				var sales = new Chart(document.getElementById("canvas1")
+						.getContext("2d"))
+					.Line(lineChartData1);
+					
+				
+				var royt = new Chart(document.getElementById("canvas2")
+						.getContext("2d"))
+					.Line(lineChartData2);
+				
+				
+				
+				//Need to redo and sum up
+				/*
+				// Assemble Sales History Table
+				var cp2 = '<div id="status"></div>' +
+					'<table class="table table-striped"><thead><tr><th>#</th>'
+					+ '<th class="text-center">Date Sold</th>'
+					+ '<th class="text-center">Units</th>'
+					+ '<th class="text-center">Revenue</th>'
+					+ '<th class="text-center">Royalty</th>'
+					+ '<th class="text-center">Gender</th>' 
+					+ '<th class="text-center">Size</th>'
+					+ '<th class="text-center">Color</th>'
+					+ '</tr></thead><tbody>';
 
-			for (i=0; i < responseArray.length; i++){
-				cp2 += '<tr><th scope="row">' + (i + 1) + '</th>' + 
-					'<td class="text-center">' + 
-						responseArray[i]["Date"]  + 
-					'</td>' + 
-					
-					'<td class="text-center">' +
-						responseArray[i]["Units"]  +
-					'</td>' +
-					
-					'<td class="text-center">' +
-						responseArray[i]["Revenue"]  +
-					'</td>' +
+				for (i=0; i < responseArray.length; i++){
+					cp2 += '<tr><th scope="row">' + (i + 1) + '</th>' + 
+						'<td class="text-center">' + 
+							responseArray[i]["Date"]  + 
+						'</td>' + 
 						
-					'<td class="text-center">' +
-						responseArray[i]["Royalty"]  +
-					'</td>' +
-					
-					'<td class="text-center">' +
-						responseArray[i]["Category 1"]  +
-					'</td>' +
-					
-					'<td class="text-center">' +
-						responseArray[i]["Category 2"]  +
-					'</td>' +
-					
-					'<td class="text-center">' +
-						responseArray[i]["Category 3"]  +
-					'</td>';
-			}
+						'<td class="text-center">' +
+							responseArray[i]["Units"]  +
+						'</td>' +
 						
-								
-			cp2 += '</tbody></table>';
-			document.getElementById("shirtlist")
-				.innerHTML = cp2;
-			*/
-		
+						'<td class="text-center">' +
+							responseArray[i]["Revenue"]  +
+						'</td>' +
+							
+						'<td class="text-center">' +
+							responseArray[i]["Royalty"]  +
+						'</td>' +
+						
+						'<td class="text-center">' +
+							responseArray[i]["Category 1"]  +
+						'</td>' +
+						
+						'<td class="text-center">' +
+							responseArray[i]["Category 2"]  +
+						'</td>' +
+						
+						'<td class="text-center">' +
+							responseArray[i]["Category 3"]  +
+						'</td>';
+				}
+							
+									
+				cp2 += '</tbody></table>';
+				document.getElementById("shirtlist")
+					.innerHTML = cp2;
+				*/
+			}); //Callback 2 end
+			
 		}); //Callback end
 	});
 	
@@ -1975,7 +1956,13 @@ function getShirtNiche(shirtASIN, callback){
 		callback(determinedNiche); //Run Callback
 	});
 }
-				
+			
+function getAllShirtNiches(callback){
+	chrome.storage.sync.get(null, function(items) {
+		callback(items);
+	});
+}
+			
 
 /***************************************************************/
 /************************ Niche Storage ************************/
