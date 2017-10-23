@@ -840,47 +840,7 @@ function renderDailyView(numberOfDays, callback){
 					})
 					
 					
-				/*
-				//Dump Sales Data 
-				var nicheDistData = '<div class="col-xs-6">';
-				nicheDistData += '<h4>Total Number Of Shirts Available For Sale In Each Niche</h4>' +
-								'<div class="niche-list-area">';
-				
-				
-				//Have to sort by descending, this is ugly
-				var sortableTotalTally = [];
-				for (var number in totalTally) {
-					sortableTotalTally.push([number, totalTally[number]]);
-				}
-
-				sortableTotalTally.sort(function(a, b) {
-					return b[1] - a[1];
-				});
-							
-				for(i=0; i < sortableTotalTally.length; i++){
-					nicheDistData += '<dl>'
-										+ '<dt>'
-										+ 		sortableTotalTally[i][0] + ":&nbsp;"
-										+ '</dt>'
-										+ '<dd>'
-										+ 		sortableTotalTally[i][1]
-										+ '</dd>'
-									+ '</dl>'
-				}
-				
-				nicheDistData += '</div>' + 
-								'<a class="more-btn">Display All</a>' +
-								'</div>';
-				
-							
-				$("#nichePanel .panel-body").append(nicheDistData);
-				
-				$(".more-btn").click(function(){
-					$('.niche-list-area').toggleClass('expanded');
-				});	
-				*/
-				
-				
+						
 					
 				//********** Get Normalized Array ***************//
 				// (This is down here because it takes longer)
@@ -927,6 +887,48 @@ function renderDailyView(numberOfDays, callback){
 					
 					var ctxNormNiches = document.getElementById("canvas7").getContext("2d");	
 					var myChart = new Chart(ctxNormNiches, lineChartData7);
+					
+					
+					//Dump Sales Data 
+					var nicheDistData = '<div class="col-xs-6">';
+					nicheDistData += '<h4>Total Number Of Shirts Available For Sale In Each Niche</h4>' +
+									'<div class="niche-list-area">';
+					
+					
+					//Have to sort by descending, this is ugly
+					var sortableTotalTally = [];
+					for (var number in totalTally) {
+						sortableTotalTally.push([number, totalTally[number]]);
+					}
+
+					sortableTotalTally.sort(function(a, b) {
+						return b[1] - a[1];
+					});
+								
+					for(i=0; i < sortableTotalTally.length; i++){
+						nicheDistData += '<dl>'
+											+ '<dt>'
+											+ 		sortableTotalTally[i][0] + ":&nbsp;"
+											+ '</dt>'
+											+ '<dd>'
+											+ 		sortableTotalTally[i][1]
+											+ '</dd>'
+										+ '</dl>'
+					}
+					
+					nicheDistData += '</div>' + 
+									'<a class="more-btn">Display All</a>' +
+									'</div>';
+					
+								
+					$("#nichePanel .panel-body").append(nicheDistData);
+					
+					$(".more-btn").click(function(){
+						$('.niche-list-area').toggleClass('expanded');
+					});	
+					
+				
+				
 				});
 				
 			}); //Callback 2 end
