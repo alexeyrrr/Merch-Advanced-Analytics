@@ -322,6 +322,23 @@ var sidebarHTML = '<nav id="sidebar">' +
 				'</nav>' +
 				'<script src="navscript.js"></script>';
 				
+var globalLineChartOptions = {
+						//responsive: true,
+						animation: {
+							duration: 0, // general animation time
+						},
+						hover: {
+							animationDuration: 0, // duration of animations when hovering an item
+						},
+						responsiveAnimationDuration: 0, // animation duration after a resize
+						tooltips: {
+							mode: 'index'
+						},
+						legend: {
+							display: false
+						}
+					};
+				
 			
 /***************************************************************/
 /********* Global Fetch Function (Sales & Live List) ***********/
@@ -398,6 +415,14 @@ function dailySalesPage(numberOfDays){
 						'<center>' +
 							'<div class="canvas-wrapper" style="width: 100%;">'+
 								'<canvas id="canvas6" height="350" width="280" style="padding:10px"></canvas>'+
+								'<h3 class="canvas-title">Niche Distribution (Number Sold)</h3>' +
+							'</div>' +
+						'</center>' +
+					'</div>' +
+					'<div class="col-xs-6">' +
+						'<center>' +
+							'<div class="canvas-wrapper" style="width: 100%;">'+
+								'<canvas id="canvas7" height="350" width="280" style="padding:10px"></canvas>'+
 								'<h3 class="canvas-title">Normalized Niche Distribution (%)</h3>' +
 							'</div>' +
 						'</center>' +
@@ -410,7 +435,7 @@ function dailySalesPage(numberOfDays){
 	var pageContent = document.querySelector(".wrapper");
 	pageContent.innerHTML += sidebarHTML;
 
-	renderDailyView(14);
+	renderDailyView(numberOfDays);
 }
 
 
@@ -465,7 +490,6 @@ function renderDailyView(numberOfDays, callback){
 		assembleDynamicBlankArray(function(resultBlankArray){
 			nicheArray = resultBlankArray;
 		
-		
 			//Sales Data (Not Very Efficient)
 			getAllShirtNiches(function(nichesLookupArray){		
 				for (i = 0; i < axisLabels.length; i++) {
@@ -508,109 +532,247 @@ function renderDailyView(numberOfDays, callback){
 						} 
 					}
 				}
-													
+				
+				//Regroup all youth sizes to just Youth
+				var adjustedSizesArray = {'Youth': 0, 'Small': 0, 'Medium': 0, 'Large': 0, 'XL': 0, '2XL': 0, '3XL': 0};
+				for(var item in sizesArray){
+					if (item == "4" || item == "6" || item == "8" || item == "10" || item == "12") {
+						adjustedSizesArray['Youth'] += parseInt(sizesArray[item]);
+					}
+					else {
+						adjustedSizesArray[item] += parseInt(sizesArray[item]);
+					}
+				}
+				
+				
+				
+				
+				//Make sure colors are in correct order												
+				var shirtColorsColorsLUT = {'Dark Heather': "#454b4b", 'Heather Grey': "#d5d9da", 'Heather Blue': "#696c9c", 'Black': "#222", 
+					'Navy': "#15232b", 'Silver': "#cfd1d1", 'Royal Blue': "#1c4086", 'Brown': "#31261d", 'Slate': "#818189", 'Red': "#b71111", 'Asphalt': "#3f3e3c", 
+					'Grass': "#5e9444", 'Olive': "#4a4f26", 'Kelly Green': "#006136", 'Baby Blue': "#8fb8db", 'White': "#eeeeee", 'Lemon': "#f0e87b", 'Cranberry': "#6e0a25",
+					'Pink': "#f8a3bc", 'Orange': "#ff5c39", 'Purple': "#514689"};
+				var finalShirtColorsLUT = [];
+				for (var key in shirtColorsArray){
+					finalShirtColorsLUT.push(shirtColorsColorsLUT[key]);
+				}
+				
+				
+				var shirtNicheColorsLUT = ["#e0f2f1", "#b2dfdb", "#80cbc4", "#4db6ac", "#26a69a", "#009688", "#00897b", "#00796b", "#00695c", "#004d40"];
+				
+				
+				//Assemble Chart Info																	
 				var lineChartData1 = {
-					"datasets": [{
-						"data": salesData,
-						label: 'Sales',
-						"pointStrokeColor": "#fff",
-						"fillColor": "rgba(91, 185, 70, 0.75)",
-						"pointColor": "rgba(91, 185, 70,1)",
-						"strokeColor": "rgba(91, 185, 70,1)"
-					} , {
-						"data": cancelData,
-						label: 'Cancellations',
-						"pointStrokeColor": "#fff",
-						"fillColor": "rgba(255, 61, 61, 0.75)",
-						"pointColor": "rgba(255, 61, 61,1)",
-						"strokeColor": "rgba(255, 61, 61,1)"
-
-					}],
-					"labels": axisLabels
+					type: 'line',
+					data: {
+						labels: axisLabels,
+						datasets: [{
+							label: 'Cancellations',
+							data: cancelData,
+							backgroundColor: "rgba(255, 61, 61, 0.75)",
+							pointBorderColor: "rgba(255, 61, 61,1)",
+							borderColor: "rgba(255, 61, 61,1)"
+						}, {
+							label: 'Sales',
+							data: salesData,
+							backgroundColor: "rgba(91, 185, 70, 0.75)",
+							pointBorderColor: "rgba(91, 185, 70,1)",
+							borderColor: "rgba(91, 185, 70,1)"
+						}]
+					},
+					options: globalLineChartOptions,
 				};
-							
+					
 				var lineChartData2 = {
-					"datasets": [{
-						"data": revenueData,
-						label: 'Revenue',
-						"pointStrokeColor": "#fff",
-						"fillColor": "rgba(246, 145, 30, 0.75)",
-						"pointColor": "rgba(246, 145, 30,1)",
-						"strokeColor": "rgba(246, 145, 30,1)"
-					}, {
-						"data": royaltyData,
-						label: 'Royalties',
-						"pointStrokeColor": "#fff",
-						"fillColor": "rgba(215, 45, 255, 0.5)",
-						"pointColor": "rgba(215, 45, 255,1)",
-						"strokeColor": "rgba(215, 45, 255,1)"
+					type: 'line',
+					data: {
+						labels: axisLabels,
+						datasets: [{
+							label: 'Royalties',
+							data: royaltyData,
+							backgroundColor: "rgba(215, 45, 255, 0.5)",
+							pointBorderColor: "rgba(215, 45, 255,1)",
+							borderColor: "rgba(215, 45, 255,1)"
+						}, {
+							label: 'Revenue',
+							data: revenueData,
+							backgroundColor: "rgba(246, 145, 30, 0.75)",
+							pointBorderColor: "rgba(246, 145, 30,1)",
+							borderColor: "rgba(246, 145, 30,1)"
+						}]
+					},
+					options: globalLineChartOptions,
+				};
+				
+				//Genders Charts
+				var lineChartData3 = {
+					type: 'doughnut',
+					data: {
+						labels: Object.keys(gendersArray),
+						datasets: [{							
+							data: Object.values(gendersArray),
+							backgroundColor: ["#3498db", "#e86dab", "#84cb74"],
+						}]
+					},
+					options: globalLineChartOptions,
+				};
+				
+				//Size Charts
+				var lineChartData4 = {
+					type: 'doughnut',
+					data: {
+						labels: Object.keys(adjustedSizesArray),
+						datasets: [{							
+							data: Object.values(adjustedSizesArray),
+							backgroundColor: ["#ffab91", "#ff8a65", "#ff7043", "#ff5722", "#e64a19", "#d84315", "#ffccbc"],
+						}]
+					},
+					options: globalLineChartOptions,
+				};
+				
+				//Colors Charts
+				var lineChartData5 = {
+					type: 'doughnut',
+					data: {
+						labels: Object.keys(shirtColorsArray),
+						datasets: [{							
+							data: Object.values(shirtColorsArray),
+							backgroundColor: finalShirtColorsLUT,
+						}]
+					},
+					options: globalLineChartOptions,
+				};
 
-					}],
-					"labels": axisLabels
+				//Shirt Niches (Non-normalized) 
+				var lineChartData6 = {
+					type: 'doughnut',
+					data: {
+						labels: Object.keys(nicheArray),
+						datasets: [{							
+							data: Object.values(nicheArray),
+							backgroundColor: shirtNicheColorsLUT,
+						}]
+					},
+					options: globalLineChartOptions,
 				};
 				
 				
-				var sales = new Chart(document.getElementById("canvas1")
-						.getContext("2d"))
-					.Line(lineChartData1);
+				
+										
+				var ctxSales = document.getElementById("canvas1").getContext("2d");	
+				var myChart = new Chart(ctxSales, lineChartData1);
 					
 				
-				var royt = new Chart(document.getElementById("canvas2")
-						.getContext("2d"))
-					.Line(lineChartData2);
+				var ctxRevenue = document.getElementById("canvas2").getContext("2d");	
+				var myChart = new Chart(ctxRevenue, lineChartData2);
+				
+				var ctxGenders = document.getElementById("canvas3").getContext("2d");	
+				var myChart = new Chart(ctxGenders, lineChartData3);
+				
+				var ctxSizes = document.getElementById("canvas4").getContext("2d");	
+				var myChart = new Chart(ctxSizes, lineChartData4);
+				
+				var ctxColors = document.getElementById("canvas5").getContext("2d");	
+				var myChart = new Chart(ctxColors, lineChartData5);
+				
+				var ctxNiches = document.getElementById("canvas6").getContext("2d");	
+				var myChart = new Chart(ctxNiches, lineChartData6);
 				
 				
+				//Summing up all values
+				var allASINValues = [];
+				for (i = 0; i < responseArray.length; i++){
+					allASINValues.push(responseArray[i]["ASIN"]);
+				}
+								
+				uniqueArray = allASINValues.filter(function(item, pos) {
+					return allASINValues.indexOf(item) == pos;
+				})
+								
 				
-				//Need to redo and sum up
-				/*
+				//Create blank target array
+				var resultSumSales = [];
+				for(i=0; i < uniqueArray.length; i++){
+					resultSumSales.push({
+						ASIN: uniqueArray[i],
+						Name: '',
+						Units: 0,
+						Cancellations: 0,
+						Royalty: 0,
+						Revenue: 0
+					})
+				}
+				
+				for (i = 0; i < resultSumSales.length; i++){
+					for (i2 = 0; i2 < responseArray.length; i2++){
+						if(resultSumSales[i]["ASIN"] == responseArray[i2]["ASIN"]){
+							resultSumSales[i]["Name"] = responseArray[i2]["Name"];
+							resultSumSales[i]["Units"] += parseInt(responseArray[i2]["Units"]);
+							resultSumSales[i]["Cancellations"] += parseInt(responseArray[i2]["Cancellations"]);
+							resultSumSales[i]["Royalty"] += parseFloat(responseArray[i2]["Royalty"]);
+							resultSumSales[i]["Revenue"] += parseFloat(responseArray[i2]["Revenue"]);
+						}
+					}
+				}
+									
 				// Assemble Sales History Table
-				var cp2 = '<div id="status"></div>' +
-					'<table class="table table-striped"><thead><tr><th>#</th>'
-					+ '<th class="text-center">Date Sold</th>'
-					+ '<th class="text-center">Units</th>'
-					+ '<th class="text-center">Revenue</th>'
-					+ '<th class="text-center">Royalty</th>'
-					+ '<th class="text-center">Gender</th>' 
-					+ '<th class="text-center">Size</th>'
-					+ '<th class="text-center">Color</th>'
-					+ '</tr></thead><tbody>';
+				var cp2 = 
+					'<table class="table table-striped" id="itemizedList"><thead><tr><th>#</th>' +
+					'<th class="text-center">Shirt Name</th>' +
+					'<th class="text-center">Units Sold</th>' +
+					'<th class="text-center">Units Cancelled</th>' +
+					'<th class="text-center">Revenue</th>' +
+					'<th class="text-center">Royalties</th>' +
+					'<th class="text-center">Listing Page</th>' +
+					'</tr></thead><tbody>';
 
-				for (i=0; i < responseArray.length; i++){
-					cp2 += '<tr><th scope="row">' + (i + 1) + '</th>' + 
+				for (i=0; i < resultSumSales.length; i++){
+					cp2 += '<tr data-href="' + '/IndividualProductPage/?ASIN=' + resultSumSales[i]["ASIN"]  + '">' + 
+						'<th scope="row">' + (i + 1) + '</th>' + 
 						'<td class="text-center">' + 
-							responseArray[i]["Date"]  + 
+							resultSumSales[i]["Name"]  + 
 						'</td>' + 
-						
+												
 						'<td class="text-center">' +
-							responseArray[i]["Units"]  +
-						'</td>' +
-						
-						'<td class="text-center">' +
-							responseArray[i]["Revenue"]  +
+							resultSumSales[i]["Units"]  +
 						'</td>' +
 							
 						'<td class="text-center">' +
-							responseArray[i]["Royalty"]  +
+							resultSumSales[i]["Cancellations"]  +
 						'</td>' +
 						
 						'<td class="text-center">' +
-							responseArray[i]["Category 1"]  +
+							resultSumSales[i]["Revenue"].toFixed(2)  +
 						'</td>' +
 						
 						'<td class="text-center">' +
-							responseArray[i]["Category 2"]  +
+							resultSumSales[i]["Royalty"].toFixed(2)  +
 						'</td>' +
 						
 						'<td class="text-center">' +
-							responseArray[i]["Category 3"]  +
-						'</td>';
+							'<a target="_blank" href="https://www.amazon.com/dp/' + 
+								resultSumSales[i]["ASIN"]  +
+							'" class="btn btn-info">Preview</a>' +
+						'</td>' 
 				}
 							
 									
 				cp2 += '</tbody></table>';
 				document.getElementById("shirtlist")
 					.innerHTML = cp2;
-				*/
+					
+				//Init TableSort
+				new Tablesort(document.getElementById('itemizedList'));
+				
+				//Make Entire Row Clickable & Link to Individual Product Page
+				$(function(){
+					$('#itemizedList tbody > tr[data-href!=""]').click(function() {
+						var url = $(this).data("href");
+						window.open(url, '_blank');
+					});
+				});
+				
+
 			}); //Callback 2 end
 			
 		}); //Callback end
@@ -1156,7 +1318,6 @@ function fetchsales(count, m, salesData, cancelData, returnData, rev, roy, chlab
 								$('#shirtListTable tbody > tr[data-href!=""]').click(function() {
 									var url = $(this).data("href");
 									window.open(url, '_blank');
-									
 								});
 							});
 								
