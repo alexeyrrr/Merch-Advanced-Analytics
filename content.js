@@ -74,6 +74,16 @@ function assembleDynamicBlankArray(callback){
 	});
 }
 
+function replicateArray(array, n) {
+  // Create an array of size "n" with undefined values
+  var arrays = Array.apply(null, new Array(n)); 
+
+  // Replace each "undefined" with our array, resulting in an array of n copies of our array
+  arrays = arrays.map(function() { return array });
+
+  // Flatten our array of arrays
+  return [].concat.apply([], arrays);
+}
 /******** More Date Related Stuff ********/				
 function monthDiff(d1, d2) {
     var months;
@@ -323,7 +333,7 @@ var sidebarHTML = '<nav id="sidebar">' +
 				'<script src="navscript.js"></script>';
 				
 var globalLineChartOptions = {
-						//responsive: true,
+						responsive: false,
 						animation: {
 							duration: 0, // general animation time
 						},
@@ -553,7 +563,10 @@ function renderDailyView(numberOfDays, callback){
 					finalShirtColorsLUT.push(shirtColorsColorsLUT[key]);
 				}
 				
-				var shirtNicheColorsLUT = ["#e0f2f1", "#b2dfdb", "#80cbc4", "#4db6ac", "#26a69a", "#009688", "#00897b", "#00796b", "#00695c", "#004d40"];
+				var shirtNicheColorsSeed = ["#e0f2f1", "#b2dfdb", "#80cbc4", "#4db6ac", "#26a69a", "#009688", "#00897b", "#00796b", "#00695c", "#004d40"];
+				//Extend Array Length
+				var shirtNicheColorsLUT = replicateArray(shirtNicheColorsSeed, 6);
+				console.log(shirtNicheColorsLUT);
 				
 				//Assemble Chart Info																	
 				var lineChartData1 = {
@@ -827,8 +840,95 @@ function renderDailyView(numberOfDays, callback){
 					})
 					
 					
+				/*
+				//Dump Sales Data 
+				var nicheDistData = '<div class="col-xs-6">';
+				nicheDistData += '<h4>Total Number Of Shirts Available For Sale In Each Niche</h4>' +
+								'<div class="niche-list-area">';
 				
+				
+				//Have to sort by descending, this is ugly
+				var sortableTotalTally = [];
+				for (var number in totalTally) {
+					sortableTotalTally.push([number, totalTally[number]]);
+				}
 
+				sortableTotalTally.sort(function(a, b) {
+					return b[1] - a[1];
+				});
+							
+				for(i=0; i < sortableTotalTally.length; i++){
+					nicheDistData += '<dl>'
+										+ '<dt>'
+										+ 		sortableTotalTally[i][0] + ":&nbsp;"
+										+ '</dt>'
+										+ '<dd>'
+										+ 		sortableTotalTally[i][1]
+										+ '</dd>'
+									+ '</dl>'
+				}
+				
+				nicheDistData += '</div>' + 
+								'<a class="more-btn">Display All</a>' +
+								'</div>';
+				
+							
+				$("#nichePanel .panel-body").append(nicheDistData);
+				
+				$(".more-btn").click(function(){
+					$('.niche-list-area').toggleClass('expanded');
+				});	
+				*/
+				
+				
+					
+				//********** Get Normalized Array ***************//
+				// (This is down here because it takes longer)
+				normalizedNicheArray = {};
+				normalizedPercentageArray = {};
+				
+				getNicheDistribution(function(totalTally){
+					for(var key in nicheArray){
+						if (key in totalTally){
+							loopTotalTally = totalTally[key];
+						} else {
+							loopTotalTally = 999; //Artifically Skew Unidentified shirts
+						}
+						
+						normalization = (nicheArray[key] / loopTotalTally);
+						normalizedNicheArray[key] = normalization;
+					}
+					
+					var grandTotal = 0;
+					for(var key in normalizedNicheArray){ //Get Total of Normalized
+						numberToAdd = parseFloat(normalizedNicheArray[key]);
+						if (!isNaN(numberToAdd)){					
+							grandTotal += numberToAdd;
+						}
+					}
+					
+					for(var key in normalizedNicheArray){
+						percertangeValue = (normalizedNicheArray[key] / grandTotal * 100).toFixed(1);
+						normalizedPercentageArray[key] = percertangeValue;
+					}
+					
+					
+					var lineChartData7 = {
+						type: 'doughnut',
+						data: {
+							labels: Object.keys(normalizedPercentageArray),
+							datasets: [{							
+								data: Object.values(normalizedPercentageArray),
+								backgroundColor: shirtNicheColorsLUT,
+							}]
+						},
+						options: globalLineChartOptions,
+					};
+					
+					var ctxNormNiches = document.getElementById("canvas7").getContext("2d");	
+					var myChart = new Chart(ctxNormNiches, lineChartData7);
+				});
+				
 			}); //Callback 2 end
 			
 		}); //Callback end
@@ -1701,7 +1801,7 @@ function productManager() {
 								'<div class="alert alert-success"><strong> Use  CTRL + F (PC) or ⌘ + F (MAC) to open the search bar.</strong>' +
 									'<div class="btn btn-info" id="reset-button">Clear All Niche Data</div>' +
 								'</div>' + 
-								'<div class="panel-body" id="manager-stats"></div>' + 
+								'<div class="panel-body" id="manager-stats"><center><h3>Loading...</h3></center></div>' + 
 							'</div>'+ 
 							'<div class="panel panel-default">' +
 							'<div class="panel-body" id="shirtlist"></div>' + 
@@ -1772,28 +1872,17 @@ function productManager() {
 		cp2 += '</tbody></table>';
 		document.getElementById("shirtlist")
 			.innerHTML = cp2;
-			
-			
-		console.log(lifetimesSalesCounter);
-			
+						
 		managerStats = '<table class="table table-striped"><thead>' + 
 			'<tr>' +
-				'<th class="text-center">Shirts With Any Lifetime Sales</th>'+
+				'<th class="text-center">Shirts With Atleast One Lifetime Sale</th>'+
 				'<th class="text-center">Total Live Shirts</th>' + 
 				'<th class="text-center">% Of Designs that Have Ever Sold</th>' + 
-				//'<th class="text-center">Royalties</th>' + 
-				//'<th class="text-center">% Of Designs that Have Ever Sold</th>' + 
-				//'<th class="text-center">Average Sales / Day </th>' + 
-				//'<th class="text-center">Average Royalties / Day </th>' +
 			'</tr></thead><tbody>' + 
 			'<tr class="success text-center">' + 
 				'<td><b>' + lifetimesSalesCounter + '</b></td>' + 
 				'<td><b>' + liveDesignsCounter + '</b></td>' + 
-				'<td><b>' + (lifetimesSalesCounter/liveDesignsCounter*100).toFixed(2) +'</b></td>' + 
-				//'<td><b>' + "test" +'</b></td>' + 
-				//'<td><b>' + "test" + '</b></td>' + 
-				//'<td><b>' + "test" +'</b></td>' + 
-				//'<td><b>' + "test" + '</b></td>' + 
+				'<td><b>' + (lifetimesSalesCounter/liveDesignsCounter*100).toFixed(2)+'%'+'</b></td>' + 
 			'</tr></tbody></table>';
 						
 			
