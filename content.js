@@ -1920,57 +1920,57 @@ function renderIndividualProductSales(queryParams){
 			var lifetimeRevenue = revenueData.reduce(function(a, b) { return a + b; }, 0).toFixed(2);
 			var lifetimeRoyalties = royaltyData.reduce(function(a, b) { return a + b; }, 0).toFixed(2);
 			
-					
-			var lineChartData1 = {
-				"datasets": [{
-					"data": salesData,
-					label: 'Sales',
-					"pointStrokeColor": "#fff",
-					"fillColor": "rgba(91, 185, 70, 0.75)",
-					"pointColor": "rgba(91, 185, 70,1)",
-					"strokeColor": "rgba(91, 185, 70,1)"
-				} , {
-					"data": cancelData,
-					label: 'Cancellations',
-					"pointStrokeColor": "#fff",
-					"fillColor": "rgba(255, 61, 61, 0.75)",
-					"pointColor": "rgba(255, 61, 61,1)",
-					"strokeColor": "rgba(255, 61, 61,1)"
-
-				}],
-				"labels": axisLabels
-			};
-						
-			var lineChartData2 = {
-				"datasets": [{
-					"data": revenueData,
-					label: 'Revenue',
-					"pointStrokeColor": "#fff",
-					"fillColor": "rgba(246, 145, 30, 0.75)",
-					"pointColor": "rgba(246, 145, 30,1)",
-					"strokeColor": "rgba(246, 145, 30,1)"
-				}, {
-					"data": royaltyData,
-					label: 'Royalties',
-					"pointStrokeColor": "#fff",
-					"fillColor": "rgba(215, 45, 255, 0.5)",
-					"pointColor": "rgba(215, 45, 255,1)",
-					"strokeColor": "rgba(215, 45, 255,1)"
-
-				}],
-				"labels": axisLabels
-			};
-			
-			
-			var sales = new Chart(document.getElementById("canvas1")
-					.getContext("2d"))
-				.Line(lineChartData1);
 				
-			
-			var royt = new Chart(document.getElementById("canvas2")
-					.getContext("2d"))
-				.Line(lineChartData2);
+
+			var lineChartData1 = {
+				type: 'line',
+				data: {
+					labels: axisLabels,
+					datasets: [{
+						label: 'Cancellations',
+						data: cancelData,
+						backgroundColor: "rgba(255, 61, 61, 0.75)",
+						pointBorderColor: "rgba(255, 61, 61,1)",
+						borderColor: "rgba(255, 61, 61,1)"
+					}, {
+						label: 'Sales',
+						data: salesData,
+						backgroundColor: "rgba(91, 185, 70, 0.75)",
+						pointBorderColor: "rgba(91, 185, 70,1)",
+						borderColor: "rgba(91, 185, 70,1)"
+					}]
+				},
+				options: globalLineChartOptions,
+			};
 		
+		
+			var lineChartData2 = {
+				type: 'line',
+				data: {
+					labels: axisLabels,
+					datasets: [{
+						label: 'Royalties',
+						data: royaltyData,
+						backgroundColor: "rgba(215, 45, 255, 0.5)",
+						pointBorderColor: "rgba(215, 45, 255,1)",
+						borderColor: "rgba(215, 45, 255,1)"
+					}, {
+						label: 'Revenue',
+						data: revenueData,
+						backgroundColor: "rgba(246, 145, 30, 0.75)",
+						pointBorderColor: "rgba(246, 145, 30,1)",
+						borderColor: "rgba(246, 145, 30,1)"
+					}]
+				},
+				options: globalLineChartOptions,
+			};
+					
+			var ctxSales = document.getElementById("canvas1").getContext("2d");	
+			var myChart = new Chart(ctxSales, lineChartData1);
+			
+			var ctxRoyalties = document.getElementById("canvas2").getContext("2d");	
+			var myChart = new Chart(ctxRoyalties, lineChartData2);
+					
 			/*Assemble Sales History Table */
 			var cp2 = '<div id="status"></div>' +
 				'<table class="table table-striped"><thead><tr><th>#</th>'
