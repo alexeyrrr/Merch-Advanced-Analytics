@@ -718,18 +718,19 @@ function renderDailyView(numberOfDays, callback){
 				// Assemble Sales History Table
 				var cp2 = 
 					'<table class="table table-striped sortable" id="itemizedList"><thead><tr><th>#</th>' +
-					'<th class="text-center">Shirt Name</th>' +
+					'<th>Shirt Name</th>' +
 					'<th class="text-center">Units Sold</th>' +
 					'<th class="text-center">Units Cancelled</th>' +
 					'<th class="text-center">Revenue</th>' +
 					'<th class="text-center">Royalties</th>' +
+					'<th class="text-center">Avg Royalties / Shirt </th>' +
 					'<th class="text-center">Listing Page</th>' +
 					'</tr></thead><tbody>';
 
 				for (i=0; i < resultSumSales.length; i++){
 					cp2 += '<tr data-href="' + '/IndividualProductPage/?ASIN=' + resultSumSales[i]["ASIN"]  + '">' + 
 						'<th scope="row">' + (i + 1) + '</th>' + 
-						'<td class="text-center">' + 
+						'<td>' + 
 							resultSumSales[i]["Name"]  + 
 						'</td>' + 
 												
@@ -747,6 +748,10 @@ function renderDailyView(numberOfDays, callback){
 						
 						'<td class="text-center">' +
 							resultSumSales[i]["Royalty"].toFixed(2)  +
+						'</td>' +
+						
+						'<td class="text-center">' +
+							(resultSumSales[i]["Royalty"].toFixed(2) / (resultSumSales[i]["Units"] - resultSumSales[i]["Cancellations"] + 0.00001)).toFixed(2)  +
 						'</td>' +
 						
 						'<td class="text-center btn-inside">' +
