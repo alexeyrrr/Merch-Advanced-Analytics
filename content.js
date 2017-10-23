@@ -1521,8 +1521,8 @@ function merchmonths(count, m, salesData, cancelData, returnData, rev, roy, chla
                     chlabel.push(['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][today.adjustMonth(-count)
                         .getMonth()
                     ]);
-                    rev.push(totrev);
-                    roy.push(totroy);
+                    rev.push(parseFloat(totrev.toFixed(2)));
+                    roy.push(parseFloat(totroy.toFixed(2)));
                     document.getElementById("twoweeksstats")
                         .innerHTML = "<center><h3>Loading Month [" + (m - count) + "/" + m + "]</h3></center>";
                     merchmonths(count - 1, m, salesData, cancelData, returnData, rev, roy, chlabel, ts);
@@ -1557,21 +1557,21 @@ function merchmonths(count, m, salesData, cancelData, returnData, rev, roy, chla
 
 		/* Projected Sales */
 		salesThisMonthSoFar = salesData[salesData.length - 1];
-		projectedSales = (salesThisMonthSoFar * 30 / daysSinceStartOfMonth); //Calculate Projection
+		projectedSales = (salesThisMonthSoFar * 30 / daysSinceStartOfMonth).toFixed(2); //Calculate Projection
 		
 		projectionSalesArray[projectionSalesArray.length - 1] = projectedSales; 
 		
 		
 		/* Projected Revenue */
 		revenueThisMonthSoFar = rev[rev.length - 1];
-		projectedRevenue = (revenueThisMonthSoFar * 30 / daysSinceStartOfMonth); //Calculate Projection
+		projectedRevenue = (revenueThisMonthSoFar * 30 / daysSinceStartOfMonth).toFixed(2); //Calculate Projection
 		
 		projectionRevenueArray[projectionRevenueArray.length - 1] = projectedRevenue; 
 		
 		
 		/* Projected Profit */
 		royaltiesThisMonthSoFar = roy[roy.length - 1];
-		projectedRoyalties = (royaltiesThisMonthSoFar * 30 / daysSinceStartOfMonth); //Calculate Projection
+		projectedRoyalties = (royaltiesThisMonthSoFar * 30 / daysSinceStartOfMonth).toFixed(2); //Calculate Projection
 		
 		projectionRoyaltiesArray[projectionRoyaltiesArray.length - 1] = projectedRoyalties; 
 
@@ -1647,7 +1647,7 @@ function merchmonths(count, m, salesData, cancelData, returnData, rev, roy, chla
 
         document.getElementById("twoweeksstats")
             .innerHTML = '<center><h3>Monthly Statistics</h3></center><br><table class="table table-striped"><thead><tr><th class="text-center">Shirts Sold</th><th class="text-center">Shirts Cancelled</th><th class="text-center">Revenue</th><th class="text-center">Royalties</th></tr></thead><tbody>' +
-            '<tr class="success text-center"><td><b>' + xx + '</b></td><td><b>' + cxx + '</b></td><td><b>' + rrev.toFixed(2) + '</b></td><td><b>' + rr.toFixed(2) + '</b></td></tr></tbody></table><br>';
+            '<tr class="success text-center"><td><b>' + xx + '</b></td><td><b>' + cxx + '</b></td><td><b>' + rrev + '</b></td><td><b>' + rr + '</b></td></tr></tbody></table><br>';
 
 
 
