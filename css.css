@@ -173,26 +173,26 @@ div.desc {
     margin: 4px;
 }
 
-table th, table tr{
+table.sortable th, table.sortable tr{
 	cursor: pointer;
 }
 
-table tbody > tr:hover{
+table.sortable tbody > tr:hover{
 	background: #d0d0d0 !important;
 }
 
-table th:not(.no-sort):hover:after {
+table.sortable th:not(.no-sort):hover:after {
     visibility: visible;
     opacity: 1;
 }
 
-th[aria-sort=ascending]:not(.no-sort):after{
+.sortable th[aria-sort=ascending]:not(.no-sort):after{
 	border-bottom: none;
     border-width: 4px 4px 0;
 	
 }
 
-table th:not(.no-sort):after {
+table.sortable th:not(.no-sort):after {
     content: '';
     float: right;
     margin-top: 7px;

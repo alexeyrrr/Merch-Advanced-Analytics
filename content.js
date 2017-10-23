@@ -565,7 +565,6 @@ function renderDailyView(numberOfDays, callback){
 				var shirtNicheColorsSeed = ["#e0f2f1", "#b2dfdb", "#80cbc4", "#4db6ac", "#26a69a", "#009688", "#00897b", "#00796b", "#00695c", "#004d40"];
 				//Extend Array Length
 				var shirtNicheColorsLUT = replicateArray(shirtNicheColorsSeed, 6);
-				console.log(shirtNicheColorsLUT);
 				
 				//Assemble Chart Info																	
 				var lineChartData1 = {
@@ -718,7 +717,7 @@ function renderDailyView(numberOfDays, callback){
 									
 				// Assemble Sales History Table
 				var cp2 = 
-					'<table class="table table-striped" id="itemizedList"><thead><tr><th>#</th>' +
+					'<table class="table table-striped sortable" id="itemizedList"><thead><tr><th>#</th>' +
 					'<th class="text-center">Shirt Name</th>' +
 					'<th class="text-center">Units Sold</th>' +
 					'<th class="text-center">Units Cancelled</th>' +
@@ -750,7 +749,7 @@ function renderDailyView(numberOfDays, callback){
 							resultSumSales[i]["Royalty"].toFixed(2)  +
 						'</td>' +
 						
-						'<td class="text-center">' +
+						'<td class="text-center btn-inside">' +
 							'<a target="_blank" href="https://www.amazon.com/dp/' + 
 								resultSumSales[i]["ASIN"]  +
 							'" class="btn btn-info">Preview</a>' +
@@ -767,8 +766,8 @@ function renderDailyView(numberOfDays, callback){
 				
 				//Make Entire Row Clickable & Link to Individual Product Page
 				$(function(){
-					$('#itemizedList tbody > tr[data-href!=""]').click(function() {
-						var url = $(this).data("href");
+					$('#itemizedList tbody > tr[data-href!=""] td:not(.btn-inside)').click(function() {
+						var url = $(this).closest("tr").data("href");
 						window.open(url, '_blank');
 					});
 				});
@@ -1183,7 +1182,7 @@ function productManager() {
 	fetchAllLiveProducts(function(ts){
 		var cp2 = '<h2>Live Listings:</h2><br>' +
 					'<div id="status"></div>' +
-					'<table id="quickEditor" class="table table-striped"><thead><tr><th>#</th>'
+					'<table id="quickEditor" class="sortable table table-striped"><thead><tr><th>#</th>'
 					+ '<th>Title</th>'
 					+ '<th class="text-center">Days Until Deletion</th>'
 					+ '<th class="text-center">Listing page</th>'
@@ -1210,24 +1209,25 @@ function productManager() {
 					lifetimesSalesCounter++;
 				}
 							
-				cp2 += '<tr data-lifetime-sales="'+ hasLifetimeSales.toString() + '"><th scope="row">' + k + '</th>' + 
+				cp2 += '<tr data-lifetime-sales="'+ hasLifetimeSales.toString() + '" data-href="\/IndividualProductPage\/?ASIN=' + ts[i].id  + '">' +
+					'<th scope="row">' + k + '</th>' + 
 					'<td class="product-name"><span>' + ts[i].name + '</span></td>' + 
 						
 					'<td class="text-center">' +
 						ts[i].daysUntilDeletion + 
 					'</td>' +
 					
-					'<td class="text-center">' +
+					'<td class="text-center btn-inside">' +
 						'<a target="_blank" href="https://www.amazon.com/dp/' + ts[i].marketplaceAsinMap.US + '" class="btn btn-info">Preview</a>' +
 					'</td>' +
 					
-					'<td class="text-center">' +
+					'<td class="text-center btn-inside">' +
 						  '<input type="text" name="nicheName" class="niche-input"/>' +
 						  '<input type="hidden" name="parentASIN" value='+ ts[i].marketplaceAsinMap.US + '>' +
 						  '<input type="submit" value="Save" class="btn btn-info save"/>' +
 					'</td>' +
 					'<td class="text-center">' + ts[i].listPrice + '</td>' +
-				'<td class="text-center">' + '<a target="_blank" href="http://merch.amazon.com/merch-tshirt/title-setup/' + ts[i].id + '/add_details" class="btn btn-info">Edit</a>' + '</td></tr>';
+					'<td class="text-center btn-inside">' + '<a target="_blank" href="http://merch.amazon.com/merch-tshirt/title-setup/' + ts[i].id + '/add_details" class="btn btn-info">Edit</a>' + '</td></tr>';
 			}
 		}
 			
@@ -1252,6 +1252,15 @@ function productManager() {
 			.innerHTML = managerStats;
 					
 		new Tablesort(document.getElementById('quickEditor'));
+		
+		//Make Entire Row Clickable & Link to Individual Product Page				
+		$(function(){
+			$('#quickEditor tbody > tr[data-href!=""] td:not(.btn-inside)').click(function() {
+				var url = $(this).closest("tr").data("href");
+				window.open(url, '_blank');
+			});
+		});
+				
 			
 		initSaveButtons(); //initialize event listeners for buttons
 		
