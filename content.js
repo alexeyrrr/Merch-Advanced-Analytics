@@ -1577,76 +1577,73 @@ function merchmonths(count, m, salesData, cancelData, returnData, rev, roy, chla
 
 		
 		/*Generate Charts */
-        var lineChartData1 = {
-            "datasets": [{
-				"data": projectionSalesArray,
-                label: 'Projected Sales',
-                "pointStrokeColor": "#fff",
-                "fillColor": "rgba(200, 200, 200, 0.75)",
-                "pointColor": "#ddd",
-                "strokeColor": "#ddd"
-            }, {
-                "data": salesData,
-                label: 'Sales',
-                "pointStrokeColor": "#fff",
-                "fillColor": "rgba(91, 185, 70, 1)",
-                "pointColor": "rgba(91, 185, 70,1)",
-                "strokeColor": "rgba(91, 185, 70,1)"
-            }, {
-                "data": cancelData,
-                label: 'Cancellations',
-                "pointStrokeColor": "#fff",
-                "fillColor": "rgba(255, 61, 61, 0.75)",
-                "pointColor": "rgba(255, 61, 61,1)",
-                "strokeColor": "rgba(255, 61, 61,1)"
+		
+		var lineChartData1 = {
+			type: 'line',
+			data: {
+				labels: chlabel,
+				datasets: [{
+					label: 'Projected Sales',
+					data: projectionSalesArray,
+					backgroundColor: "rgba(200, 200, 200, 0.75)",
+					pointBorderColor: "#ddd",
+					borderColor: "#ddd"
+				}, {
+					label: 'Cancellations',
+					data: cancelData,
+					backgroundColor: "rgba(255, 61, 61, 0.75)",
+					pointBorderColor: "rgba(255, 61, 61,1)",
+					borderColor: "rgba(255, 61, 61,1)"
+				} , {
+					label: 'Sales',
+					data: salesData,
+					backgroundColor: "rgba(91, 185, 70, 1)",
+					pointBorderColor: "rgba(91, 185, 70,1)",
+					borderColor: "rgba(91, 185, 70,1)"
+				}]
+			},
+			options: globalLineChartOptions,
+		};
+				
+		var lineChartData2 = {
+			type: 'line',
+			data: {
+				labels: chlabel,
+				datasets: [{
+					label: 'Royalties',
+					data: roy,
+					backgroundColor: "rgba(215, 45, 255, 0.5)",
+					pointBorderColor: "rgba(215, 45, 255, 1)",
+					borderColor: "rgba(215, 45, 255, 1)"
+				},  {
+					label: 'Revenue',
+					data: rev,
+					backgroundColor: "rgba(246, 145, 30, 1)",
+					pointBorderColor: "rgba(246, 145, 30, 1)",
+					borderColor: "rgba(246, 145, 30, 1)"
+				}, {
+					label: 'Projected Royalties',
+					data: projectionRoyaltiesArray,
+					backgroundColor: "rgba(210, 210, 210, 0.75)",
+					pointBorderColor: "#ccc",
+					borderColor: "#ccc"
+				}, {
+					label: 'Projected Revenue',
+					data: projectionRevenueArray,
+					backgroundColor: "rgba(200, 200, 200, 0.75)",
+					pointBorderColor: "#ddd",
+					borderColor: "#ddd"
+				}]
+			},
+			options: globalLineChartOptions,
+		};
 
-            }],
-            "labels": chlabel
-
-        };
-
-
-        var lineChartData2 = {
-            "datasets": [{
-				"data": projectionRevenueArray,
-                label: 'Projected Revenue',
-                "pointStrokeColor": "#fff",
-                "fillColor": "rgba(200, 200, 200, 0.75)",
-                "pointColor": "#ddd",
-                "strokeColor": "#ddd"
-            }, {
-				"data": projectionRoyaltiesArray,
-                label: 'Projected Revenue',
-                "pointStrokeColor": "#fff",
-                "fillColor": "rgba(220, 220, 220, 0.75)",
-                "pointColor": "#ddd",
-                "strokeColor": "#ddd"
-            }, {
-                "data": rev,
-                label: 'Revenue',
-                "pointStrokeColor": "#fff",
-                "fillColor": "rgba(246, 145, 30, 1)",
-                "pointColor": "rgba(246, 145, 30, 1)",
-                "strokeColor": "rgba(246, 145, 30, 1)"
-            }, {
-                "data": roy,
-                label: 'Royalties',
-                "pointStrokeColor": "#fff",
-                "fillColor": "rgba(215, 45, 255, 0.5)",
-                "pointColor": "rgba(215, 45, 255, 1)",
-                "strokeColor": "rgba(215, 45, 255, 1)"
-
-            }],
-            "labels": chlabel
-
-        };
-
-        var sales = new Chart(document.getElementById("canvas1")
-                .getContext("2d"))
-            .Line(lineChartData1);
-        var royt = new Chart(document.getElementById("canvas2")
-                .getContext("2d"))
-            .Line(lineChartData2);
+		var ctxSales = document.getElementById("canvas1").getContext("2d");	
+		var myChart = new Chart(ctxSales, lineChartData1);
+		
+		var ctxSales = document.getElementById("canvas2").getContext("2d");	
+		var myChart = new Chart(ctxSales, lineChartData2);
+		
 
         document.getElementById("twoweeksstats")
             .innerHTML = '<center><h3>Monthly Statistics</h3></center><br><table class="table table-striped"><thead><tr><th class="text-center">Shirts Sold</th><th class="text-center">Shirts Cancelled</th><th class="text-center">Revenue</th><th class="text-center">Royalties</th></tr></thead><tbody>' +
