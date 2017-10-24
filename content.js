@@ -408,35 +408,43 @@ function dailySalesPage(numberOfDays){
 				'<center>' +
 					'<div class="canvas-wrapper">' +
 						'<canvas id="canvas3" height="350" width="280" style="padding:10px"></canvas>' +
-						'<h3 class="canvas-title">Gender Distribution</h3>' +
+						'<h4 class="canvas-title">Gender Distribution</h4>' +
 					'</div>' +
 					'<div class="canvas-wrapper">'+
 						'<canvas id="canvas4" height="350" width="280" style="padding:10px"></canvas>' +
-						'<h3 class="canvas-title">Size Distribution</h3>' +
+						'<h4 class="canvas-title">Size Distribution</h4>' +
 					'</div>'+
 					'<div class="canvas-wrapper">'+
 						'<canvas id="canvas5" height="350" width="280" style="padding:10px"></canvas>'+
-						'<h3 class="canvas-title">Color Distribution</h3>' +
+						'<h4 class="canvas-title">Color Distribution</h4>' +
 					'</div>' +
 					'</div> </div>' +
 				'</center>' +
-				' <div class="panel panel-default" id="nichePanel">    <div class="panel-heading">Niche Analysis</div>    <div class="panel-body">'+
-					'<div class="col-xs-6">' +
-						'<center>' +
-							'<div class="canvas-wrapper" style="width: 100%;">'+
-								'<canvas id="canvas6" height="350" width="280" style="padding:10px"></canvas>'+
-								'<h3 class="canvas-title">Niche Distribution (Number Sold)</h3>' +
-							'</div>' +
-						'</center>' +
-					'</div>' +
-					'<div class="col-xs-6">' +
-						'<center>' +
-							'<div class="canvas-wrapper" style="width: 100%;">'+
-								'<canvas id="canvas7" height="350" width="280" style="padding:10px"></canvas>'+
-								'<h3 class="canvas-title">Normalized Niche Distribution (%)</h3>' +
-							'</div>' +
-						'</center>' +
-					'</div>' +
+				' <div class="panel panel-default" id="nichePanel"> ' +
+					'<div class="panel-heading">' +
+						'Niche Analysis' +
+						'<i class="fa fa-info-circle" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="Group together TShirt designs of similar niches or styles to help forecast future winners on a broader scale"></i>'+
+					'</div>' + 
+					'<div class="panel-body">'+
+						'<div class="col-xs-6">' +
+							'<center>' +
+								'<div class="canvas-wrapper" style="width: 100%;">'+
+									'<canvas id="canvas6" height="350" width="280" style="padding:10px"></canvas>'+
+									'<h4 class="canvas-title">Niche Distribution (Number Sold)</h4>' +
+								'</div>' +
+							'</center>' +
+						'</div>' +
+						'<div class="col-xs-6">' +
+							'<center>' +
+								'<div class="canvas-wrapper" style="width: 100%;">'+
+									'<canvas id="canvas7" height="350" width="280" style="padding:10px"></canvas>'+
+									'<div class="canvas-title">' +
+										'<h4>Normalized Niche Distribution (%)</h4>' +
+										'<i class="fa fa-info-circle" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="Tooltip on bottom"></i>'+
+									'</div>' +
+								'</div>' +
+							'</center>' +
+						'</div>' +
 				'</div> </div>' +
 				'<br><div class="panel panel-default"><div class="panel-heading">Shirts Sold</div> <div class="panel-body" id="shirtlist"></div></div></div>' + 
 			'</div>' +
@@ -799,7 +807,12 @@ function renderDailyView(numberOfDays, callback){
 				totals.revenue = revenueData.reduce(function(a, b) { return a + b; }, 0).toFixed(2);				
 				totals.royalty = royaltyData.reduce(function(a, b) { return a + b; }, 0).toFixed(2);
 				
-				stats = '<center><h3>Statistics For The Past ' + numberofDaysInner + ' Days</h3></center>';	
+				var daysText = 'Days';
+				if (numberofDaysInner == 1){
+					daysText = 'Day';
+				}
+				
+				stats = '<center><h3>Statistics For The Past ' + numberofDaysInner + ' ' + daysText + '</h3></center>';	
 				stats += '<table class="table table-striped"><thead><tr>' +
 						'<th class="text-center">Shirts Sold</th>' + 
 						'<th class="text-center">Shirts Cancelled</th>' + 
@@ -905,7 +918,7 @@ function renderDailyView(numberOfDays, callback){
 					var ctxNormNiches = document.getElementById("canvas7").getContext("2d");	
 					var myChart = new Chart(ctxNormNiches, lineChartData7);
 					
-					
+					/*
 					//Dump Sales Data 
 					var nicheDistData = '<div class="col-xs-6">';
 					nicheDistData += '<h4>Total Number Of Shirts Available For Sale In Each Niche</h4>' +
@@ -939,11 +952,17 @@ function renderDailyView(numberOfDays, callback){
 					
 								
 					$("#nichePanel .panel-body").append(nicheDistData);
+					*/
+					
 					
 					$(".more-btn").click(function(){
 						$('.niche-list-area').toggleClass('expanded');
 					});	
-					
+
+					//Initialize Tooltips
+					$(function () {
+					  $('[data-toggle="tooltip"]').tooltip()
+					})
 				
 				
 				});

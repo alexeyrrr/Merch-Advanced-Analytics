@@ -164,9 +164,22 @@ div.desc {
 	position: absolute;
 	left: 0;
     bottom: 0;
-	font-size: 1.7rem;
+	left: 50%;
+    transform: translate(-50%, 0);
+}
+.canvas-title h4{
+	display: inline-block;
 }
 
+.fa-info-circle{
+	margin: 12px 6px;
+    font-size: 1.5rem;
+}
+.panel-heading .fa-info-circle{
+	margin: 0;
+	margin-left: 5px;
+	float: none;
+}
 .niche-input{
 	float: left;
     width: calc(100% - 83px);
