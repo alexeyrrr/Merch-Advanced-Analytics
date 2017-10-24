@@ -339,9 +339,8 @@ dt, dd{
 }
 
 .number-of-days-wrapper{
+	margin: 4px 10px 0 0;
 	float:left; 
-	width: 100%;
-	display: block;
 	font-weight: 700;
 }
 

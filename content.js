@@ -303,8 +303,8 @@ if (cmd.indexOf("MerchAnalyticsSettings") !== -1) {
 var globalHeader = '<head><style></style></head>' + 
 					"<script src='tablesort.min.js'></script>" + 
 					"<script src='tablesort.number.js'></script>" +
-					'<script src="https://code.jquery.com/jquery-1.12.0.min.js"></script>' +    
-					'<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>';
+					'<script src="jquery.js"></script>' +    
+					'<script src="bootstrap.min.js"></script>';
 
 
 var sidebarHTML = '<nav id="sidebar">' +
@@ -313,12 +313,12 @@ var sidebarHTML = '<nav id="sidebar">' +
 						'</div>' +
 
 						'<ul class="list-unstyled components">' +
-							'<li><a href="/MerchToolsTodaySales">Today\'s Sales</a></li>' +
-							'<li><a href="/MerchToolsTwoWeeksSales">14 Day Sales</a></li>' +
-							'<li><a href="/MerchToolsAllMonthsSales">Monthly Sales</a></li>' +
-							'<li><a href="/MerchToolsEditor">Manage Products</a></li>' +
-							'<li style="display:none;"><a href="/IndividualProductPage/">Individual Product Info</a></li>' +
-							'<li><a href="/MerchAnalyticsSettings">Settings</a></li>' +
+							'<li><a href="/MerchToolsTodaySales"><i class="fa fa-calendar-o" aria-hidden="true"></i> Today\'s Sales</a></li>' +
+							'<li><a href="/MerchToolsTwoWeeksSales"><i class="fa fa-calendar" aria-hidden="true"></i> 14 Day Sales</a></li>' +
+							'<li><a href="/MerchToolsAllMonthsSales"><i class="fa fa-area-chart" aria-hidden="true"></i> Monthly Sales</a></li>' +
+							'<li><a href="/MerchToolsEditor"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Manage Products</a></li>' +
+							'<li style="display:none;"><a href="/IndividualProductPage/"><i class="fa fa-crosshairs" aria-hidden="true"></i> Individual Product Info</a></li>' +
+							'<li><a href="/MerchAnalyticsSettings"><i class="fa fa-cogs" aria-hidden="true"></i> Settings</a></li>' +
 
 							/*'<li>' +
 								'<a href="#subMenu" data-toggle="collapse" aria-expanded="false">Other Tools</a>' +
@@ -397,10 +397,11 @@ function dailySalesPage(numberOfDays){
 	style.rel = 'stylesheet';
 	style.type = 'text/css';
 	style.href = chrome.extension.getURL('css.css');
-
+	
 	document.body.innerHTML = '<body>' +
 			'<div class="wrapper">' +
-				'<div class="container"><div class="panel panel-default"></center><div class="panel-body" id="dailystats"><center><h3>Loading..</h3></center></div></div>' +
+				'<div class="container"><div class="panel panel-default"></center>'+
+				'<div class="panel-body" id="dailystats"><center><h3>Loading...</h3><i class="fa-li fa fa-spinner fa-spin"></i></center></div></div>' +
 				' <div class="panel panel-default" id="salesPanel">    <div class="panel-heading">Sales/Cancellations</div>    <div class="panel-body"><center><canvas id="canvas1" height="450" width="800" ></canvas></center></div> </div>' +
 				' <div class="panel panel-default" id="revenuePanel">    <div class="panel-heading">Revenue/Royalties</div>    <div class="panel-body"><center><canvas id="canvas2" height="450" width="800" ></canvas></center></div> </div>' +
 				' <div class="panel panel-default">    <div class="panel-heading">Advanced Analytics</div>    <div class="panel-body">'+
@@ -798,7 +799,7 @@ function renderDailyView(numberOfDays, callback){
 				totals.revenue = revenueData.reduce(function(a, b) { return a + b; }, 0).toFixed(2);				
 				totals.royalty = royaltyData.reduce(function(a, b) { return a + b; }, 0).toFixed(2);
 				
-				stats = '<center><h3>Statistics For The Past ' + numberofDaysInner + ' Days</h3></center><br>';	
+				stats = '<center><h3>Statistics For The Past ' + numberofDaysInner + ' Days</h3></center>';	
 				stats += '<table class="table table-striped"><thead><tr>' +
 						'<th class="text-center">Shirts Sold</th>' + 
 						'<th class="text-center">Shirts Cancelled</th>' + 
@@ -815,7 +816,7 @@ function renderDailyView(numberOfDays, callback){
 						+ '<td><b>' + (totals.royalty /(totals.sales - totals.cancelled + 0.00001)).toFixed(2) + '</b></td>'
 						+ '<td><b>' + (totals.sales /(numberofDaysInner+ 0.00001)).toFixed(2) + '</b></td>'
 						+ '<td><b>' + (totals.royalty /(numberofDaysInner+ 0.00001)).toFixed(2) + '</b></td>'
-						+ '</tr></tbody></table><br>'
+						+ '</tr></tbody></table>'
 
 						+ '<div class="number-of-days-wrapper">'
 						+ '<span>Adjust date range to the last</span>'
@@ -1126,8 +1127,17 @@ function merchmonths(count, m, salesData, cancelData, returnData, rev, roy, chla
 		
 
         document.getElementById("twoweeksstats")
-            .innerHTML = '<center><h3>Monthly Statistics</h3></center><br><table class="table table-striped"><thead><tr><th class="text-center">Shirts Sold</th><th class="text-center">Shirts Cancelled</th><th class="text-center">Revenue</th><th class="text-center">Royalties</th></tr></thead><tbody>' +
-            '<tr class="success text-center"><td><b>' + xx + '</b></td><td><b>' + cxx + '</b></td><td><b>' + rrev + '</b></td><td><b>' + rr + '</b></td></tr></tbody></table><br>';
+            .innerHTML = '<center><h3>Monthly Statistics</h3></center><br>'+ 
+			'<table class="table table-striped">' +
+			'<thead><tr><th class="text-center">Shirts Sold</th><th class="text-center">Shirts Cancelled</th><th class="text-center">Revenue</th><th class="text-center">Royalties</th></tr></thead>'+
+			'<tbody>' +
+				'<tr class="success text-center">'+
+					'<td><b>' + xx + '</b></td>'+
+					'<td><b>' + cxx + '</b></td>'+
+					'<td><b>' + rrev.toFixed(2) + '</b></td>'+
+					'<td><b>' + rr.toFixed(2) + '</b></td>'+
+				'</tr>'+
+			'</tbody></table>';
 
 
 

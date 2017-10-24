@@ -8,7 +8,7 @@
       "default_title": "Merch Analytics"
    },
    "content_scripts": [ {
-      "css": [ "bootstrap.min.css", "css.css" ],
+      "css": [ "bootstrap.min.css", "css.css", "font-awesome.css" ],
       "js": [ "content.js", "jquery.js", "bootstrap.min.js", "Chart.min.js", "tablesort.min.js", "tablesort.number.js", "navscript.js", "popup.js" ],
       "matches": [ "https://*/MerchToolsTodaySales/*", "https://*/MerchToolsTwoWeeksSales/*", "https://*/MerchToolsAllMonthsSales/*", "https://*/MerchToolsEditor/*", "https://*/IndividualProductPage/*", "https://*/MerchAnalyticsSettings/*" ],
       "run_at": "document_end"
@@ -20,11 +20,19 @@
       "48": "icon48.png"
    },
    "web_accessible_resources": [
-       "options.html"
-	],
+		"options.html",
+		"fonts/fontawesome-webfont.woff",
+		"fonts/fontawesome-webfont.woff2",
+		"fonts/fontawesome-webfont.ttf",
+		"fonts/*.woff",
+		"fonts/*.ttf",
+		"*.ttf"
+	],	
    "manifest_version": 2,
    "name": "Merch Analytics",
    "permissions": [ "tabs", "activeTab", "contextMenus", "notifications", "storage", "*://*.amazon.com/*" ],
    "update_url": "https://clients2.google.com/service/update2/crx",
    "version": "0.0.0.1"
 }
+
+
