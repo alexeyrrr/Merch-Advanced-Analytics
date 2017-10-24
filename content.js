@@ -1206,13 +1206,14 @@ function productManager() {
 					'<div class="wrapper">' +
 						'<div class="container">' + 
 							'<div class="panel panel-default">' +
-								'<div class="alert alert-success clear"><strong> Use  CTRL + F (PC) or ⌘ + F (MAC) to open the search bar.</strong>' +
-									'<div class="btn btn-default" id="reset-button">Clear All Niche Data</div>' +
-								'</div>' + 
+								'<center><h2>Product Manager</h2></center>' +
 								'<div class="panel-body" id="manager-stats"><center><h3>Loading...</h3></center></div>' + 
 							'</div>'+ 
 							'<div class="panel panel-default">' +
-							'<div class="panel-body" id="shirtlist"></div>' + 
+								'<div class="panel-heading clear"><strong> Use  CTRL + F (PC) or ⌘ + F (MAC) to open the search bar.</strong>' +
+									'<div class="btn btn-default" id="reset-button">Clear All Niche Data</div>' +
+								'</div>' + 
+								'<div class="panel-body" id="shirtlist"></div>' + 
 							'</div>'+ 
 						'</div>' + 
 					'</div>' +
@@ -1227,7 +1228,7 @@ function productManager() {
 	
 
 	fetchAllLiveProducts(function(ts){
-		var cp2 = '<h2>Live Listings:</h2><br>' +
+		var cp2 = ' ' + //'<h3>Live Shirt Listings:</h3>' +
 					'<div id="status"></div>' +
 					'<table id="quickEditor" class="sortable table table-striped"><thead><tr><th>#</th>'
 					+ '<th>Title</th>'
@@ -1588,28 +1589,28 @@ function fetchIndividualProductSales(targetASIN, callback){
 /*********************** Settings Page *************************/
 /***************************************************************/
 function settingsPage (e) {
-   (e || window.event).preventDefault();
-   document.head.innerHTML = globalHeader;
-   document.body.innerHTML = '<body>'+
+	(e || window.event).preventDefault();
+	document.head.innerHTML = globalHeader;
+	document.body.innerHTML = '<body>'+
 								'<div class="wrapper">' +
 								'</div>' +
 							'</body>';
-   var pageContent = document.querySelector(".wrapper");
+	var pageContent = document.querySelector(".wrapper");
 	pageContent.innerHTML += sidebarHTML;
-	
+
 	var style = document.createElement('link');
 	style.rel = 'stylesheet';
 	style.type = 'text/css';
 	style.href = chrome.extension.getURL('css.css');
 
-	
-   var con = document.querySelector('.wrapper'), xhr = new XMLHttpRequest();
 
-   xhr.onreadystatechange = function (e) { 
+	var con = document.querySelector('.wrapper'), xhr = new XMLHttpRequest();
+
+	xhr.onreadystatechange = function (e) { 
 		if (xhr.readyState == 4 && xhr.status == 200) {
 			con.innerHTML += xhr.responseText;
 		}
-   }
+	}
 
 	xhr.open("GET", chrome.extension.getURL('options.html'), true);
 	xhr.setRequestHeader('Content-type', 'text/html');
@@ -1776,7 +1777,12 @@ function initSaveButtons(){ //Adds event listeners to all buttons
 		});
 			
 		//Listener for reset button
-		document.getElementById('reset-button').addEventListener("click", function(){clearAllNicheData();}, false);
+		document.getElementById('reset-button').addEventListener("click", function(){
+			var confirmResponse = confirm("This will clear all the data you have entered. Are you sure you want to clear all niches?");
+			if (confirmResponse == true) {
+				clearAllNicheData();
+			} 
+		}, false);
 		
 		//Enter key goes to next field
 		$('#shirtlist input[type="text"]').keydown(function(e) {
