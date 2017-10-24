@@ -3,31 +3,79 @@
 		<div class="panel-heading">
 			Settings
 		</div>
+		<form>
+			<div class="form-row">
+				<div class="form-group">
+					<div class="col-xs-12 col-sm-3">
+						<label for="timezone">Set Timezone</label>
+					</div>
+					<div class="col-xs-12 col-sm-9">
+						<select class="form-control" id="timezone">
+							<option>-12</option>
+							<option>-11</option>
+							<option>-10</option>
+							<option>-9</option>
+							<option>-8</option>
+							<option>-7</option>
+							<option>-6</option>
+							<option>-5</option>
+							<option>-4</option>
+							<option>-3</option>
+							<option>-2</option>
+							<option>-1</option>
+							<option>0</option>
+							<option>+1</option>
+							<option>+2</option>
+							<option>+3</option>
+							<option>+4</option>
+							<option>+5</option>
+							<option>+6</option>
+							<option>+7</option>
+							<option>+8</option>
+							<option>+9</option>
+							<option>+10</option>
+							<option>+11</option>
+							<option>+12</option>
+						</select>
+					</div>
+				</div>
+			</div>
+
+			<div class="form-row">
+				<div class="form-group">
+					<div class="col-xs-12 col-sm-3">
+						<label for="notificationSound">Sound Notifications</label>
+					</div>
+					
+					<div class="col-xs-12 col-sm-9">
+						<input type="checkbox" name="notificationSound" class="input-switch" id="notificationSound" checked="">
+						<label></label>
+					</div>
+				</div>
+			</div>
+			
+			<div class="form-row">
+				<div class="form-group">
+					<div class="col-xs-12 col-sm-3">
+						<label for="notificationPopup">Popup Sounds</label>
+					</div>
+					
+					<div class="col-xs-12 col-sm-9">
+						<input type="checkbox" name="notificationPopup" class="input-switch" id="notificationPopup" checked="">
+					</div>
+				</div>
+			</div>
+			
+			<div class="form-row">
+				<div class="form-group">
+					<button id="save" class="btn btn-info">
+						Save
+					</button>
+				</div>
+			</div>
 		
-		<table>
-			<form>
-			  <tr><td></td>
-				<td>Sales</td>
-				<td><input type="radio" name="sales" value="1" checked> <img src="img/sound.png" height="16" width="16">
-					<input type="radio" name="sales" value="0"> <img src="img/sound.png" height="16" width="16">
-				</td></tr>
-			  <tr><td>Notifications:</td>
-				   <td>Cancels</td>
-				   <td><input type="radio" name="cancels" value="1" checked> <img src="img/sound.png" height="16" width="16">
-					   <input type="radio" name="cancels" value="0"> <img src="img/sound.png" height="16" width="16"> </td></tr>
-			  <tr><td></td><td>Logout</td>
-			  <td><input type="radio" name="lout" value="1" checked> <img src="img/sound.png" height="16" width="16">
-				  <input type="radio" name="lout" value="0"> <img src="img/sound.png" height="16" width="16"> </td>
-			  </tr>
-			<tr></tr><tr><td>Pop-up </td><td></td>
-			<td><input type="radio" name="pop" value="1" checked> ON
-			  <input type="radio" name="pop" value="0"> OFF </td>
-			</form>
-		</table> 
+		</form>
+	</div>
 
-		<button id="save" class="btn btn-info">Save</button>
-	</div<
-
-	<div id="status"></div>
 	<script src="options.js"></script>
 </div>

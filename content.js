@@ -182,7 +182,6 @@ Date.prototype.setUTC = function(reset) {
 };
 
 
-
 /***************************************************************/
 /************************* Login Functions *********************/
 /***************************************************************/
@@ -209,7 +208,7 @@ function logincheck(cmd, queryParams = null) {
                         '<h6><a href="https://merch.amazon.com/dashboard" target="_blank"><p>>>Click here to open Merch by Amazon Login<<</p></a></h6>' +
                         '</div>' +
                         '<div class="modal-footer">' +
-                        '<button type="button" class="btn btn-success" data-dismiss="modal">Done, Reload The Page ! .</button>' +
+                        '<button type="button" class="btn btn-success" data-dismiss="modal">Done, Reload The Page!</button>' +
                         '</div></div></div></div>';
 
                     document.body.innerHTML = loginerr;
@@ -229,7 +228,7 @@ function logincheck(cmd, queryParams = null) {
                             dailySalesPage(14);
                             break;
                         case "todaysales":
-                            dailySalesPage(0);
+                            dailySalesPage(1);
                             break;
                         case "merchall":
                             merchmonthsall();
@@ -445,12 +444,16 @@ function dailySalesPage(numberOfDays){
 	var pageContent = document.querySelector(".wrapper");
 	pageContent.innerHTML += sidebarHTML;
 
-	renderDailyView(numberOfDays);
+	//Reduce days by 1 to get proper result
+	renderDailyView(numberOfDays-1);
 }
 
-function renderDailyView(numberOfDays, callback){
-	var today = new Date().setTimeZone();
-	today.setUTCHours(7,0,0,0); 
+function renderDailyView(numberOfDays, callback){		
+	var losAngelesOffset = -7*60*60000;
+	var today = new Date(new Date().getTime() + losAngelesOffset);
+
+	
+	
 	var fromDate = today.adjustDate(-numberOfDays).getTime();
 	var toDate = today.getTime();
 	
@@ -719,6 +722,7 @@ function renderDailyView(numberOfDays, callback){
 				var cp2 = 
 					'<table class="table table-striped sortable" id="itemizedList"><thead><tr><th>#</th>' +
 					'<th>Shirt Name</th>' +
+					'<th class="text-center">Niche Category</th>' +
 					'<th class="text-center">Units Sold</th>' +
 					'<th class="text-center">Units Cancelled</th>' +
 					'<th class="text-center">Revenue</th>' +
@@ -728,12 +732,21 @@ function renderDailyView(numberOfDays, callback){
 					'</tr></thead><tbody>';
 
 				for (i=0; i < resultSumSales.length; i++){
+					//Assign Niche
+					if(nichesLookupArray[resultSumSales[i]["ASIN"]] != undefined){
+						specificNiche = JSON.parse(nichesLookupArray[resultSumSales[i]["ASIN"]])["niche"];
+					}
+						
 					cp2 += '<tr data-href="' + '/IndividualProductPage/?ASIN=' + resultSumSales[i]["ASIN"]  + '">' + 
 						'<th scope="row">' + (i + 1) + '</th>' + 
 						'<td>' + 
 							resultSumSales[i]["Name"]  + 
 						'</td>' + 
-												
+						
+						'<td class="text-center">'+
+							specificNiche +
+						'</td>' +
+										
 						'<td class="text-center">' +
 							resultSumSales[i]["Units"]  +
 						'</td>' +
@@ -799,9 +812,9 @@ function renderDailyView(numberOfDays, callback){
 						+ '<td><b>' + totals.cancelled + '</b></td>'
 						+ '<td><b>' + totals.revenue + '</b></td>'
 						+ '<td><b>' + totals.royalty + '</b></td>'
-						+ '<td><b>' + (totals.royalty /(totals.sales - totals.cancelled)).toFixed(2) + '</b></td>'
-						+ '<td><b>' + (totals.sales /(numberofDaysInner)).toFixed(2) + '</b></td>'
-						+ '<td><b>' + (totals.royalty /(numberofDaysInner)).toFixed(2) + '</b></td>'
+						+ '<td><b>' + (totals.royalty /(totals.sales - totals.cancelled + 0.00001)).toFixed(2) + '</b></td>'
+						+ '<td><b>' + (totals.sales /(numberofDaysInner+ 0.00001)).toFixed(2) + '</b></td>'
+						+ '<td><b>' + (totals.royalty /(numberofDaysInner+ 0.00001)).toFixed(2) + '</b></td>'
 						+ '</tr></tbody></table><br>'
 
 						+ '<div class="number-of-days-wrapper">'
@@ -1272,7 +1285,6 @@ function productManager() {
 		});
 }
 
-
 /***************************************************************/
 /**************** Individual Product Page **********************/
 /***************************************************************/
@@ -1330,14 +1342,26 @@ function renderIndividualProductSales(queryParams){
 			
 			for ( i =0; i < liveProductsArray.length; i++){
 				if(liveProductsArray[i]["marketplaceAsinMap"]["US"] == targetASIN){
-					var firstPublishDate = new Date(parseInt(liveProductsArray[i]["firstPublishDate"]));
-					var imgURL = liveProductsArray[i]["imageURL"]; //Not working ATM
-					var firstPublishDateString = firstPublishDate.toDateString();
-					var shirtName = liveProductsArray[i]["name"];					
+					if(liveProductsArray[i]["status"] == "LIVE"){
+						var firstPublishDate = new Date(parseInt(liveProductsArray[i]["firstPublishDate"]));
+						var imgURL = liveProductsArray[i]["imageURL"]; //Not working ATM
+						var firstPublishDateString = firstPublishDate.toDateString();
+						var shirtName = liveProductsArray[i]["name"];	
+						break;
+					} else{
+						alert("Item has been deleted");
+						break;
+					}
 				}
 			
 			}
-										
+			
+			//TODO workaround error handling
+			if (!firstPublishDate){
+				alert("Item not found");
+			}
+									
+									
 			//Generate Axis Labels
 			var axisLabels = [];
 			while (firstPublishDate <= today.getTime()) {
@@ -1543,7 +1567,13 @@ function settingsPage (e) {
 							'</body>';
    var pageContent = document.querySelector(".wrapper");
 	pageContent.innerHTML += sidebarHTML;
-   
+	
+	var style = document.createElement('link');
+	style.rel = 'stylesheet';
+	style.type = 'text/css';
+	style.href = chrome.extension.getURL('css.css');
+
+	
    var con = document.querySelector('.wrapper'), xhr = new XMLHttpRequest();
 
    xhr.onreadystatechange = function (e) { 
@@ -1616,7 +1646,6 @@ function getShirtGender(shirtASIN){
 	}
 	return shirtGender;
 }
-
 
 function getShirtNiche(shirtASIN, callback){
 	var myKey = String(shirtASIN);
