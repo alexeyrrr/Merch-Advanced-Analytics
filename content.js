@@ -1619,64 +1619,8 @@ function settingsPage (e) {
 
 
 /***************************************************************/
-/************* Shirt Determination Functions *******************/
+/************************ Niche Storage ************************/
 /***************************************************************/
-function getShirtColor(shirtASIN){
-	knownColors = ["Dark Heather", "Heather Grey", "Heather Blue", "Black", "Navy", "Silver", "Royal Blue", "Brown", "Slate", "Red", "Asphalt", "Grass", "Olive", "Kelly Green", "Baby Blue", "White", "Lemon", "Cranberry", "Pink", "Orange", "Purple"];
-	for(var i = 0, len = knownColors.length; i < len; i++){
-		term = knownColors[i];
-		var index = shirtASIN.indexOf(term); 
-		if (index != -1) {
-			color =  knownColors[i];
-			break;
-		} else{
-			color = "Unknown Color";
-		}
-	}
-	return color;
-}
-
-function getShirtSize(shirtASIN){
-	adultSizes = ["Small", "Medium", "Large", "XL", "2XL", "3XL"];
-	youthSizes =  ["4", "6", "8", "10", "12"];
-	
-	for(var i = 0, len = adultSizes.length + youthSizes.length ; i < len; i++){
-		var indexAdult = shirtASIN.indexOf(adultSizes[i]); 
-		if (indexAdult != -1) {
-			size =  adultSizes[i];
-			break;
-		}
-		
-		var indexYouth = shirtASIN.indexOf(youthSizes[i]); 
-		if (indexYouth != -1) {
-			size = "Youth"
-			break
-		}	
-	}
-	
-	if (size == null){ //Just in case can't determine the size
-		size = "Unknown Size";
-	}
-	
-	return size;
-}
-
-function getShirtGender(shirtASIN){
-	knownGenders = ["Mens", "Womens", "Kids"];
-
-	for(var i = 0, len = knownGenders.length; i < len; i++){
-		term = knownGenders[i];
-		var index = shirtASIN.indexOf(term); 
-		if (index != -1) {
-			shirtGender =  knownGenders[i];
-			break;
-		} else{
-			shirtGender = "Unknown Gender";
-		}
-	}
-	return shirtGender;
-}
-
 function getShirtNiche(shirtASIN, callback){
 	var myKey = String(shirtASIN);
 	
@@ -1698,11 +1642,7 @@ function getAllShirtNiches(callback){
 		callback(items);
 	});
 }
-			
-
-/***************************************************************/
-/************************ Niche Storage ************************/
-/***************************************************************/
+		
 function saveShirtNiche(nicheName, parentASIN) {		
 	//Assemble Stringified JSON	
 	var key = parentASIN,
@@ -1718,7 +1658,6 @@ function saveShirtNiche(nicheName, parentASIN) {
         console.log('Saved', key, data);
     });
 }
-
 
 function readShirtNiche(){	
 	$('[name="nicheName"]').each(function () {
