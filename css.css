@@ -220,6 +220,10 @@ dt, dd{
 	float:left;
 }
 
+.niche-tag{
+	color: #666;
+}
+
 .input-switch + label::before{
 	content: "OFF";
     display: block;
@@ -267,6 +271,11 @@ dt, dd{
     left: 4px;
     right: auto;
 }
+.input-switch:checked + label::after {
+    background-color: #f7f7f7;
+    left: 29px;
+}
+
 	
 	
 [data-lifetime-sales="false"] td.product-name{

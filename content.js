@@ -723,7 +723,7 @@ function renderDailyView(numberOfDays, callback){
 				var cp2 = 
 					'<table class="table table-striped sortable" id="itemizedList"><thead><tr><th>#</th>' +
 					'<th>Shirt Name</th>' +
-					'<th class="text-center">Niche Category</th>' +
+					'<th class="">Niche Category</th>' +
 					'<th class="text-center">Units Sold</th>' +
 					'<th class="text-center">Units Cancelled</th>' +
 					'<th class="text-center">Revenue</th>' +
@@ -744,8 +744,8 @@ function renderDailyView(numberOfDays, callback){
 							resultSumSales[i]["Name"]  + 
 						'</td>' + 
 						
-						'<td class="text-center">'+
-							specificNiche +
+						'<td class="niche-tag">'+
+							'<i class="fa fa-tag" aria-hidden="true"></i> '+ specificNiche +
 						'</td>' +
 										
 						'<td class="text-center">' +
