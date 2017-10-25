@@ -341,14 +341,6 @@ var sidebarHTML = '<nav id="sidebar">' +
 							'<li><a href="/MerchAnalyticsProductManager"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Manage Products</a></li>' +
 							'<li style="display:none;"><a href="/IndividualProductPage/"><i class="fa fa-crosshairs" aria-hidden="true"></i> Individual Product Info</a></li>' +
 							'<li><a href="/MerchAnalyticsSettings"><i class="fa fa-cogs" aria-hidden="true"></i> Settings</a></li>' +
-
-							/*'<li>' +
-								'<a href="#subMenu" data-toggle="collapse" aria-expanded="false">Other Tools</a>' +
-								'<ul class="collapse list-unstyled" id="subMenu">' +
-									'<li><a href="/MerchToolsAllASINs">Live ASINs</a></li>' +
-								'</ul>' +
-							'</li>' +
-							*/
 						'</ul>' +
 				'</nav>' +
 				'<script src="navscript.js"></script>';
@@ -476,7 +468,7 @@ function dailySalesPage(numberOfDays){
 	pageContent.innerHTML += sidebarHTML;
 
 	//Reduce days by 1 to get proper result
-	renderDailyView(numberOfDays);
+	renderDailyView(numberOfDays-1);
 }
 
 function renderDailyView(numberOfDays, callback){		
@@ -489,7 +481,7 @@ function renderDailyView(numberOfDays, callback){
 		var axisLabels = [];
 		var stopDate = today.adjustDate(-numberOfDays); //Same as fromDate, but not UNIX time
 		
-		while (stopDate < toDate) {
+		while (stopDate <= toDate) {
 			var dd = stopDate.getDate();
 			var mm = stopDate.getMonth()+1;
 
@@ -1198,7 +1190,7 @@ function merchmonthsall() {
 	pageContent.innerHTML += sidebarHTML;
 		
 
-    document.title = "Merch Months - MerchTools ";
+    document.title = "Monthly View - Merch Analytics";
     document.body.style.backgroundColor = "#ecf1f2";
     salesData = [];
     cancelData = [];
@@ -1238,7 +1230,7 @@ function productManager() {
 				'</body>';
 	
     document.body.innerHTML = bodyHTML;
-    document.title = "Quick Editor  - MerchTools ";
+    document.title = "Manage Products - Merch Advanced Analytics";
     document.body.style.backgroundColor = "#ecf1f2";  //"#D1F8CC";
 	
 	var pageContent = document.querySelector(".wrapper");
@@ -1412,7 +1404,7 @@ function renderIndividualProductSales(queryParams){
 									
 			//Generate Axis Labels
 			var axisLabels = [];
-			while (firstPublishDate < today.getTime()) {
+			while (firstPublishDate <= today.getTime()) {
 				var dd = firstPublishDate.getDate();
 				var mm = firstPublishDate.getMonth()+1;
 

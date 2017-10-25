@@ -46,7 +46,7 @@ chrome.contextMenus.create({
 });
 
 chrome.contextMenus.create({
-	"title":  "Quick Editor", contexts:["browser_action"], onclick: function(info, tab) { 
+	"title":  "Manage Products", contexts:["browser_action"], onclick: function(info, tab) { 
 		quickeditor(); 
 	}
 });
