@@ -183,15 +183,29 @@ Date.prototype.setUTC = function(reset) {
 
 
 /***************************************************************/
-/************************* Login Functions *********************/
+/******* Login Functions / Timezone Global Options *************/
 /***************************************************************/
 var OPTION_TIMEZONE_OFFSET = -7*60*60000;
+var DAYLIGHT_SAVINGS = false;
+
+//Determine if Daylight Savings Now
+(function(){
+	var today = new Date();
+	var jan = new Date(today.getFullYear(),0,1);
+	var jul = new Date(today.getFullYear(),6,1);
+	DAYLIGHT_SAVINGS = Math.min(jan.getTimezoneOffset(),jul.getTimezoneOffset()) == today.getTimezoneOffset();  
+})();
+
 
 function logincheck(cmd, queryParams = null) {
 	chrome.storage.sync.get("Settings", function(items) {
 		if(Object.values(items).length != 0){
 			parsedJson = JSON.parse(items["Settings"]);
 			OPTION_TIMEZONE_OFFSET = parseInt(parsedJson["timezone"])*60*60000;
+			
+			if (DAYLIGHT_SAVINGS){
+				OPTION_TIMEZONE_OFFSET += 1*60*60000;
+			}
 		}
 	
 		var sls = 'https://merch.amazon.com/accountSummary';
@@ -281,19 +295,19 @@ var parseQueryString = function( funcQueryString ) {
 parsedParams = parseQueryString(queryString);
 //End Parsing Query Params
 
-if (cmd.indexOf("MerchToolsTodaySales") !== -1) {
+if (cmd.indexOf("MerchAnalyticsTodaySales") !== -1) {
     logincheck("todaysales");
 };
 
-if (cmd.indexOf("MerchToolsTwoWeeksSales") !== -1) {
+if (cmd.indexOf("MerchAnalyticsTwoWeekSales") !== -1) {
     logincheck("twoweekssales");
 };
 
-if (cmd.indexOf("MerchToolsAllMonthsSales") !== -1) {
+if (cmd.indexOf("MerchAnalyticsAllMonthsSales") !== -1) {
     logincheck("merchall");
 };
 
-if (cmd.indexOf("MerchToolsEditor") !== -1) {
+if (cmd.indexOf("MerchAnalyticsProductManager") !== -1) {
     logincheck("productManager");
 };
 
@@ -321,10 +335,10 @@ var sidebarHTML = '<nav id="sidebar">' +
 						'</div>' +
 
 						'<ul class="list-unstyled components">' +
-							'<li><a href="/MerchToolsTodaySales"><i class="fa fa-calendar-o" aria-hidden="true"></i> Today\'s Sales</a></li>' +
-							'<li><a href="/MerchToolsTwoWeeksSales"><i class="fa fa-calendar" aria-hidden="true"></i> 14 Day Sales</a></li>' +
-							'<li><a href="/MerchToolsAllMonthsSales"><i class="fa fa-area-chart" aria-hidden="true"></i> Monthly Sales</a></li>' +
-							'<li><a href="/MerchToolsEditor"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Manage Products</a></li>' +
+							'<li><a href="/MerchAnalyticsTodaySales"><i class="fa fa-calendar-o" aria-hidden="true"></i> Today\'s Sales</a></li>' +
+							'<li><a href="/MerchAnalyticsTwoWeekSales"><i class="fa fa-calendar" aria-hidden="true"></i> 14 Day Sales</a></li>' +
+							'<li><a href="/MerchAnalyticsAllMonthsSales"><i class="fa fa-area-chart" aria-hidden="true"></i> Monthly Sales</a></li>' +
+							'<li><a href="/MerchAnalyticsProductManager"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Manage Products</a></li>' +
 							'<li style="display:none;"><a href="/IndividualProductPage/"><i class="fa fa-crosshairs" aria-hidden="true"></i> Individual Product Info</a></li>' +
 							'<li><a href="/MerchAnalyticsSettings"><i class="fa fa-cogs" aria-hidden="true"></i> Settings</a></li>' +
 

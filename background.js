@@ -1,23 +1,23 @@
 /*Created by Alexey Rom, Based on MerchTool by HandyTools */
 function gotodaysales(info, tab) {
-	l2 = "https://merch.amazon.com/MerchToolsTodaySales";
+	l2 = "https://merch.amazon.com/MerchAnalyticsTodaySales";
 	chrome.tabs.create({ url: l2 });
 };
 
 
 function gotwoweeksssales(info, tab) {
-	l2 = "https://merch.amazon.com/MerchToolsTwoWeeksSales";
+	l2 = "https://merch.amazon.com/MerchAnalyticsTwoWeekSales";
 	chrome.tabs.create({ url: l2 });
 };
 
 
 function allmonthssales(info, tab) {
-	l2 = "https://merch.amazon.com/MerchToolsAllMonthsSales";
+	l2 = "https://merch.amazon.com/MerchAnalyticsAllMonthsSales";
 	chrome.tabs.create({ url: l2 });
 };
 
 function quickeditor(info, tab) {
-	l2 = "https://merch.amazon.com/MerchToolsEditor";
+	l2 = "https://merch.amazon.com/MerchAnalyticsProductManager";
 	chrome.tabs.create({ url: l2 });
 };
 
