@@ -298,8 +298,10 @@ if (cmd.indexOf("MerchAnalyticsSettings") !== -1) {
 };
 
 /***************************************************************/
-/************************** Global HTML ************************/
+/********************* Global HTML  / Options ******************/
 /***************************************************************/
+var OPTION_TIMEZONE = -7;
+
 var globalHeader = '<head><style></style></head>' + 
 					"<script src='tablesort.min.js'></script>" + 
 					"<script src='tablesort.number.js'></script>" +
@@ -446,7 +448,7 @@ function dailySalesPage(numberOfDays){
 							'</center>' +
 						'</div>' +
 				'</div> </div>' +
-				'<br><div class="panel panel-default"><div class="panel-heading">Shirts Sold</div> <div class="panel-body" id="shirtlist"></div></div></div>' + 
+				'<br><div class="panel panel-default"><div class="panel-heading">Shirts Sold During Selected Period</div> <div class="panel-body" id="shirtlist"></div></div></div>' + 
 			'</div>' +
 		'</body>';
 			
@@ -1598,6 +1600,9 @@ function settingsPage (e) {
 	var pageContent = document.querySelector(".wrapper");
 	pageContent.innerHTML += sidebarHTML;
 
+    document.title = "Settings  - Merch Advanced Analytics";
+    document.body.style.backgroundColor = "#ecf1f2";  
+	
 	var style = document.createElement('link');
 	style.rel = 'stylesheet';
 	style.type = 'text/css';
@@ -1606,18 +1611,85 @@ function settingsPage (e) {
 
 	var con = document.querySelector('.wrapper'), xhr = new XMLHttpRequest();
 
-	xhr.onreadystatechange = function (e) { 
-		if (xhr.readyState == 4 && xhr.status == 200) {
-			con.innerHTML += xhr.responseText;
-		}
-	}
-
 	xhr.open("GET", chrome.extension.getURL('options.html'), true);
 	xhr.setRequestHeader('Content-type', 'text/html');
+	xhr.onreadystatechange = function (e) { 
+		if (xhr.readyState == 4) {
+            if ([200, 201, 202, 203, 204, 205, 206, 207, 226].indexOf(xhr.status) === -1) {
+
+            } else {
+				con.innerHTML += xhr.responseText;
+				
+				$(function(){
+					restore_options();
+					$('#save-settings').click(function() {
+						save_options();						
+					});
+				})
+			}
+		}
+	}
 	xhr.send();
 }
 
+// Restores select box and checkbox state using the preferences
+// stored in chrome.storage.
+function restore_options() {
+	chrome.storage.sync.get("Settings", function(items) {
+		if(Object.values(items).length != 0){
+			parsedJson = JSON.parse(items["Settings"]);
+			
+			optionTimezone = parsedJson["timezone"];
+			optionSound	= parsedJson["sound"];
+			optionNotif	= parsedJson["popup"];
+			
+			if (optionTimezone){				
+				$("#timezone").val(optionTimezone);
+			} 
+			
+			if (optionSound){
+				$('#notificationSound').prop('checked', true);
+			} else {
+				$('#notificationSound').prop('checked', false);
+			}
+					
+			if (optionNotif){
+				$('#notificationPopup').prop('checked', true);
+			}else{
+				$('#notificationPopup').prop('checked', false);
+			}
+		}
+	});
+}
 
+// Saves options to chrome.storage
+function save_options() {
+	var optionTimeZone = $('#timezone').find(":selected").val();
+	var optionSound = $('#notificationSound').prop("checked") ? 1 : 0;
+	var optionNotif = $('#notificationPopup').prop("checked") ? 1 : 0;
+	
+	var data = JSON.stringify({
+		'timezone': parseInt(optionTimeZone),
+		'sound': optionSound,
+		'popup': optionNotif
+	});
+    var jsonfile = {};
+    jsonfile["Settings"] = data;
+	
+	chrome.storage.sync.set(jsonfile, function () {
+		var status = $('#save-settings');
+		status.text('Saved');
+		status.removeClass('btn-default');
+		status.addClass('btn-success');
+		console.log("Saved", data);
+		setTimeout(function() {
+			status.text('Save');
+			status.removeClass('btn-success');
+			status.addClass('btn-default');
+		}, 750);
+    });
+	
+}
 /***************************************************************/
 /************************ Niche Storage ************************/
 /***************************************************************/
@@ -1696,13 +1768,11 @@ function getNicheDistribution(callback){
 	});
 	
 }
-
 	
 function clearAllNicheData(){
 	 chrome.storage.sync.clear();
 	 alert("All previous data has been cleared");
 }
-
 
 function initSaveButtons(){ //Adds event listeners to all buttons	
 	$(function(){

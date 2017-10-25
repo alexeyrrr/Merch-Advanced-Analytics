@@ -85,7 +85,7 @@ var chng = 0 ;
 
 
 var checkforsales = function() {
-    var salesAnalytics = 'https://merch.amazon.com/salesAnalyticsSummary';
+    var salesAnalytics = 'https://merch.amazon.com/product-purchases-summary'; //https://merch.amazon.com/salesAnalyticsSummary
     var req = new XMLHttpRequest();
     req.open("GET", salesAnalytics, true);
     req.onreadystatechange = function() {

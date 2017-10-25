@@ -236,6 +236,12 @@ dt, dd{
 .niche-tag{
 	color: #666;
 }
+.form-group{
+	margin-top: 10px;
+}
+.input-switch{
+	display:none;
+}
 
 .input-switch + label::before{
 	content: "OFF";
