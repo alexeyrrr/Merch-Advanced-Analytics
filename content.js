@@ -476,7 +476,7 @@ function dailySalesPage(numberOfDays){
 	pageContent.innerHTML += sidebarHTML;
 
 	//Reduce days by 1 to get proper result
-	renderDailyView(numberOfDays-1);
+	renderDailyView(numberOfDays);
 }
 
 function renderDailyView(numberOfDays, callback){		
@@ -489,7 +489,7 @@ function renderDailyView(numberOfDays, callback){
 		var axisLabels = [];
 		var stopDate = today.adjustDate(-numberOfDays); //Same as fromDate, but not UNIX time
 		
-		while (stopDate <= toDate) {
+		while (stopDate < toDate) {
 			var dd = stopDate.getDate();
 			var mm = stopDate.getMonth()+1;
 
@@ -1412,7 +1412,7 @@ function renderIndividualProductSales(queryParams){
 									
 			//Generate Axis Labels
 			var axisLabels = [];
-			while (firstPublishDate <= today.getTime()) {
+			while (firstPublishDate < today.getTime()) {
 				var dd = firstPublishDate.getDate();
 				var mm = firstPublishDate.getMonth()+1;
 
