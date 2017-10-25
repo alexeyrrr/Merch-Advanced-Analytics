@@ -989,17 +989,15 @@ function merchmonths(count, m, salesData, cancelData, returnData, rev, roy, chla
         startDate = thatMonth.getFirstDateOfMonth();
         endDate = thatMonth.getLastDayOfMonth();
 
-        var sls = 'https://merch.amazon.com/salesAnalyticsRecord/all?fromDate=' + startDate.getTime() + '&toDate=' + endDate.getTime();
+        var sls = 'https://merch.amazon.com/product-purchases-records?fromDate=' + startDate.getTime() + '&toDate=' + endDate.getTime();
         var reqs = new XMLHttpRequest();
         reqs.open("GET", sls, true);
         reqs.onreadystatechange = function() {
             if (reqs.readyState == 4) {
                 if ([200, 201, 202, 203, 204, 205, 206, 207, 226].indexOf(reqs.status) === -1) {
-                    alert("error");
+                    alert("Amazon Server Response Error");
 
                 } else {
-
-
                     var tots = 0;
                     var totr = 0;
                     var totc = 0;
@@ -1007,16 +1005,18 @@ function merchmonths(count, m, salesData, cancelData, returnData, rev, roy, chla
                     var totroy = 0;
                     var ts = JSON.parse(reqs.responseText);
 
-                    for (i = 0; i < ts.length; i++) {
-                        if (ts[i].isParentAsin == true) {
-                            tots += parseInt(ts[i].unitsSold);
-                            totr += parseInt(ts[i].unitsReturned);
-                            totc += parseInt(ts[i].unitsCancelled);
-                            totrev += parseFloat(parseFloat(ts[i].revenueValue)
-                                .toFixed(2));
-                            totroy += parseFloat(parseFloat(ts[i].royaltyValue)
-                                .toFixed(2));
-                        };
+					for (var item in ts){
+						var firstKey = Object.keys(ts[item])[0];
+						var innerData = ts[item][firstKey];
+						
+						tots += parseInt(innerData[0].unitsSold);
+						totr += parseInt(innerData[0].unitsReturned);
+						totc += parseInt(innerData[0].unitsCancelled);
+						totrev += parseFloat(parseFloat(innerData[0].revenueValue)
+							.toFixed(2));
+						totroy += parseFloat(parseFloat(innerData[0].royaltyValue)
+							.toFixed(2));
+                        
                     };
 
                     salesData.push(tots);
