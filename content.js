@@ -183,15 +183,29 @@ Date.prototype.setUTC = function(reset) {
 
 
 /***************************************************************/
-/************************* Login Functions *********************/
+/******* Login Functions / Timezone Global Options *************/
 /***************************************************************/
 var OPTION_TIMEZONE_OFFSET = -7*60*60000;
+var DAYLIGHT_SAVINGS = false;
+
+//Determine if Daylight Savings Now
+(function(){
+	var today = new Date();
+	var jan = new Date(today.getFullYear(),0,1);
+	var jul = new Date(today.getFullYear(),6,1);
+	DAYLIGHT_SAVINGS = Math.min(jan.getTimezoneOffset(),jul.getTimezoneOffset()) == today.getTimezoneOffset();  
+})();
+
 
 function logincheck(cmd, queryParams = null) {
 	chrome.storage.sync.get("Settings", function(items) {
 		if(Object.values(items).length != 0){
 			parsedJson = JSON.parse(items["Settings"]);
 			OPTION_TIMEZONE_OFFSET = parseInt(parsedJson["timezone"])*60*60000;
+			
+			if (DAYLIGHT_SAVINGS){
+				OPTION_TIMEZONE_OFFSET += 1*60*60000;
+			}
 		}
 	
 		var sls = 'https://merch.amazon.com/accountSummary';
