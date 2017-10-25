@@ -185,71 +185,79 @@ Date.prototype.setUTC = function(reset) {
 /***************************************************************/
 /************************* Login Functions *********************/
 /***************************************************************/
+var OPTION_TIMEZONE_OFFSET = -7*60*60000;
+
 function logincheck(cmd, queryParams = null) {
-	//Disappointed but not surprised :)
-    var sls = 'https://merch.amazon.com/accountSummary';
-    var reqs = new XMLHttpRequest();
-    reqs.open("GET", sls, true);
-    reqs.onreadystatechange = function() {
-        if (reqs.readyState == 4) {
+	chrome.storage.sync.get("Settings", function(items) {
+		if(Object.values(items).length != 0){
+			parsedJson = JSON.parse(items["Settings"]);
+			OPTION_TIMEZONE_OFFSET = parseInt(parsedJson["timezone"])*60*60000;
+		}
+	
+		var sls = 'https://merch.amazon.com/accountSummary';
+		var reqs = new XMLHttpRequest();
+		reqs.open("GET", sls, true);
+		reqs.onreadystatechange = function() {
+			if (reqs.readyState == 4) {
 
-            if ([200, 201, 202, 203, 204, 205, 206, 207, 226].indexOf(reqs.status) === -1) {
+				if ([200, 201, 202, 203, 204, 205, 206, 207, 226].indexOf(reqs.status) === -1) {
 
-            } else {
-                if (reqs.responseText.indexOf('AuthenticationPortal') != -1) {
+				} else {
+					if (reqs.responseText.indexOf('AuthenticationPortal') != -1) {
 
-                    loginerr = '<div id="myModal" class="modal fade" role="dialog">' +
-                        '<div class="modal-dialog">' +
-                        '<div class="modal-content">' +
-                        '<div class="modal-header">' +
-                        '<h4 class="modal-title">Please Login </h4>' +
-                        ' </div>' +
-                        '<div class="modal-body">' +
-                        '<h6><a href="https://merch.amazon.com/dashboard" target="_blank"><p>>>Click here to open Merch by Amazon Login<<</p></a></h6>' +
-                        '</div>' +
-                        '<div class="modal-footer">' +
-                        '<button type="button" class="btn btn-success" data-dismiss="modal">Done, Reload The Page!</button>' +
-                        '</div></div></div></div>';
+						loginerr = '<div id="myModal" class="modal fade" role="dialog">' +
+							'<div class="modal-dialog">' +
+							'<div class="modal-content">' +
+							'<div class="modal-header">' +
+							'<h4 class="modal-title">Please Login </h4>' +
+							' </div>' +
+							'<div class="modal-body">' +
+							'<h6><a href="https://merch.amazon.com/dashboard" target="_blank"><p>>>Click here to open Merch by Amazon Login<<</p></a></h6>' +
+							'</div>' +
+							'<div class="modal-footer">' +
+							'<button type="button" class="btn btn-success" data-dismiss="modal">Done, Reload The Page!</button>' +
+							'</div></div></div></div>';
 
-                    document.body.innerHTML = loginerr;
+						document.body.innerHTML = loginerr;
 
-                    $('#myModal')
-                        .modal('show');
+						$('#myModal')
+							.modal('show');
 
-                    $(document)
-                        .on('hide.bs.modal', '#myModal', function() {
-                            location.reload();
-                        });
+						$(document)
+							.on('hide.bs.modal', '#myModal', function() {
+								location.reload();
+							});
 
 
-                } else {
-                    switch (cmd) {
-                        case "twoweekssales":
-                            dailySalesPage(14);
-                            break;
-                        case "todaysales":
-                            dailySalesPage(1);
-                            break;
-                        case "merchall":
-                            merchmonthsall();
-                            break;
-                        case "productManager":
-                            productManager();
-                            break;
-						case "individualProductPage":
-                            individualProductPage(queryParams);
-                            break;
-						case "settings":
-                            settingsPage();
-                            break;
-                    };
-                };
-            };
+					} else {
+						switch (cmd) {
+							case "twoweekssales":
+								dailySalesPage(14);
+								break;
+							case "todaysales":
+								dailySalesPage(1);
+								break;
+							case "merchall":
+								merchmonthsall();
+								break;
+							case "productManager":
+								productManager();
+								break;
+							case "individualProductPage":
+								individualProductPage(queryParams);
+								break;
+							case "settings":
+								settingsPage();
+								break;
+						};
+					};
+				};
 
-        };
-    };
+			};
+		};
 
-    reqs.send();
+		reqs.send();
+	});
 
 };
 
@@ -300,8 +308,6 @@ if (cmd.indexOf("MerchAnalyticsSettings") !== -1) {
 /***************************************************************/
 /********************* Global HTML  / Options ******************/
 /***************************************************************/
-var OPTION_TIMEZONE = -7;
-
 var globalHeader = '<head><style></style></head>' + 
 					"<script src='tablesort.min.js'></script>" + 
 					"<script src='tablesort.number.js'></script>" +
@@ -460,11 +466,7 @@ function dailySalesPage(numberOfDays){
 }
 
 function renderDailyView(numberOfDays, callback){		
-	var losAngelesOffset = -7*60*60000;
-	var today = new Date(new Date().getTime() + losAngelesOffset);
-
-	
-	
+	var today = new Date(new Date().getTime() + OPTION_TIMEZONE_OFFSET);	
 	var fromDate = today.adjustDate(-numberOfDays).getTime();
 	var toDate = today.getTime();
 	
@@ -981,8 +983,8 @@ function renderDailyView(numberOfDays, callback){
 /***************************************************************/	
 function merchmonths(count, m, salesData, cancelData, returnData, rev, roy, chlabel, ts) {
     if (count >= 0) {
-        var today = new Date().setTimeZone();
-		today.setUTCHours(7,0,0,0) ; 
+        var today = new Date(new Date().getTime() + OPTION_TIMEZONE_OFFSET);
+		
         var thatMonth = today.adjustMonth(-count);
         startDate = thatMonth.getFirstDateOfMonth();
         endDate = thatMonth.getLastDayOfMonth();
@@ -1369,8 +1371,8 @@ function renderIndividualProductSales(queryParams){
 		// Need To get First Publication Date
 		fetchAllLiveProducts(function (liveProductsArray){
 			var firstPublishDate = "";
-			var today = new Date().setTimeZone();
-			today.setUTCHours(7,0,0,0); 
+			var today = new Date(new Date().getTime() + OPTION_TIMEZONE_OFFSET);
+			
 			
 			for ( i =0; i < liveProductsArray.length; i++){
 				if(liveProductsArray[i]["marketplaceAsinMap"]["US"] == targetASIN){
@@ -1569,8 +1571,7 @@ function renderIndividualProductSales(queryParams){
 }
 
 function fetchIndividualProductSales(targetASIN, callback){
-	var today = new Date().setTimeZone();
-	today.setUTCHours(7,0,0,0); 
+	var today = new Date(new Date().getTime() + OPTION_TIMEZONE_OFFSET);
 	var fromDate = today.adjustDate(-90).getTime();
 	var toDate = today.getTime();
 	
