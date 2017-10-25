@@ -1276,7 +1276,7 @@ function productManager() {
 					'<td class="text-center btn-inside">' +
 						  '<input type="text" name="nicheName" class="niche-input"/>' +
 						  '<input type="hidden" name="parentASIN" value='+ ts[i].marketplaceAsinMap.US + '>' +
-						  '<input type="submit" value="Save" class="btn btn-info save"/>' +
+						  '<button class="btn btn-info save"/>Save</button>' +
 					'</td>' +
 					'<td class="text-center">' + ts[i].listPrice + '</td>' +
 					'<td class="text-center btn-inside">' + '<a target="_blank" href="http://merch.amazon.com/merch-tshirt/title-setup/' + ts[i].id + '/add_details" class="btn btn-info">Edit</a>' + '</td></tr>';
@@ -1784,6 +1784,18 @@ function initSaveButtons(){ //Adds event listeners to all buttons
 			
 			//Remove class than makes button red
 			$(this).removeClass("btn-danger");
+			
+			$(this).text('Saved');
+			$(this).removeClass('btn-info');
+			$(this).addClass('btn-success');
+			
+			var that  = $(this); // Need to reset scope
+			setTimeout(function() {
+				that.text('Save');
+				that.removeClass('btn-success');
+				that.addClass('btn-info');
+			}, 750);
+			
 		});
 			
 		//Listener for reset button
@@ -1798,8 +1810,21 @@ function initSaveButtons(){ //Adds event listeners to all buttons
 		$('#shirtlist input[type="text"]').keydown(function(e) {
 			if (e.which == 13) { //Enter Key
 				e.preventDefault();
-				$(this).siblings('input[type="submit"]').click(); //Click Submit Button
+				
+				var targetButton = $(this).siblings('.save');
+				
+				targetButton.click(); //Click Submit Button
 				$(this).closest("tr").next().find('input[type="text"]').focus(); //Focus on Next Field
+				
+				targetButton.text('Saved');
+				targetButton.removeClass('btn-info');
+				targetButton.addClass('btn-success');
+				
+				setTimeout(function() {
+					targetButton.text('Save');
+					targetButton.removeClass('btn-success');
+					targetButton.addClass('btn-info');
+				}, 750);
 			}
 			
 			if (e.which == 38) { //Up Key
