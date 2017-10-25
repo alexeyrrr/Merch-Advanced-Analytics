@@ -431,7 +431,7 @@ function dailySalesPage(numberOfDays){
 				' <div class="panel panel-default" id="nichePanel"> ' +
 					'<div class="panel-heading">' +
 						'Niche Analysis' +
-						'<i class="fa fa-info-circle" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="Group together TShirt designs of similar niches or styles to help forecast future winners on a broader scale"></i>'+
+						'<i class="fa fa-info-circle" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="Group together TShirt designs of similar niches or styles to help forecast future winners on a broader scale. Niche tags can be set on the Manage Products page"></i>'+
 					'</div>' + 
 					'<div class="panel-body">'+
 						'<div class="col-xs-6">' +
@@ -448,7 +448,7 @@ function dailySalesPage(numberOfDays){
 									'<canvas id="canvas7" height="350" width="280" style="padding:10px"></canvas>'+
 									'<div class="canvas-title">' +
 										'<h4>Normalized Niche Distribution (%)</h4>' +
-										'<i class="fa fa-info-circle" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="Tooltip on bottom"></i>'+
+										'<i class="fa fa-info-circle" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="A normalized distribution takes into account the number of shirts for each niche and factors out the relative availablilty of each niche. (i.e. think like comparing a country\'s GDP vs GDP Per Capita)"></i>'+
 									'</div>' +
 								'</div>' +
 							'</center>' +
