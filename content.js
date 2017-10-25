@@ -401,6 +401,9 @@ function fetchAllLiveProducts(callback){
 function dailySalesPage(numberOfDays){
 	document.head.innerHTML = globalHeader;
 
+	document.title = "Daily View - Merch Advanced Analytics";
+    document.body.style.backgroundColor = "#ecf1f2";  
+	
 	var style = document.createElement('link');
 	style.rel = 'stylesheet';
 	style.type = 'text/css';
@@ -408,53 +411,76 @@ function dailySalesPage(numberOfDays){
 	
 	document.body.innerHTML = '<body>' +
 			'<div class="wrapper">' +
-				'<div class="container"><div class="panel panel-default"></center>'+
-				'<div class="panel-body" id="dailystats"><center><h3>Loading...</h3><i class="fa-li fa fa-spinner fa-spin"></i></center></div></div>' +
-				' <div class="panel panel-default" id="salesPanel">    <div class="panel-heading">Sales/Cancellations</div>    <div class="panel-body"><center><canvas id="canvas1" height="450" width="800" ></canvas></center></div> </div>' +
-				' <div class="panel panel-default" id="revenuePanel">    <div class="panel-heading">Revenue/Royalties</div>    <div class="panel-body"><center><canvas id="canvas2" height="450" width="800" ></canvas></center></div> </div>' +
-				' <div class="panel panel-default">    <div class="panel-heading">Advanced Analytics</div>    <div class="panel-body">'+
-				'<center>' +
-					'<div class="canvas-wrapper">' +
-						'<canvas id="canvas3" height="350" width="280" style="padding:10px"></canvas>' +
-						'<h4 class="canvas-title">Gender Distribution</h4>' +
+				'<div class="container">' +
+					'<div class="panel panel-default"></center>'+
+						'<div class="panel-body" id="dailystats"><center><h3>Loading...</h3><i class="fa-li fa fa-spinner fa-spin"></i></center></div>'+ 
 					'</div>' +
-					'<div class="canvas-wrapper">'+
-						'<canvas id="canvas4" height="350" width="280" style="padding:10px"></canvas>' +
-						'<h4 class="canvas-title">Size Distribution</h4>' +
-					'</div>'+
-					'<div class="canvas-wrapper">'+
-						'<canvas id="canvas5" height="350" width="280" style="padding:10px"></canvas>'+
-						'<h4 class="canvas-title">Color Distribution</h4>' +
+					'<div class="panel panel-default" id="salesPanel">' +
+						'<div class="panel-heading">' + 
+							'<ul class="nav nav-tabs" role="tablist">' +
+								'<li class="active"><a href="#sales" role="tab" data-toggle="tab">Sales/Cancellations</a></li>' +
+								'<li><a href="#revenue" role="tab" data-toggle="tab">Revenue/Royalties</a></li>' +
+								'<li><a href="#advanced" role="tab" data-toggle="tab">Advanced Analytics</a></li>' +
+								'<li><a href="#niche" role="tab" data-toggle="tab">'+
+									'Niche Analysis' +
+									'<i class="fa fa-info-circle" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="Group together TShirt designs of similar niches or styles to help forecast future winners on a broader scale. Niche tags can be set on the Manage Products page"></i>'+
+								'</a></li>' +
+							'</ul>' +
+						'</div>' +
+						
+						'<div class="panel-body tab-content">' +
+							'<div class="tab-pane active" id="sales">' +
+								'<center><canvas id="canvas1" height="450" width="800" ></canvas></center>' + 
+							'</div>' +
+							
+							'<div class="tab-pane" id="revenue">' +
+								'<center><canvas id="canvas2" height="450" width="800" ></canvas></center>' +
+							'</div>' + 
+							'<div class="tab-pane" id="advanced">' +
+								'<center>' +
+								'<div class="canvas-wrapper">' +
+									'<canvas id="canvas3" height="350" width="280" style="padding:10px"></canvas>' +
+									'<h4 class="canvas-title">Gender Distribution</h4>' +
+								'</div>' +
+								'<div class="canvas-wrapper">'+
+									'<canvas id="canvas4" height="350" width="280" style="padding:10px"></canvas>' +
+									'<h4 class="canvas-title">Size Distribution</h4>' +
+								'</div>'+
+								'<div class="canvas-wrapper">'+
+									'<canvas id="canvas5" height="350" width="280" style="padding:10px"></canvas>'+
+									'<h4 class="canvas-title">Color Distribution</h4>' +
+								'</div>' +
+							'</center>' +
+							'</div>' +
+							'<div class="tab-pane" id="niche">' +
+								'<div class="col-xs-6">' +
+									'<center>' +
+										'<div class="canvas-wrapper" style="width: 100%;">'+
+											'<canvas id="canvas6" height="350" width="280" style="padding:10px"></canvas>'+
+											'<h4 class="canvas-title">Niche Distribution (Number Sold)</h4>' +
+										'</div>' +
+									'</center>' +
+								'</div>' +
+								'<div class="col-xs-6">' +
+									'<center>' +
+										'<div class="canvas-wrapper" style="width: 100%;">'+
+											'<canvas id="canvas7" height="350" width="280" style="padding:10px"></canvas>'+
+											'<div class="canvas-title">' +
+												'<h4>Normalized Niche Distribution (%)</h4>' +
+												'<i class="fa fa-info-circle" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="A normalized distribution takes into account the number of shirts for each niche and factors out the relative availablilty of each niche. (i.e. think like comparing a country\'s GDP vs GDP Per Capita)"></i>'+
+											'</div>' +
+										'</div>' +
+									'</center>' +
+								'</div>' +
+							'</div>' +
+						'</div>' +
 					'</div>' +
-					'</div> </div>' +
-				'</center>' +
-				' <div class="panel panel-default" id="nichePanel"> ' +
-					'<div class="panel-heading">' +
-						'Niche Analysis' +
-						'<i class="fa fa-info-circle" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="Group together TShirt designs of similar niches or styles to help forecast future winners on a broader scale. Niche tags can be set on the Manage Products page"></i>'+
+					
+					'<div class="panel panel-default">' + 
+						'<div class="panel-heading">Shirts Sold During Selected Period</div>' +
+						'<div class="panel-body" id="shirtlist"></div>' +
 					'</div>' + 
-					'<div class="panel-body">'+
-						'<div class="col-xs-6">' +
-							'<center>' +
-								'<div class="canvas-wrapper" style="width: 100%;">'+
-									'<canvas id="canvas6" height="350" width="280" style="padding:10px"></canvas>'+
-									'<h4 class="canvas-title">Niche Distribution (Number Sold)</h4>' +
-								'</div>' +
-							'</center>' +
-						'</div>' +
-						'<div class="col-xs-6">' +
-							'<center>' +
-								'<div class="canvas-wrapper" style="width: 100%;">'+
-									'<canvas id="canvas7" height="350" width="280" style="padding:10px"></canvas>'+
-									'<div class="canvas-title">' +
-										'<h4>Normalized Niche Distribution (%)</h4>' +
-										'<i class="fa fa-info-circle" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="A normalized distribution takes into account the number of shirts for each niche and factors out the relative availablilty of each niche. (i.e. think like comparing a country\'s GDP vs GDP Per Capita)"></i>'+
-									'</div>' +
-								'</div>' +
-							'</center>' +
-						'</div>' +
-				'</div> </div>' +
-				'<br><div class="panel panel-default"><div class="panel-heading">Shirts Sold During Selected Period</div> <div class="panel-body" id="shirtlist"></div></div></div>' + 
+				'</div>' + 
 			'</div>' +
 		'</body>';
 			
@@ -846,35 +872,34 @@ function renderDailyView(numberOfDays, callback){
 							
 				document.getElementById("dailystats")
 					.innerHTML = stats;
-					
+
+				/*
 				if(numberofDaysInner == 1){ //Hide Top 2 Charts if Days == 1, since they're useless.
 					document.getElementById('salesPanel').style.display = "none";
 					document.getElementById('revenuePanel').style.display = "none";
 				}
+				*/
 				
 				
-				$('#save-number-days')
-					.on('click', function(e) {
-						numberOfDaysInput = parseInt($(this).closest("div").find('[name="numberOfDaysInput"]').val());
-											
-						if (numberOfDaysInput === parseInt(numberOfDaysInput, 10)){ //Check if integer
-							if(numberOfDaysInput <= 0){
-								alert('Enter a number greater than 0');
-							} else if (numberOfDaysInput > 90){
-								alert('Cannot get info for more than 90 days');
-								
-							} else{
-								dailySalesPage(numberOfDaysInput);
-								//location.reload();
-							}
+				$('#save-number-days').on('click', function(e) {
+					numberOfDaysInput = parseInt($(this).closest("div").find('[name="numberOfDaysInput"]').val());
+										
+					if (numberOfDaysInput === parseInt(numberOfDaysInput, 10)){ //Check if integer
+						if(numberOfDaysInput <= 0){
+							alert('Enter a number greater than 0');
+						} else if (numberOfDaysInput > 90){
+							alert('Cannot get info for more than 90 days');
 							
 						} else{
-							alert("Please complete field with a number");
+							dailySalesPage(numberOfDaysInput);
+							//location.reload();
 						}
-					})
-					
-					
 						
+					} else{
+						alert("Please complete field with a number");
+					}
+				})
+					
 					
 				//********** Get Normalized Array ***************//
 				// (This is down here because it takes longer)
@@ -922,7 +947,7 @@ function renderDailyView(numberOfDays, callback){
 					var ctxNormNiches = document.getElementById("canvas7").getContext("2d");	
 					var myChart = new Chart(ctxNormNiches, lineChartData7);
 					
-					/*
+					
 					//Dump Sales Data 
 					var nicheDistData = '<div class="col-xs-6">';
 					nicheDistData += '<h4>Total Number Of Shirts Available For Sale In Each Niche</h4>' +
@@ -955,8 +980,8 @@ function renderDailyView(numberOfDays, callback){
 									'</div>';
 					
 								
-					$("#nichePanel .panel-body").append(nicheDistData);
-					*/
+					$("#niche").append(nicheDistData);
+					
 					
 					
 					$(".more-btn").click(function(){
