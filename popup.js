@@ -4,6 +4,6 @@ document.querySelector("#goToMA").onclick = function() {
 };
 
 function gotodaysales(info, tab) {
-	l2 = "https://merch.amazon.com/MerchToolsTodaySales";
+	l2 = "https://merch.amazon.com/MerchAnalyticsTodaySales";
 	chrome.tabs.create({ url: l2 });
 };

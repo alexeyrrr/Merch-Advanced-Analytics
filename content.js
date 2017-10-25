@@ -281,19 +281,19 @@ var parseQueryString = function( funcQueryString ) {
 parsedParams = parseQueryString(queryString);
 //End Parsing Query Params
 
-if (cmd.indexOf("MerchToolsTodaySales") !== -1) {
+if (cmd.indexOf("MerchAnalyticsTodaySales") !== -1) {
     logincheck("todaysales");
 };
 
-if (cmd.indexOf("MerchToolsTwoWeeksSales") !== -1) {
+if (cmd.indexOf("MerchAnalyticsTwoWeekSales") !== -1) {
     logincheck("twoweekssales");
 };
 
-if (cmd.indexOf("MerchToolsAllMonthsSales") !== -1) {
+if (cmd.indexOf("MerchAnalyticsAllMonthsSales") !== -1) {
     logincheck("merchall");
 };
 
-if (cmd.indexOf("MerchToolsEditor") !== -1) {
+if (cmd.indexOf("MerchAnalyticsProductManager") !== -1) {
     logincheck("productManager");
 };
 
@@ -321,10 +321,10 @@ var sidebarHTML = '<nav id="sidebar">' +
 						'</div>' +
 
 						'<ul class="list-unstyled components">' +
-							'<li><a href="/MerchToolsTodaySales"><i class="fa fa-calendar-o" aria-hidden="true"></i> Today\'s Sales</a></li>' +
-							'<li><a href="/MerchToolsTwoWeeksSales"><i class="fa fa-calendar" aria-hidden="true"></i> 14 Day Sales</a></li>' +
-							'<li><a href="/MerchToolsAllMonthsSales"><i class="fa fa-area-chart" aria-hidden="true"></i> Monthly Sales</a></li>' +
-							'<li><a href="/MerchToolsEditor"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Manage Products</a></li>' +
+							'<li><a href="/MerchAnalyticsTodaySales"><i class="fa fa-calendar-o" aria-hidden="true"></i> Today\'s Sales</a></li>' +
+							'<li><a href="/MerchAnalyticsTwoWeekSales"><i class="fa fa-calendar" aria-hidden="true"></i> 14 Day Sales</a></li>' +
+							'<li><a href="/MerchAnalyticsAllMonthsSales"><i class="fa fa-area-chart" aria-hidden="true"></i> Monthly Sales</a></li>' +
+							'<li><a href="/MerchAnalyticsProductManager"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Manage Products</a></li>' +
 							'<li style="display:none;"><a href="/IndividualProductPage/"><i class="fa fa-crosshairs" aria-hidden="true"></i> Individual Product Info</a></li>' +
 							'<li><a href="/MerchAnalyticsSettings"><i class="fa fa-cogs" aria-hidden="true"></i> Settings</a></li>' +
 

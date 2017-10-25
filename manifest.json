@@ -10,7 +10,7 @@
    "content_scripts": [ {
       "css": [ "bootstrap.min.css", "css.css", "font-awesome.css" ],
       "js": [ "content.js", "jquery.js", "bootstrap.min.js", "Chart.min.js", "tablesort.min.js", "tablesort.number.js", "navscript.js", "popup.js" ],
-      "matches": [ "https://*/MerchToolsTodaySales/*", "https://*/MerchToolsTwoWeeksSales/*", "https://*/MerchToolsAllMonthsSales/*", "https://*/MerchToolsEditor/*", "https://*/IndividualProductPage/*", "https://*/MerchAnalyticsSettings/*" ],
+      "matches": [ "https://*/MerchAnalyticsTodaySales/*", "https://*/MerchAnalyticsTwoWeekSales/*", "https://*/MerchAnalyticsAllMonthsSales/*", "https://*/MerchAnalyticsProductManager/*", "https://*/IndividualProductPage/*", "https://*/MerchAnalyticsSettings/*" ],
       "run_at": "document_end"
    } ],
    "description": "Analytics tool for Merch by Amazon",
