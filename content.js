@@ -395,7 +395,7 @@ function fetchAllLiveProducts(callback){
             } else {
                 var result = JSON.parse(reqs.responseText);
 				callback(result);
-            };
+            }
         };
     };
     reqs.send();
@@ -706,7 +706,7 @@ function renderDailyView(numberOfDays, callback){
 				for (i = 0; i < responseArray.length; i++){
 					allASINValues.push(responseArray[i]["ASIN"]);
 				}
-								
+												
 				uniqueArray = allASINValues.filter(function(item, pos) {
 					return allASINValues.indexOf(item) == pos;
 				})
@@ -1231,7 +1231,7 @@ function productManager() {
 	
     document.body.innerHTML = bodyHTML;
     document.title = "Manage Products - Merch Advanced Analytics";
-    document.body.style.backgroundColor = "#ecf1f2";  //"#D1F8CC";
+    document.body.style.backgroundColor = "#ecf1f2";  
 	
 	var pageContent = document.querySelector(".wrapper");
 	pageContent.innerHTML += sidebarHTML;
@@ -1242,6 +1242,7 @@ function productManager() {
 					'<div id="status"></div>' +
 					'<table id="quickEditor" class="sortable table table-striped"><thead><tr><th>#</th>'
 					+ '<th>Title</th>'
+					+ '<th class="text-center">Creation Date</th>'
 					+ '<th class="text-center">Days Until Deletion</th>'
 					+ '<th class="text-center">Listing page</th>'
 					+ '<th class="text-center">Niche</th>'
@@ -1266,11 +1267,32 @@ function productManager() {
 					hasLifetimeSales = true;
 					lifetimesSalesCounter++;
 				}
-							
-				cp2 += '<tr data-lifetime-sales="'+ hasLifetimeSales.toString() + '" data-href="\/IndividualProductPage\/?ASIN=' + ts[i].id  + '">' +
+				
+				
+				//Parse Create Date
+				var rawCreateDate = new Date(parseInt(ts[i].createDate));
+				var dd = rawCreateDate.getDate();
+				var mm = rawCreateDate.getMonth()+1;
+
+				var yyyy = rawCreateDate.getFullYear();
+				if(dd<10){
+					dd='0'+dd;
+				} 
+				if(mm<10){
+					mm='0'+mm;
+				} 
+				var stringifiedCreateDate = mm+'-'+dd+'-'+yyyy;
+				
+				
+				
+				cp2 += '<tr data-lifetime-sales="'+ hasLifetimeSales.toString() + '" data-href="\/IndividualProductPage\/?ASIN=' + ts[i].marketplaceAsinMap.US  + '">' +
 					'<th scope="row">' + k + '</th>' + 
 					'<td class="product-name"><span>' + ts[i].name + '</span></td>' + 
 						
+					'<td class="text-center">' +	
+						stringifiedCreateDate +
+					'</td>' +
+					
 					'<td class="text-center">' +
 						ts[i].daysUntilDeletion + 
 					'</td>' +
@@ -1375,11 +1397,10 @@ function renderIndividualProductSales(queryParams){
 		// Assemble Data for Graphs 
 		
 		// Need To get First Publication Date
-		fetchAllLiveProducts(function (liveProductsArray){
+		fetchAllLiveProducts( function(liveProductsArray){
 			var firstPublishDate = "";
 			var today = new Date(new Date().getTime() + OPTION_TIMEZONE_OFFSET);
-			
-			
+						
 			for ( i =0; i < liveProductsArray.length; i++){
 				if(liveProductsArray[i]["marketplaceAsinMap"]["US"] == targetASIN){
 					if(liveProductsArray[i]["status"] == "LIVE"){
@@ -1387,24 +1408,28 @@ function renderIndividualProductSales(queryParams){
 						var imgURL = liveProductsArray[i]["imageURL"]; //Not working ATM
 						var firstPublishDateString = firstPublishDate.toDateString();
 						var shirtName = liveProductsArray[i]["name"];	
+						
 						break;
 					} else{
 						alert("Item has been deleted");
 						break;
 					}
 				}
-			
 			}
 			
 			//TODO workaround error handling
 			if (!firstPublishDate){
-				alert("Item not found");
+				alert("Item not found", "First Publish Date: ", firstPublishDate);
 			}
 									
 									
 			//Generate Axis Labels
 			var axisLabels = [];
-			while (firstPublishDate <= today.getTime()) {
+			
+			var todayTime = today.getTime();
+			todayTime += 1*60*60000;
+			
+			while (firstPublishDate < todayTime) {
 				var dd = firstPublishDate.getDate();
 				var mm = firstPublishDate.getMonth()+1;
 
@@ -1419,8 +1444,7 @@ function renderIndividualProductSales(queryParams){
 				axisLabels.push(stringifiedDate);
 				firstPublishDate = firstPublishDate.adjustDate(1);
 			}
-			
-			
+						
 			//Extract Dates of Sales
 			var datesArray = [];
 			for ( i =0; i < responseArray.length; i++){
