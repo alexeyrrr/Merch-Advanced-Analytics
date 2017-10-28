@@ -322,11 +322,15 @@ if (cmd.indexOf("MerchAnalyticsSettings") !== -1) {
 /***************************************************************/
 /********************* Global HTML  / Options ******************/
 /***************************************************************/
-var globalHeader = '<head><style></style></head>' + 
-					"<script src='tablesort.min.js'></script>" + 
-					"<script src='tablesort.number.js'></script>" +
-					'<script src="jquery.js"></script>' +    
-					'<script src="bootstrap.min.js"></script>';
+var globalHeader = '<head><style></style></head>' ;
+					/*
+					'<script type="text/javascript" src="jquery.js"></script>' +    
+					'<script type="text/javascript" src="bootstrap.min.js"></script>' +
+					'<script type="text/javascript" src="tablesort.min.js"></script>' + 
+					'<script type="text/javascript" src="tablesort.number.js"></script>' +
+					'<script type="text/javascript" src="moment.min.js"></script>' +    
+					'<script type="text/javascript" src="daterangepicker.js"></script>';
+					*/
 
 
 var sidebarHTML = '<nav id="sidebar">' +
@@ -868,25 +872,31 @@ function renderDailyView(numberOfDays, callback){
 						+ '</tr></tbody></table>'
 
 						+ '<div class="number-of-days-wrapper">'
-						+ '<span>Adjust date range to the last</span>'
-						+ 	'<input type="text" name="numberOfDaysInput" />' 
-						+    'days'
+						+ 	'<span>Adjust date range</span>'
+						//+ 	'<input type="text" name="numberOfDaysInput" />' + 'days'
+						
+						+	'<input type="text" name="datefilter" class="form-control" value="01/01/2015 - 01/31/2015" id="save-number-days"/>'
 						+ '</div>'
-						+ 	'<input type="submit" value="Update & Refresh" class="btn btn-success" id="save-number-days"/>';
+						//+ 	'<input type="submit" value="Update & Refresh" class="btn btn-success" id="save-number-days"/>';
+						
 						
 			   
 							
 				document.getElementById("dailystats")
 					.innerHTML = stats;
+				
 
+				$('input[name="datefilter"]').daterangepicker();
+				
+				$('input[name="datefilter"]').on('apply.daterangepicker', function(ev, picker) {
+					$(this).val(picker.startDate.format('MM/DD/YYYY') + ' - ' + picker.endDate.format('MM/DD/YYYY'));
+					console.log(picker.startDate.format('MM/DD/YYYY'));
+				});
+
+				
+  
+  
 				/*
-				if(numberofDaysInner == 1){ //Hide Top 2 Charts if Days == 1, since they're useless.
-					document.getElementById('salesPanel').style.display = "none";
-					document.getElementById('revenuePanel').style.display = "none";
-				}
-				*/
-				
-				
 				$('#save-number-days').on('click', function(e) {
 					numberOfDaysInput = parseInt($(this).closest("div").find('[name="numberOfDaysInput"]').val());
 										
@@ -905,6 +915,7 @@ function renderDailyView(numberOfDays, callback){
 						alert("Please complete field with a number");
 					}
 				})
+				*/
 					
 					
 				//********** Get Normalized Array ***************//
