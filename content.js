@@ -784,8 +784,11 @@ function renderDailyView(unixFromDate, unixToDate, callback){
 
 				for (i=0; i < resultSumSales.length; i++){
 					//Assign Niche
+					
 					if(nichesLookupArray[resultSumSales[i]["ASIN"]] != undefined){
 						specificNiche = JSON.parse(nichesLookupArray[resultSumSales[i]["ASIN"]])["niche"];
+					} else {
+						specificNiche = "";
 					}
 						
 					cp2 += '<tr data-href="' + '/IndividualProductPage/?ASIN=' + resultSumSales[i]["ASIN"]  + '">' + 
