@@ -244,12 +244,18 @@ function logincheck(cmd, queryParams = null) {
 
 
 					} else {
+						//Calculate Unix Timestamps
+						var today = new Date(new Date().getTime() + OPTION_TIMEZONE_OFFSET);	
+						var fromDate14 = today.adjustDate(-13).getTime();
+						var fromDate1 = today.adjustDate(0).getTime();
+						var toDate = today.getTime();
+						
 						switch (cmd) {
 							case "twoweekssales":
-								dailySalesPage(14);
+								dailySalesPage(fromDate14, toDate);
 								break;
 							case "todaysales":
-								dailySalesPage(1);
+								dailySalesPage(fromDate1, toDate);
 								break;
 							case "merchall":
 								merchmonthsall(12);
@@ -322,16 +328,7 @@ if (cmd.indexOf("MerchAnalyticsSettings") !== -1) {
 /***************************************************************/
 /********************* Global HTML  / Options ******************/
 /***************************************************************/
-var globalHeader = '<head><style></style></head>' ;
-					/*
-					'<script type="text/javascript" src="jquery.js"></script>' +    
-					'<script type="text/javascript" src="bootstrap.min.js"></script>' +
-					'<script type="text/javascript" src="tablesort.min.js"></script>' + 
-					'<script type="text/javascript" src="tablesort.number.js"></script>' +
-					'<script type="text/javascript" src="moment.min.js"></script>' +    
-					'<script type="text/javascript" src="daterangepicker.js"></script>';
-					*/
-
+var globalHeader = '<head><style></style></head>';
 
 var sidebarHTML = '<nav id="sidebar">' +
 						'<div class="sidebar-header">' +
@@ -408,7 +405,7 @@ function fetchAllLiveProducts(callback){
 /***************************************************************/
 /********************** Daily Sales Page ***********************/
 /***************************************************************/	
-function dailySalesPage(numberOfDays){
+function dailySalesPage(fromDate, toDate){
 	document.head.innerHTML = globalHeader;
 
 	document.title = "Daily View - Merch Advanced Analytics";
@@ -496,26 +493,25 @@ function dailySalesPage(numberOfDays){
 			
 	var pageContent = document.querySelector(".wrapper");
 	pageContent.innerHTML += sidebarHTML;
-
-	//Reduce days by 1 to get proper result
-	renderDailyView(numberOfDays-1);
+		
+	renderDailyView(fromDate, toDate);
 }
 
-function renderDailyView(numberOfDays, callback){		
-	var today = new Date(new Date().getTime() + OPTION_TIMEZONE_OFFSET);	
-	var fromDate = today.adjustDate(-numberOfDays).getTime();
-	var toDate = today.getTime();
-	
-	fetchSalesDataCSV(fromDate, toDate, function(responseArray){		
+function renderDailyView(unixFromDate, unixToDate, callback){	
+	fetchSalesDataCSV(unixFromDate, unixToDate, function(responseArray){		
 		//Generate Axis Labels
 		var axisLabels = [];
-		var stopDate = today.adjustDate(-numberOfDays); //Same as fromDate, but not UNIX time
+				
+		//Reset Var Scope
+		var localUnixFromDate = unixFromDate;	
+		var localUnixToDate = unixToDate;
 		
-		while (stopDate <= toDate) {
-			var dd = stopDate.getDate();
-			var mm = stopDate.getMonth()+1;
+		while (localUnixFromDate <= localUnixToDate) {
+			var date = new Date(localUnixFromDate);
+			var dd = date.getDate();
+			var mm = date.getMonth()+1;
 
-			var yyyy = stopDate.getFullYear();
+			var yyyy = date.getFullYear();
 			if(dd<10){
 				dd='0'+dd;
 			} 
@@ -524,9 +520,11 @@ function renderDailyView(numberOfDays, callback){
 			} 
 			var stringifiedDate = mm+'-'+dd+'-'+yyyy;
 			axisLabels.push(stringifiedDate);
-			stopDate = stopDate.adjustDate(1);
+			
+			localUnixFromDate = localUnixFromDate + 24*60*60000;
 		}
-						
+		
+		
 		//Extract Dates of Sales
 		var datesArray = [];
 		for ( i =0; i < responseArray.length; i++){
@@ -551,6 +549,10 @@ function renderDailyView(numberOfDays, callback){
 			//Sales Data (Not Very Efficient)
 			getAllShirtNiches(function(nichesLookupArray){		
 				var numberofDaysInner = axisLabels.length; //Janky Way to recover number of days with proper scope
+				
+				//Reset Scope Again
+				var localUnixToDate2 = unixToDate;
+				var localUnixFromDate2 = unixFromDate;
 				
 				for (i = 0; i < axisLabels.length; i++) {
 					for ( i2 = 0; i2 < responseArray.length; i2++){
@@ -847,12 +849,14 @@ function renderDailyView(numberOfDays, callback){
 				totals.revenue = revenueData.reduce(function(a, b) { return a + b; }, 0).toFixed(2);				
 				totals.royalty = royaltyData.reduce(function(a, b) { return a + b; }, 0).toFixed(2);
 				
-				var daysText = 'Days';
-				if (numberofDaysInner == 1){
-					daysText = 'Day';
-				}
+
 				
-				stats = '<center><h3>Statistics For The Past ' + numberofDaysInner + ' ' + daysText + '</h3></center>';	
+				
+				fromDateString = moment.unix(localUnixFromDate2/1000).format("MM/DD/YYYY");
+				toDateString = moment.unix(localUnixToDate2/1000).format("MM/DD/YYYY");
+				
+				
+				stats = '<center><h3>Daily Statistics: ' + fromDateString + ' to ' + toDateString + '</h3></center>';	
 				stats += '<table class="table table-striped"><thead><tr>' +
 						'<th class="text-center">Shirts Sold</th>' + 
 						'<th class="text-center">Shirts Cancelled</th>' + 
@@ -872,12 +876,9 @@ function renderDailyView(numberOfDays, callback){
 						+ '</tr></tbody></table>'
 
 						+ '<div class="number-of-days-wrapper">'
-						+ 	'<span>Adjust date range</span>'
-						//+ 	'<input type="text" name="numberOfDaysInput" id="save-number-days" />' + 'days'
-						
-						+	'<input type="text" name="datefilter" class="form-control" value="01/01/2015 - 01/31/2015" />'
+						+ 	'<span>Adjust date range</span>'						
+						+	'<input type="text" name="datefilter" class="form-control" value="' + fromDateString + " - " + toDateString + '" />'
 						+ '</div>'
-						//+ 	'<input type="submit" value="Update & Refresh" class="btn btn-success" id="save-number-days"/>';
 						
 						
 			   
@@ -886,11 +887,38 @@ function renderDailyView(numberOfDays, callback){
 					.innerHTML = stats;
 				
 
-				$('input[name="datefilter"]').daterangepicker();
+				$('input[name="datefilter"]').daterangepicker(
+					{  
+						maxDate: new Date,
+						minDate: new Date().adjustDate(-89),
+						ranges: {
+						   'Today': [moment(), moment()],
+						   'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+						   'Last 14 Days': [moment().subtract(13, 'days'), moment()],
+						   'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+						   'This Month': [moment().startOf('month'), moment().endOf('month')],
+						   'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+						}
+					}
+				);
 				
 				$('input[name="datefilter"]').on('apply.daterangepicker', function(ev, picker) {
-					$(this).val(picker.startDate.format('MM/DD/YYYY') + ' - ' + picker.endDate.format('MM/DD/YYYY'));
-					console.log(picker.startDate.format('MM/DD/YYYY'));
+					//$(this).val(picker.startDate.format('MM/DD/YYYY') + ' - ' + picker.endDate.format('MM/DD/YYYY'));
+					
+					//Calculate Unix Timestamps
+					var today = new Date().getTime();
+					var fromDate = picker.startDate.unix()*1000;
+					var toDate = picker.endDate.unix()*1000;
+					
+					var daysIntoThePast = today - fromDate;
+					
+					if (daysIntoThePast >= 90*24*60*60000){
+						alert('Cannot get info for more than 90 days. Please choose an earlier date range.');
+					} else if (daysIntoThePast <= 0){
+						alert('Cannot get info into the future. Please choose a later date range.');
+					}else{
+						dailySalesPage(fromDate, toDate);
+					}
 				});
 
 				
