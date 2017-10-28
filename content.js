@@ -252,7 +252,7 @@ function logincheck(cmd, queryParams = null) {
 								dailySalesPage(1);
 								break;
 							case "merchall":
-								merchmonthsall();
+								merchmonthsall(12);
 								break;
 							case "productManager":
 								productManager();
@@ -873,9 +873,9 @@ function renderDailyView(numberOfDays, callback){
 
 						+ '<div class="number-of-days-wrapper">'
 						+ 	'<span>Adjust date range</span>'
-						//+ 	'<input type="text" name="numberOfDaysInput" />' + 'days'
+						//+ 	'<input type="text" name="numberOfDaysInput" id="save-number-days" />' + 'days'
 						
-						+	'<input type="text" name="datefilter" class="form-control" value="01/01/2015 - 01/31/2015" id="save-number-days"/>'
+						+	'<input type="text" name="datefilter" class="form-control" value="01/01/2015 - 01/31/2015" />'
 						+ '</div>'
 						//+ 	'<input type="submit" value="Update & Refresh" class="btn btn-success" id="save-number-days"/>';
 						
@@ -894,30 +894,6 @@ function renderDailyView(numberOfDays, callback){
 				});
 
 				
-  
-  
-				/*
-				$('#save-number-days').on('click', function(e) {
-					numberOfDaysInput = parseInt($(this).closest("div").find('[name="numberOfDaysInput"]').val());
-										
-					if (numberOfDaysInput === parseInt(numberOfDaysInput, 10)){ //Check if integer
-						if(numberOfDaysInput <= 0){
-							alert('Enter a number greater than 0');
-						} else if (numberOfDaysInput > 90){
-							alert('Cannot get info for more than 90 days');
-							
-						} else{
-							dailySalesPage(numberOfDaysInput);
-							//location.reload();
-						}
-						
-					} else{
-						alert("Please complete field with a number");
-					}
-				})
-				*/
-					
-					
 				//********** Get Normalized Array ***************//
 				// (This is down here because it takes longer)
 				normalizedNicheArray = {};
@@ -1192,7 +1168,7 @@ function merchmonths(count, m, salesData, cancelData, returnData, rev, roy, chla
 		
 
         document.getElementById("twoweeksstats")
-            .innerHTML = '<center><h3>Monthly Statistics</h3></center><br>'+ 
+            .innerHTML = '<center><h3>Statistics For The Past ' + m + ' Months</h3></center><br>'+ 
 			'<table class="table table-striped">' +
 			'<thead><tr><th class="text-center">Shirts Sold</th><th class="text-center">Shirts Cancelled</th><th class="text-center">Revenue</th><th class="text-center">Royalties</th></tr></thead>'+
 			'<tbody>' +
@@ -1202,14 +1178,43 @@ function merchmonths(count, m, salesData, cancelData, returnData, rev, roy, chla
 					'<td><b>' + rrev.toFixed(2) + '</b></td>'+
 					'<td><b>' + rr.toFixed(2) + '</b></td>'+
 				'</tr>'+
-			'</tbody></table>';
+			'</tbody></table>' +
+			
+			'<div class="number-of-days-wrapper">' +
+				'<span>Adjust date range for the past </span>' +
+			 	'<input type="text" name="numberOfDaysInput" />' + 'months' +
+			'</div>' +
+			'<input type="submit" value="Update & Refresh" class="btn btn-success" id="save-number-months"/>';
+				
+				
+		//Make Number Selector Work
+		$('#save-number-months').on('click', function(e) {
+			numberOfDaysInput = parseInt($(this).closest("div").find('[name="numberOfDaysInput"]').val());
+			var maxDateRange = monthDiff( //Calculate available data since merch inception
+				new Date(2015, 6, 1),
+				new Date()
+			);
+			if (numberOfDaysInput === parseInt(numberOfDaysInput, 10)){ //Check if integer
+				if(numberOfDaysInput <= 0){
+					alert('Enter a number greater than 0');
+				} else if (numberOfDaysInput > maxDateRange){
+					alert('Cannot get info for more than ' + maxDateRange + ' months');
+					
+				} else{
+					merchmonthsall(numberOfDaysInput);
+				}
+				
+			} else{
+				alert("Please complete field with a number");
+			}
+		})
 
 
-
+		
     };
 }
 
-function merchmonthsall() {
+function merchmonthsall(numberOfMonths) {
     document.head.innerHTML = globalHeader;
     var d = new Date();
     n = d.toString();
@@ -1235,10 +1240,7 @@ function merchmonthsall() {
     roy = [];
     chlabel = [];
 
-    iio = monthDiff(
-        new Date(2016, 6, 1),
-        new Date()
-    );
+	iio = numberOfMonths;
     merchmonths(iio, iio, salesData, cancelData, returnData, rev, roy, chlabel);
 };
 
