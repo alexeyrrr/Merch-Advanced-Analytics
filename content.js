@@ -420,7 +420,7 @@ function dailySalesPage(fromDate, toDate){
 			'<div class="wrapper">' +
 				'<div class="container">' +
 					'<div class="card"></center>'+
-						'<div class="card-block" id="dailystats"><center><h3>Loading...</h3><i class="fa-li fa fa-spinner fa-spin"></i></center></div>'+ 
+						'<div class="card-block" id="dailystats"><center><h3>Loading...</h3><i class="fa fa-spinner fa-spin fa-4"></i></center></div>'+ 
 					'</div>' +
 					'<div class="card" id="salesPanel">' +
 						'<div class="card-header">' + 
@@ -859,15 +859,24 @@ function renderDailyView(unixFromDate, unixToDate, callback){
 				toDateString = moment.unix(localUnixToDate2/1000).format("MM/DD/YYYY");
 				
 				
-				stats = '<center><h3>Daily Statistics: ' + fromDateString + ' to ' + toDateString + '</h3></center>';	
-				stats += '<div class="container row no-gutters" style="display: flex; flex-direction: row;">' +
+				stats = '<div class="container row">'+
+							'<div class="col-sm-6 col-xs-6">' +
+								'<h3>Daily Statistics</h3>' +
+							'</div>' +
+							'<div class="col-sm-6 col-xs-6">' +
+								'<i class="fa fa-caret-down float-right down-arrow" aria-hidden="true"></i>' +
+								'<input class="date-selector" type="text" name="datefilter" class="form-control" value="' + fromDateString + " - " + toDateString + '" />' +
+								
+							'</div>' +	
+						'</div>';	
+				stats += '<div class="container row no-gutters">' +
 					
-						'<div class="col-lg-2 col-sm-3 col-xs-12 ">'+
+						'<div class="col-lg-2 col-sm-3 col-xs-12 offset-lg-2">'+
 							'<div class="card">'+
 								'<div class="card-body">'+                                                                       
 									'<div class="row">'+
 										'<div class="col-lg-12 col-sm-12 col-xs-12">'+
-											'<h2 class="font-weight-lighter" style="color:#474C4F;" data-toggle="tooltip" data-placement="top" title="Drafts">'+ totals.sales + '</h2>'+
+											'<h2 class="font-weight-lighter" style="color:#474C4F;"  >'+ totals.sales + '</h2>'+
 										'</div>'+
 									'</div>'+
 									'<div class="col-">'+
@@ -882,7 +891,7 @@ function renderDailyView(unixFromDate, unixToDate, callback){
 								'<div class="card-body">'+                                                                       
 									'<div class="row">'+
 										'<div class="col-lg-12 col-sm-12 col-xs-12">'+
-											'<h2 class="font-weight-lighter" style="color:#474C4F;" data-toggle="tooltip" data-placement="top" title="Drafts">'+ totals.cancelled + '</h2>'+
+											'<h2 class="font-weight-lighter" style="color:#474C4F;"  >'+ totals.cancelled + '</h2>'+
 										'</div>'+
 									'</div>'+
 									'<div class="col-">'+
@@ -897,7 +906,7 @@ function renderDailyView(unixFromDate, unixToDate, callback){
 								'<div class="card-body">'+                                                                       
 									'<div class="row">'+
 										'<div class="col-lg-12 col-sm-12 col-xs-12">'+
-											'<h2 class="font-weight-lighter" style="color:#474C4F;" data-toggle="tooltip" data-placement="top" title="Drafts">$'+ totals.revenue + '</h2>'+
+											'<h2 class="font-weight-lighter" style="color:#474C4F;"  >$'+ totals.revenue + '</h2>'+
 										'</div>'+
 									'</div>'+
 									'<div class="col-">'+
@@ -912,7 +921,7 @@ function renderDailyView(unixFromDate, unixToDate, callback){
 								'<div class="card-body">'+                                                                       
 									'<div class="row">'+
 										'<div class="col-lg-12 col-sm-12 col-xs-12">'+
-											'<h2 class="font-weight-lighter" style="color:#474C4F;" data-toggle="tooltip" data-placement="top" title="Drafts">$'+ totals.royalty + '</h2>'+
+											'<h2 class="font-weight-lighter" style="color:#474C4F;"  >$'+ totals.royalty + '</h2>'+
 										'</div>'+
 									'</div>'+
 									'<div class="col-">'+
@@ -922,12 +931,12 @@ function renderDailyView(unixFromDate, unixToDate, callback){
 							'</div>'+
 						'</div>'+
 						
-						'<div class="col-lg-2 col-sm-3 col-xs-12 ">'+
+						'<div class="col-lg-2 col-sm-3 col-xs-12 offset-lg-3 offset-sm-1">'+
 							'<div class="card">'+
 								'<div class="card-body">'+                                                                       
 									'<div class="row">'+
 										'<div class="col-lg-12 col-sm-12 col-xs-12">'+
-											'<h2 class="font-weight-lighter" style="color:#474C4F;" data-toggle="tooltip" data-placement="top" title="Drafts">$'+ (totals.royalty /(totals.sales - totals.cancelled + 0.00001)).toFixed(2) + '</h2>'+
+											'<h2 class="font-weight-lighter" style="color:#474C4F;"  >$'+ (totals.royalty /(totals.sales - totals.cancelled + 0.00001)).toFixed(2) + '</h2>'+
 										'</div>'+
 									'</div>'+
 									'<div class="col-">'+
@@ -942,7 +951,7 @@ function renderDailyView(unixFromDate, unixToDate, callback){
 								'<div class="card-body">'+                                                                       
 									'<div class="row">'+
 										'<div class="col-lg-12 col-sm-12 col-xs-12">'+
-											'<h2 class="font-weight-lighter" style="color:#474C4F;" data-toggle="tooltip" data-placement="top" title="Drafts">'+ (totals.sales /(numberofDaysInner+ 0.00001)).toFixed(2) + '</h2>'+
+											'<h2 class="font-weight-lighter" style="color:#474C4F;"  >'+ (totals.sales /(numberofDaysInner+ 0.00001)).toFixed(2) + '</h2>'+
 										'</div>'+
 									'</div>'+
 									'<div class="col-">'+
@@ -957,7 +966,7 @@ function renderDailyView(unixFromDate, unixToDate, callback){
 								'<div class="card-body">'+                                                                       
 									'<div class="row">'+
 										'<div class="col-lg-12 col-sm-12 col-xs-12">'+
-											'<h2 class="font-weight-lighter" style="color:#474C4F;" data-toggle="tooltip" data-placement="top" title="Drafts">$'+ (totals.royalty /(numberofDaysInner+ 0.00001)).toFixed(2) + '</h2>'+
+											'<h2 class="font-weight-lighter" style="color:#474C4F;"  >$'+ (totals.royalty /(numberofDaysInner+ 0.00001)).toFixed(2) + '</h2>'+
 										'</div>'+
 									'</div>'+
 									'<div class="col-">'+
@@ -965,16 +974,13 @@ function renderDailyView(unixFromDate, unixToDate, callback){
 									'</div>'+ 
 								'</div>'+
 							'</div>'+
-						'</div>'+
-												
-						'<div class="number-of-days-wrapper">' +
-						 	'<span>Adjust date range</span>'	+					
-							'<input type="text" name="datefilter" class="form-control" value="' + fromDateString + " - " + toDateString + '" />' +
 						'</div>';
+												
 						
 						
-			   
 							
+						
+									
 				document.getElementById("dailystats")
 					.innerHTML = stats;
 				
@@ -1074,11 +1080,11 @@ function renderDailyView(unixFromDate, unixToDate, callback){
 												'<div class="card-body">'+                                                                       
 													'<div class="row">'+
 														'<div class="col-lg-12 col-sm-12 col-xs-12">'+
-															'<h2 class="font-weight-lighter" style="color:#474C4F;" data-toggle="tooltip" data-placement="top" title="Drafts">'+ topSellingNiches[0] + '</h2>'+
+															'<h2 class="font-weight-lighter" style="color:#474C4F;"  >'+ topSellingNiches[0] + '</h2>'+
 														'</div>'+
 													'</div>'+
 													'<div class="col-">'+
-														'<p class="text-muted text-uppercase small">#1 Top Selling Niche/p>'+
+														'<p class="text-muted text-uppercase small">#1 Top Selling Niche</p>'+
 													'</div>'+ 
 												'</div>'+
 											'</div>'+
@@ -1089,7 +1095,7 @@ function renderDailyView(unixFromDate, unixToDate, callback){
 												'<div class="card-body">'+                                                                       
 													'<div class="row">'+
 														'<div class="col-lg-12 col-sm-12 col-xs-12">'+
-															'<h2 class="font-weight-lighter" style="color:#474C4F;" data-toggle="tooltip" data-placement="top" title="Drafts">'+ topSellingNiches[1] + '</h2>'+
+															'<h2 class="font-weight-lighter" style="color:#474C4F;"  >'+ topSellingNiches[1] + '</h2>'+
 														'</div>'+
 													'</div>'+
 													'<div class="col-">'+
@@ -1104,7 +1110,7 @@ function renderDailyView(unixFromDate, unixToDate, callback){
 												'<div class="card-body">'+                                                                       
 													'<div class="row">'+
 														'<div class="col-lg-12 col-sm-12 col-xs-12">'+
-															'<h2 class="font-weight-lighter" style="color:#474C4F;" data-toggle="tooltip" data-placement="top" title="Drafts">'+ topSellingNiches[2] + '</h2>'+
+															'<h2 class="font-weight-lighter" style="color:#474C4F;"  >'+ topSellingNiches[2] + '</h2>'+
 														'</div>'+
 													'</div>'+
 													'<div class="col-">'+

@@ -75,7 +75,7 @@ a, a:hover, a:focus {
 }
 
 #sidebar .sidebar-header {
-    padding: 20px 20px 20px 10px;
+    padding: 40px 20px 20px 10px;
 }
 
 #sidebar .sidebar-header h3{
@@ -376,10 +376,20 @@ dt, dd{
     float: left;
 }
 
-.number-of-days-wrapper{
-	margin: 4px 10px 0 0;
-	float:left; 
-	font-weight: 700;
+.date-selector{
+	border: none;
+	font-size: 1.75rem;
+	font-weight: 500;
+    line-height: 1.2;
+	width: calc(100% - 40px);
+	float:right;
+	color: #222;
+	text-align: right;
+}
+.down-arrow{
+	float:right;
+	color: #222;
+	margin: 7px;
 }
 
 [name="numberOfDaysInput"]{
