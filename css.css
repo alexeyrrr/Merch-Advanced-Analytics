@@ -24,6 +24,7 @@
 	padding-top: 20px;
 	width: 100%;
     float: left;
+	max-width: none;
 }
 
 .clear::after { 
@@ -393,4 +394,8 @@ dt, dd{
 		float:none;
 		text-align: left;
 	}
+}
+
+.save{
+	max-width: 58px;
 }

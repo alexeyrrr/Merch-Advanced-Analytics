@@ -328,7 +328,7 @@ if (cmd.indexOf("MerchAnalyticsSettings") !== -1) {
 /***************************************************************/
 /********************* Global HTML  / Options ******************/
 /***************************************************************/
-var globalHeader = '<head><style></style></head>';
+var globalHeader = '<head><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"></head>';
 
 var sidebarHTML = '<nav id="sidebar">' +
 						'<div class="sidebar-header">' +
@@ -419,23 +419,23 @@ function dailySalesPage(fromDate, toDate){
 	document.body.innerHTML = '<body>' +
 			'<div class="wrapper">' +
 				'<div class="container">' +
-					'<div class="panel panel-default"></center>'+
-						'<div class="panel-body" id="dailystats"><center><h3>Loading...</h3><i class="fa-li fa fa-spinner fa-spin"></i></center></div>'+ 
+					'<div class="card"></center>'+
+						'<div class="card-block" id="dailystats"><center><h3>Loading...</h3><i class="fa-li fa fa-spinner fa-spin"></i></center></div>'+ 
 					'</div>' +
-					'<div class="panel panel-default" id="salesPanel">' +
-						'<div class="panel-heading">' + 
+					'<div class="card" id="salesPanel">' +
+						'<div class="card-header">' + 
 							'<ul class="nav nav-tabs" role="tablist">' +
-								'<li class="active"><a href="#sales" role="tab" data-toggle="tab">Sales/Cancellations</a></li>' +
-								'<li><a href="#revenue" role="tab" data-toggle="tab">Revenue/Royalties</a></li>' +
-								'<li><a href="#advanced" role="tab" data-toggle="tab">Advanced Analytics</a></li>' +
-								'<li><a href="#niche" role="tab" data-toggle="tab">'+
+								'<li class="nav-item active"><a href="#sales" role="tab" data-toggle="tab">Sales/Cancellations</a></li>' +
+								'<li class="nav-item"><a href="#revenue" role="tab" data-toggle="tab">Revenue/Royalties</a></li>' +
+								'<li class="nav-item"><a href="#advanced" role="tab" data-toggle="tab">Advanced Analytics</a></li>' +
+								'<li class="nav-item"><a href="#niche" role="tab" data-toggle="tab">'+
 									'Niche Analysis' +
 									'<i class="fa fa-info-circle" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="Group together TShirt designs of similar niches or styles to help forecast future winners on a broader scale. Niche tags can be set on the Manage Products page"></i>'+
 								'</a></li>' +
 							'</ul>' +
 						'</div>' +
 						
-						'<div class="panel-body tab-content">' +
+						'<div class="card-block tab-content">' +
 							'<div class="tab-pane active" id="sales">' +
 								'<center><canvas id="canvas1" height="450" width="800" ></canvas></center>' + 
 							'</div>' +
@@ -483,9 +483,9 @@ function dailySalesPage(fromDate, toDate){
 						'</div>' +
 					'</div>' +
 					
-					'<div class="panel panel-default">' + 
-						'<div class="panel-heading">Shirts Sold During Selected Period</div>' +
-						'<div class="panel-body" id="shirtlist"></div>' +
+					'<div class="card">' + 
+						'<div class="card-header">Shirts Sold During Selected Period</div>' +
+						'<div class="card-block" id="shirtlist"></div>' +
 					'</div>' + 
 				'</div>' + 
 			'</div>' +
@@ -955,7 +955,6 @@ function renderDailyView(unixFromDate, unixToDate, callback){
 						normalizedPercentageArray[key] = percertangeValue;
 					}
 					
-					
 					var lineChartData7 = {
 						type: 'doughnut',
 						data: {
@@ -972,6 +971,45 @@ function renderDailyView(unixFromDate, unixToDate, callback){
 					var myChart = new Chart(ctxNormNiches, lineChartData7);
 					
 					
+					
+					//Compute Top Selling Niches
+					topSellingNiches = Object.keys(normalizedPercentageArray).sort(function(a,b) {
+							return normalizedPercentageArray[b]-normalizedPercentageArray[a]
+					});
+					
+					
+					//Generate Top Niches
+					topNichesData = '<div>' +
+										topSellingNiches[0] +
+										topSellingNiches[1] +
+										topSellingNiches[2] +
+									'</div>' +
+									
+									'<div class="card">' +
+										'<img class="img-fluid" src="https://mdbootstrap.com/img/Photos/Horizontal/Nature/4-col/img%20%282%29.jpg" alt="Card image cap">' +
+
+										'<div class="card-body">' +
+											'<h4 class="card-title">Card title</h4>' +
+											'<p class="card-text">Some quick example t ext to build on the card title and make up the bulk of the cards content.</p>'+
+											'<a href="#" class="btn btn-primary">Button</a>' + 
+										'</div>'
+									'</div>';
+
+
+					
+					
+					
+					$("#niche").append(topNichesData);
+					
+					
+
+
+
+					
+					console.log();
+					
+					
+					/*
 					//Dump Sales Data 
 					var nicheDistData = '<div class="col-xs-6">';
 					nicheDistData += '<h4>Total Number Of Shirts Available For Sale In Each Niche</h4>' +
@@ -1011,6 +1049,9 @@ function renderDailyView(unixFromDate, unixToDate, callback){
 					$(".more-btn").click(function(){
 						$('.niche-list-area').toggleClass('expanded');
 					});	
+					*/
+					
+					
 
 					//Initialize Tooltips
 					$(function () {
@@ -1251,9 +1292,9 @@ function merchmonthsall(numberOfMonths) {
     n = d.toString();
     document.body.innerHTML = '<body>' + 
 									'<div class="wrapper">' +
-										'<div class="container"><div class="panel panel-default"></center><div class="panel-body" id="twoweeksstats"><center><h3>Loading..</h3></center></div></div>' +
-										' <div class="panel panel-default">    <div class="panel-heading">Sales/Cancellations</div>    <div class="panel-body"><center><canvas id="canvas1" height="450" width="800" ></canvas></center></div> </div>' +
-										' <div class="panel panel-default">    <div class="panel-heading">Revenue/Royalties</div>    <div class="panel-body"><center><canvas id="canvas2" height="450" width="800" ></canvas></center></div> </div>' +
+										'<div class="container"><div class="card"></center><div class="card-block" id="twoweeksstats"><center><h3>Loading..</h3></center></div></div>' +
+										' <div class="card">    <div class="card-header">Sales/Cancellations</div>    <div class="card-block"><center><canvas id="canvas1" height="450" width="800" ></canvas></center></div> </div>' +
+										' <div class="card">    <div class="card-header">Revenue/Royalties</div>    <div class="card-block"><center><canvas id="canvas2" height="450" width="800" ></canvas></center></div> </div>' +
 										'<br></div>' + 
 									'</div>' +
 								'</body>';
@@ -1284,15 +1325,15 @@ function productManager() {
 	bodyHTML = '<body>' + 
 					'<div class="wrapper">' +
 						'<div class="container">' + 
-							'<div class="panel panel-default">' +
+							'<div class="card">' +
 								'<center><h2>Product Manager</h2></center>' +
-								'<div class="panel-body" id="manager-stats"><center><h3>Loading...</h3></center></div>' + 
+								'<div class="card-block" id="manager-stats"><center><h3>Loading...</h3></center></div>' + 
 							'</div>'+ 
-							'<div class="panel panel-default">' +
-								'<div class="panel-heading clear"><strong> Use  CTRL + F (PC) or ⌘ + F (MAC) to open the search bar.</strong>' +
+							'<div class="card">' +
+								'<div class="card-header clear"><strong> Use  CTRL + F (PC) or ⌘ + F (MAC) to open the search bar.</strong>' +
 									'<div class="btn btn-default" id="reset-button">Clear All Niche Data</div>' +
 								'</div>' + 
-								'<div class="panel-body" id="shirtlist"></div>' + 
+								'<div class="card-block" id="shirtlist"></div>' + 
 							'</div>'+ 
 						'</div>' + 
 					'</div>' +
@@ -1425,27 +1466,27 @@ function individualProductPage(queryParams){
 	bodyHTML = '<body>' + 
 					'<div class="wrapper">' + 
 						'<div class="container">' +
-							'<div class="panel panel-default">' +
+							'<div class="card">' +
 								'<div class="alert alert-success" id="status">' + 
 									'<strong> Loading ... </strong>' +
 								'</div>'+
-								'<div class="panel-body" id="individualShirtSummary"></div>' +
+								'<div class="card-block" id="individualShirtSummary"></div>' +
 							'</div>'+
-							' <div class="panel panel-default" id="salesPanel">' + 
-								'<div class="panel-heading">Sales/Cancellations</div>' + 
-								'<div class="panel-body">' + 
+							' <div class="card" id="salesPanel">' + 
+								'<div class="card-header">Sales/Cancellations</div>' + 
+								'<div class="card-block">' + 
 									'<center><canvas id="canvas1" height="450" width="800" ></canvas></center>' + 
 								'</div>' + 
 							'</div>' +
-							'<div class="panel panel-default" id="revenuePanel">'+ 
-								'<div class="panel-heading">Revenue/Royalties</div>' + 
-								'<div class="panel-body">' + 
+							'<div class="card" id="revenuePanel">'+ 
+								'<div class="card-header">Revenue/Royalties</div>' + 
+								'<div class="card-block">' + 
 									'<center><canvas id="canvas2" height="450" width="800" ></canvas></center>' + 
 								'</div>' + 
 							'</div>' +
-							'<div class="panel panel-default">' + 
-								'<div class="panel-heading">Sales History</div>' + 
-								'<div class="panel-body" id="individualShirtSales"></div>' +
+							'<div class="card">' + 
+								'<div class="card-header">Sales History</div>' + 
+								'<div class="card-block" id="individualShirtSales"></div>' +
 							'</div>' +
 						'</div>' + 
 					'</div>' + 
