@@ -9,7 +9,7 @@
    },
    "content_scripts": [ {
       "css": [ "bootstrap.min.css", "css.css", "font-awesome.css", "daterangepicker.css" ],
-      "js": [ "jquery-3.2.1.slim.min.js", "bootstrap.min.js", "popper.min.js", "Chart.min.js", "tablesort.min.js", "tablesort.number.js", "moment.min.js", "daterangepicker.js", "popup.js", "navscript.js", "content.js"  ],
+      "js": [ "jquery-3.2.1.slim.min.js", "popper.min.js", "bootstrap.min.js", "Chart.min.js", "tablesort.min.js", "tablesort.number.js", "moment.min.js", "daterangepicker.js", "popup.js", "navscript.js", "content.js"  ],
       "matches": [ "https://*/MerchAnalyticsTodaySales/*", "https://*/MerchAnalyticsTwoWeekSales/*", "https://*/MerchAnalyticsAllMonthsSales/*", "https://*/MerchAnalyticsProductManager/*", "https://*/IndividualProductPage/*", "https://*/MerchAnalyticsSettings/*" ],
       "run_at": "document_end"
    } ],

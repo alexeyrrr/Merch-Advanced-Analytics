@@ -424,11 +424,11 @@ function dailySalesPage(fromDate, toDate){
 					'</div>' +
 					'<div class="card" id="salesPanel">' +
 						'<div class="card-header">' + 
-							'<ul class="nav nav-tabs" role="tablist">' +
-								'<li class="nav-item active"><a href="#sales" role="tab" data-toggle="tab">Sales/Cancellations</a></li>' +
-								'<li class="nav-item"><a href="#revenue" role="tab" data-toggle="tab">Revenue/Royalties</a></li>' +
-								'<li class="nav-item"><a href="#advanced" role="tab" data-toggle="tab">Advanced Analytics</a></li>' +
-								'<li class="nav-item"><a href="#niche" role="tab" data-toggle="tab">'+
+							'<ul class="nav nav-pills card-header-pills" role="tablist">' +
+								'<li class="nav-item"><a class="nav-link active" href="#sales" role="tab" data-toggle="tab">Sales/Cancellations</a></li>' +
+								'<li class="nav-item"><a class="nav-link" href="#revenue" role="tab" data-toggle="tab">Revenue/Royalties</a></li>' +
+								'<li class="nav-item"><a class="nav-link" href="#advanced" role="tab" data-toggle="tab">Advanced Analytics</a></li>' +
+								'<li class="nav-item"><a class="nav-link" href="#niche" role="tab" data-toggle="tab">'+
 									'Niche Analysis' +
 									'<i class="fa fa-info-circle" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="Group together TShirt designs of similar niches or styles to help forecast future winners on a broader scale. Niche tags can be set on the Manage Products page"></i>'+
 								'</a></li>' +
@@ -436,35 +436,35 @@ function dailySalesPage(fromDate, toDate){
 						'</div>' +
 						
 						'<div class="card-block tab-content">' +
-							'<div class="tab-pane active" id="sales">' +
+							'<div class="tab-pane active" role="tabpanel" id="sales">' +
 								'<center><canvas id="canvas1" height="450" width="800" ></canvas></center>' + 
 							'</div>' +
 							
-							'<div class="tab-pane" id="revenue">' +
+							'<div class="tab-pane" role="tabpanel" id="revenue">' +
 								'<center><canvas id="canvas2" height="450" width="800" ></canvas></center>' +
 							'</div>' + 
-							'<div class="tab-pane" id="advanced">' +
+							'<div class="tab-pane" role="tabpanel"  id="advanced">' +
 								'<center>' +
 								'<div class="canvas-wrapper">' +
 									'<canvas id="canvas3" height="350" width="280" style="padding:10px"></canvas>' +
-									'<h4 class="canvas-title">Gender Distribution</h4>' +
+									'<h5 class="canvas-title">Gender Distribution</h5>' +
 								'</div>' +
 								'<div class="canvas-wrapper">'+
 									'<canvas id="canvas4" height="350" width="280" style="padding:10px"></canvas>' +
-									'<h4 class="canvas-title">Size Distribution</h4>' +
+									'<h5 class="canvas-title">Size Distribution</h5>' +
 								'</div>'+
 								'<div class="canvas-wrapper">'+
 									'<canvas id="canvas5" height="350" width="280" style="padding:10px"></canvas>'+
-									'<h4 class="canvas-title">Color Distribution</h4>' +
+									'<h5 class="canvas-title">Color Distribution</h5>' +
 								'</div>' +
 							'</center>' +
 							'</div>' +
-							'<div class="tab-pane" id="niche">' +
+							'<div class="tab-pane" role="tabpanel" id="niche">' +
 								'<div class="col-xs-6">' +
 									'<center>' +
 										'<div class="canvas-wrapper" style="width: 100%;">'+
 											'<canvas id="canvas6" height="350" width="280" style="padding:10px"></canvas>'+
-											'<h4 class="canvas-title">Niche Distribution (Number Sold)</h4>' +
+											'<h5 class="canvas-title">Niche Distribution (Number Sold)</h5>' +
 										'</div>' +
 									'</center>' +
 								'</div>' +
@@ -473,7 +473,7 @@ function dailySalesPage(fromDate, toDate){
 										'<div class="canvas-wrapper" style="width: 100%;">'+
 											'<canvas id="canvas7" height="350" width="280" style="padding:10px"></canvas>'+
 											'<div class="canvas-title">' +
-												'<h4>Normalized Niche Distribution (%)</h4>' +
+												'<h5>Normalized Niche Distribution (%)</h5>' +
 												'<i class="fa fa-info-circle" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="A normalized distribution takes into account the number of shirts for each niche and factors out the relative availablilty of each niche. (i.e. think like comparing a country\'s GDP vs GDP Per Capita)"></i>'+
 											'</div>' +
 										'</div>' +
@@ -824,7 +824,7 @@ function renderDailyView(unixFromDate, unixToDate, callback){
 						'<td class="text-center btn-inside">' +
 							'<a target="_blank" href="https://www.amazon.com/dp/' + 
 								resultSumSales[i]["ASIN"]  +
-							'" class="btn btn-info">Preview</a>' +
+							'" class="btn btn-primary">Preview</a>' +
 						'</td>' 
 				}
 							
@@ -860,28 +860,117 @@ function renderDailyView(unixFromDate, unixToDate, callback){
 				
 				
 				stats = '<center><h3>Daily Statistics: ' + fromDateString + ' to ' + toDateString + '</h3></center>';	
-				stats += '<table class="table table-striped"><thead><tr>' +
-						'<th class="text-center">Shirts Sold</th>' + 
-						'<th class="text-center">Shirts Cancelled</th>' + 
-						'<th class="text-center">Revenue</th>' + 
-						'<th class="text-center">Royalties</th>'
-						+ '<th class="text-center">Average Royalties / Shirt </th>'
-						+ '<th class="text-center">Average Sales / Day </th>'
-						+ '<th class="text-center">Average Royalties / Day </th>'
-						+ '</tr></thead><tbody>'
-						+ '<tr class="success text-center"><td><b>' + totals.sales + '</b></td>'
-						+ '<td><b>' + totals.cancelled + '</b></td>'
-						+ '<td><b>' + totals.revenue + '</b></td>'
-						+ '<td><b>' + totals.royalty + '</b></td>'
-						+ '<td><b>' + (totals.royalty /(totals.sales - totals.cancelled + 0.00001)).toFixed(2) + '</b></td>'
-						+ '<td><b>' + (totals.sales /(numberofDaysInner+ 0.00001)).toFixed(2) + '</b></td>'
-						+ '<td><b>' + (totals.royalty /(numberofDaysInner+ 0.00001)).toFixed(2) + '</b></td>'
-						+ '</tr></tbody></table>'
-
-						+ '<div class="number-of-days-wrapper">'
-						+ 	'<span>Adjust date range</span>'						
-						+	'<input type="text" name="datefilter" class="form-control" value="' + fromDateString + " - " + toDateString + '" />'
-						+ '</div>'
+				stats += '<div class="container row no-gutters" style="display: flex; flex-direction: row;">' +
+					
+						'<div class="col-lg-2 col-sm-3 col-xs-12 ">'+
+							'<div class="card">'+
+								'<div class="card-body">'+                                                                       
+									'<div class="row">'+
+										'<div class="col-lg-12 col-sm-12 col-xs-12">'+
+											'<h2 class="font-weight-lighter" style="color:#474C4F;" data-toggle="tooltip" data-placement="top" title="Drafts">'+ totals.sales + '</h2>'+
+										'</div>'+
+									'</div>'+
+									'<div class="col-">'+
+										'<p class="text-muted text-uppercase small">Shirts Sold</p>'+
+									'</div>'+ 
+								'</div>'+
+							'</div>'+
+						'</div>'+
+						
+						'<div class="col-lg-2 col-sm-3 col-xs-12 ">'+
+							'<div class="card">'+
+								'<div class="card-body">'+                                                                       
+									'<div class="row">'+
+										'<div class="col-lg-12 col-sm-12 col-xs-12">'+
+											'<h2 class="font-weight-lighter" style="color:#474C4F;" data-toggle="tooltip" data-placement="top" title="Drafts">'+ totals.cancelled + '</h2>'+
+										'</div>'+
+									'</div>'+
+									'<div class="col-">'+
+										'<p class="text-muted text-uppercase small">Shirts Cancelled</p>'+
+									'</div>'+ 
+								'</div>'+
+							'</div>'+
+						'</div>'+
+						
+						'<div class="col-lg-2 col-sm-3 col-xs-12 ">'+
+							'<div class="card">'+
+								'<div class="card-body">'+                                                                       
+									'<div class="row">'+
+										'<div class="col-lg-12 col-sm-12 col-xs-12">'+
+											'<h2 class="font-weight-lighter" style="color:#474C4F;" data-toggle="tooltip" data-placement="top" title="Drafts">$'+ totals.revenue + '</h2>'+
+										'</div>'+
+									'</div>'+
+									'<div class="col-">'+
+										'<p class="text-muted text-uppercase small">Revenue</p>'+
+									'</div>'+ 
+								'</div>'+
+							'</div>'+
+						'</div>'+
+						
+						'<div class="col-lg-2 col-sm-3 col-xs-12 ">'+
+							'<div class="card">'+
+								'<div class="card-body">'+                                                                       
+									'<div class="row">'+
+										'<div class="col-lg-12 col-sm-12 col-xs-12">'+
+											'<h2 class="font-weight-lighter" style="color:#474C4F;" data-toggle="tooltip" data-placement="top" title="Drafts">$'+ totals.royalty + '</h2>'+
+										'</div>'+
+									'</div>'+
+									'<div class="col-">'+
+										'<p class="text-muted text-uppercase small">Royalties</p>'+
+									'</div>'+ 
+								'</div>'+
+							'</div>'+
+						'</div>'+
+						
+						'<div class="col-lg-2 col-sm-3 col-xs-12 ">'+
+							'<div class="card">'+
+								'<div class="card-body">'+                                                                       
+									'<div class="row">'+
+										'<div class="col-lg-12 col-sm-12 col-xs-12">'+
+											'<h2 class="font-weight-lighter" style="color:#474C4F;" data-toggle="tooltip" data-placement="top" title="Drafts">$'+ (totals.royalty /(totals.sales - totals.cancelled + 0.00001)).toFixed(2) + '</h2>'+
+										'</div>'+
+									'</div>'+
+									'<div class="col-">'+
+										'<p class="text-muted text-uppercase small">Average Royalties / Shirt</p>'+
+									'</div>'+ 
+								'</div>'+
+							'</div>'+
+						'</div>'+
+						
+						'<div class="col-lg-2 col-sm-3 col-xs-12 ">'+
+							'<div class="card">'+
+								'<div class="card-body">'+                                                                       
+									'<div class="row">'+
+										'<div class="col-lg-12 col-sm-12 col-xs-12">'+
+											'<h2 class="font-weight-lighter" style="color:#474C4F;" data-toggle="tooltip" data-placement="top" title="Drafts">'+ (totals.sales /(numberofDaysInner+ 0.00001)).toFixed(2) + '</h2>'+
+										'</div>'+
+									'</div>'+
+									'<div class="col-">'+
+										'<p class="text-muted text-uppercase small">Average Sales / Day</p>'+
+									'</div>'+ 
+								'</div>'+
+							'</div>'+
+						'</div>'+
+						
+												'<div class="col-lg-2 col-sm-3 col-xs-12 ">'+
+							'<div class="card">'+
+								'<div class="card-body">'+                                                                       
+									'<div class="row">'+
+										'<div class="col-lg-12 col-sm-12 col-xs-12">'+
+											'<h2 class="font-weight-lighter" style="color:#474C4F;" data-toggle="tooltip" data-placement="top" title="Drafts">$'+ (totals.royalty /(numberofDaysInner+ 0.00001)).toFixed(2) + '</h2>'+
+										'</div>'+
+									'</div>'+
+									'<div class="col-">'+
+										'<p class="text-muted text-uppercase small">Average Royalties / Day</p>'+
+									'</div>'+ 
+								'</div>'+
+							'</div>'+
+						'</div>'+
+												
+						'<div class="number-of-days-wrapper">' +
+						 	'<span>Adjust date range</span>'	+					
+							'<input type="text" name="datefilter" class="form-control" value="' + fromDateString + " - " + toDateString + '" />' +
+						'</div>';
 						
 						
 			   
@@ -979,21 +1068,54 @@ function renderDailyView(unixFromDate, unixToDate, callback){
 					
 					
 					//Generate Top Niches
-					topNichesData = '<div>' +
-										topSellingNiches[0] +
-										topSellingNiches[1] +
-										topSellingNiches[2] +
-									'</div>' +
+					topNichesData = '<div class="container row">' +					
+										'<div class="col-lg-2 col-sm-3 col-xs-12 ">'+
+											'<div class="card">'+
+												'<div class="card-body">'+                                                                       
+													'<div class="row">'+
+														'<div class="col-lg-12 col-sm-12 col-xs-12">'+
+															'<h2 class="font-weight-lighter" style="color:#474C4F;" data-toggle="tooltip" data-placement="top" title="Drafts">'+ topSellingNiches[0] + '</h2>'+
+														'</div>'+
+													'</div>'+
+													'<div class="col-">'+
+														'<p class="text-muted text-uppercase small">#1 Top Selling Niche/p>'+
+													'</div>'+ 
+												'</div>'+
+											'</div>'+
+										'</div>'+
 									
-									'<div class="card">' +
-										'<img class="img-fluid" src="https://mdbootstrap.com/img/Photos/Horizontal/Nature/4-col/img%20%282%29.jpg" alt="Card image cap">' +
-
-										'<div class="card-body">' +
-											'<h4 class="card-title">Card title</h4>' +
-											'<p class="card-text">Some quick example t ext to build on the card title and make up the bulk of the cards content.</p>'+
-											'<a href="#" class="btn btn-primary">Button</a>' + 
-										'</div>'
+										'<div class="col-lg-2 col-sm-3 col-xs-12 ">'+
+											'<div class="card">'+
+												'<div class="card-body">'+                                                                       
+													'<div class="row">'+
+														'<div class="col-lg-12 col-sm-12 col-xs-12">'+
+															'<h2 class="font-weight-lighter" style="color:#474C4F;" data-toggle="tooltip" data-placement="top" title="Drafts">'+ topSellingNiches[1] + '</h2>'+
+														'</div>'+
+													'</div>'+
+													'<div class="col-">'+
+														'<p class="text-muted text-uppercase small">#2 Top Selling Niche</p>'+
+													'</div>'+ 
+												'</div>'+
+											'</div>'+
+										'</div>'+
+										
+										'<div class="col-lg-2 col-sm-3 col-xs-12 ">'+
+											'<div class="card">'+
+												'<div class="card-body">'+                                                                       
+													'<div class="row">'+
+														'<div class="col-lg-12 col-sm-12 col-xs-12">'+
+															'<h2 class="font-weight-lighter" style="color:#474C4F;" data-toggle="tooltip" data-placement="top" title="Drafts">'+ topSellingNiches[2] + '</h2>'+
+														'</div>'+
+													'</div>'+
+													'<div class="col-">'+
+														'<p class="text-muted text-uppercase small">#3 Top Selling Niche</p>'+
+													'</div>'+ 
+												'</div>'+
+											'</div>'+
+										'</div>'+
+						
 									'</div>';
+
 
 
 					
@@ -1256,7 +1378,7 @@ function merchmonths(count, m, salesData, cancelData, returnData, rev, roy, chla
 				'<span>Adjust date range for the past </span>' +
 			 	'<input type="text" name="numberOfDaysInput" />' + 'months' +
 			'</div>' +
-			'<input type="submit" value="Update & Refresh" class="btn btn-success" id="save-number-months"/>';
+			'<input type="submit" value="Update & Refresh" class="btn btn-primary" id="save-number-months"/>';
 				
 				
 		//Make Number Selector Work
@@ -1408,16 +1530,16 @@ function productManager() {
 					'</td>' +
 					
 					'<td class="text-center btn-inside">' +
-						'<a target="_blank" href="https://www.amazon.com/dp/' + ts[i].marketplaceAsinMap.US + '" class="btn btn-info">Preview</a>' +
+						'<a target="_blank" href="https://www.amazon.com/dp/' + ts[i].marketplaceAsinMap.US + '" class="btn btn-primary">Preview</a>' +
 					'</td>' +
 					
 					'<td class="text-center btn-inside">' +
 						  '<input type="text" name="nicheName" class="niche-input"/>' +
 						  '<input type="hidden" name="parentASIN" value='+ ts[i].marketplaceAsinMap.US + '>' +
-						  '<button class="btn btn-info save"/>Save</button>' +
+						  '<button class="btn btn-primary save"/>Save</button>' +
 					'</td>' +
 					'<td class="text-center">' + ts[i].listPrice + '</td>' +
-					'<td class="text-center btn-inside">' + '<a target="_blank" href="http://merch.amazon.com/merch-tshirt/title-setup/' + ts[i].id + '/add_details" class="btn btn-info">Edit</a>' + '</td></tr>';
+					'<td class="text-center btn-inside">' + '<a target="_blank" href="http://merch.amazon.com/merch-tshirt/title-setup/' + ts[i].id + '/add_details" class="btn btn-primary">Edit</a>' + '</td></tr>';
 			}
 		}
 			
@@ -1926,14 +2048,14 @@ function initSaveButtons(){ //Adds event listeners to all buttons
 			$(this).removeClass("btn-danger");
 			
 			$(this).text('Saved');
-			$(this).removeClass('btn-info');
+			$(this).removeClass('btn-primary');
 			$(this).addClass('btn-success');
 			
 			var that  = $(this); // Need to reset scope
 			setTimeout(function() {
 				that.text('Save');
 				that.removeClass('btn-success');
-				that.addClass('btn-info');
+				that.addClass('btn-primary');
 			}, 750);
 			
 		});
@@ -1957,13 +2079,13 @@ function initSaveButtons(){ //Adds event listeners to all buttons
 				$(this).closest("tr").next().find('input[type="text"]').focus(); //Focus on Next Field
 				
 				targetButton.text('Saved');
-				targetButton.removeClass('btn-info');
+				targetButton.removeClass('btn-primary');
 				targetButton.addClass('btn-success');
 				
 				setTimeout(function() {
 					targetButton.text('Save');
 					targetButton.removeClass('btn-success');
-					targetButton.addClass('btn-info');
+					targetButton.addClass('btn-primary');
 				}, 750);
 			}
 			

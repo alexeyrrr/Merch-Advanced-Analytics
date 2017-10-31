@@ -7,6 +7,9 @@
 	padding-left: 250px;
 }
 
+.card{
+	margin-bottom: 20px;
+}
 #sidebar {
     z-index: 1000;
     position: fixed;
@@ -68,6 +71,7 @@ a, a:hover, a:focus {
 
 #reset-button{
 	float: right;
+	cursor: pointer;
 }
 
 #sidebar .sidebar-header {
@@ -76,7 +80,6 @@ a, a:hover, a:focus {
 
 #sidebar .sidebar-header h3{
     font-weight: 900;
-	transform: scale(1, 1.1);
 }
 
 #sidebar ul.components {
@@ -179,7 +182,7 @@ div.desc {
 }
 
 .fa-info-circle{
-	margin: 12px 6px;
+	margin: 0 6px;
     font-size: 1.5rem;
 }
 .panel-heading .fa-info-circle{
@@ -398,4 +401,8 @@ dt, dd{
 
 .save{
 	max-width: 58px;
+}
+
+.card-block{ /* Temp Solution for now */
+	padding: 27px;
 }
