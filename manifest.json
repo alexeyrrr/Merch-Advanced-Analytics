@@ -13,7 +13,7 @@
       "matches": [ "https://*/MerchAnalyticsTodaySales/*", "https://*/MerchAnalyticsTwoWeekSales/*", "https://*/MerchAnalyticsAllMonthsSales/*", "https://*/MerchAnalyticsProductManager/*", "https://*/IndividualProductPage/*", "https://*/MerchAnalyticsSettings/*" ],
       "run_at": "document_end"
    } ],
-   "description": "Analytics tool for Merch by Amazon",
+   "description": "Merch by Amazon Analytics tool to discover your top-selling niches and demographics. Spend less time designs, and more time making money.",
    "icons": {
       "128": "icon128.png",
       "16": "icon16.png",
@@ -30,10 +30,10 @@
 		"*.ttf"
 	],	
    "manifest_version": 2,
-   "name": "Merch Analytics",
+   "name": "Merch Advanced Analytics",
    "permissions": [ "tabs", "activeTab", "contextMenus", "notifications", "storage", "*://*.amazon.com/*" ],
    "update_url": "https://clients2.google.com/service/update2/crx",
-   "version": "0.0.0.3"
+   "version": "0.0.0.4"
 }
 
 

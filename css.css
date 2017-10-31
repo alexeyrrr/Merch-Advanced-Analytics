@@ -13,6 +13,7 @@ html, body{
 
 .card{
 	margin-bottom: 20px;
+	height: calc(100% - 20px);
 }
 #sidebar {
     z-index: 1000;
@@ -34,6 +35,11 @@ html, body{
 	max-width: none;
 }
 
+.inner-container{
+	width: 100%;
+	max-width: 1000px;
+	margin: 0 auto;
+}
 .clear::after { 
 	content: "";
 	display: block; 
