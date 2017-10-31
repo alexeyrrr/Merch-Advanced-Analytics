@@ -202,8 +202,7 @@ div.desc {
 }
 .niche-input{
 	float: left;
-    width: calc(100% - 83px);
-    margin: 4px;
+    width: calc(100% - 80px);
 }
 
 table.sortable th, table.sortable tr{
@@ -251,6 +250,13 @@ dl{
 
 dt, dd{
 	float:left;
+}
+
+input[type="text"]{
+	border-radius: 5px;
+    padding: 6px;
+    margin: 0 4px;
+    border: 1px solid #bbb;
 }
 
 .niche-tag{
@@ -302,8 +308,8 @@ dt, dd{
 }
 
 .input-switch:checked + label {
-    background-color: #44d095;
-    border: 1px solid #3cbf88;
+    background-color: #007bff;
+    border: 1px solid #007bff;
 }
 .input-switch:checked + label::before {
     content: "ON";
@@ -387,7 +393,8 @@ dt, dd{
 }
 
 .date-selector{
-	border: none;
+	border: none !important;
+	padding: 0 !important;
 	outline-style:none;
 	box-shadow:none;
 	border-color:transparent;
@@ -406,6 +413,10 @@ dt, dd{
     font-weight: 600;
     width: 100%;
     background: #f5f5f5;
+}
+
+.range_inputs{
+	display: none;
 }
 .down-arrow{
 	float:right;

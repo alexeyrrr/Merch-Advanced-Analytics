@@ -1492,10 +1492,10 @@ function productManager() {
 					'<div id="status"></div>' +
 					'<table id="quickEditor" class="sortable table table-striped"><thead><tr><th>#</th>'
 					+ '<th>Title</th>'
+					+ '<th class="text-center">Niche</th>'
 					+ '<th class="text-center">Creation Date</th>'
 					+ '<th class="text-center">Days Until Deletion</th>'
 					+ '<th class="text-center">Listing page</th>'
-					+ '<th class="text-center">Niche</th>'
 					+ '<th class="text-center">Price</th>' 
 					+ '<th class="text-center">Edit</th>'
 					+ '</tr></thead><tbody>';
@@ -1539,6 +1539,12 @@ function productManager() {
 					'<th scope="row">' + k + '</th>' + 
 					'<td class="product-name"><span>' + ts[i].name + '</span></td>' + 
 						
+					'<td class="text-center btn-inside">' +
+						  '<input type="text" name="nicheName" class="niche-input"/>' +
+						  '<input type="hidden" name="parentASIN" value='+ ts[i].marketplaceAsinMap.US + '>' +
+						  '<button class="btn btn-primary save"/>Save</button>' +
+					'</td>' +
+					
 					'<td class="text-center">' +	
 						stringifiedCreateDate +
 					'</td>' +
@@ -1551,11 +1557,6 @@ function productManager() {
 						'<a target="_blank" href="https://www.amazon.com/dp/' + ts[i].marketplaceAsinMap.US + '" class="btn btn-primary">Preview</a>' +
 					'</td>' +
 					
-					'<td class="text-center btn-inside">' +
-						  '<input type="text" name="nicheName" class="niche-input"/>' +
-						  '<input type="hidden" name="parentASIN" value='+ ts[i].marketplaceAsinMap.US + '>' +
-						  '<button class="btn btn-primary save"/>Save</button>' +
-					'</td>' +
 					'<td class="text-center">' + ts[i].listPrice + '</td>' +
 					'<td class="text-center btn-inside">' + '<a target="_blank" href="http://merch.amazon.com/merch-tshirt/title-setup/' + ts[i].id + '/add_details" class="btn btn-primary">Edit</a>' + '</td></tr>';
 			}
