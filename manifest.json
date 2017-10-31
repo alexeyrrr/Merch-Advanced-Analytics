@@ -13,7 +13,7 @@
       "matches": [ "https://*/MerchAnalyticsTodaySales/*", "https://*/MerchAnalyticsTwoWeekSales/*", "https://*/MerchAnalyticsAllMonthsSales/*", "https://*/MerchAnalyticsProductManager/*", "https://*/IndividualProductPage/*", "https://*/MerchAnalyticsSettings/*" ],
       "run_at": "document_end"
    } ],
-   "description": "Merch by Amazon Analytics tool to discover your top-selling niches and demographics. Spend less time designs, and more time making money.",
+   "description": "Merch by Amazon Analytics tool to discover your top-selling niches. Spend less time designs, and more time making money.",
    "icons": {
       "128": "icon128.png",
       "16": "icon16.png",
