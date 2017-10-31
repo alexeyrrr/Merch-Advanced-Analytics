@@ -378,6 +378,9 @@ dt, dd{
 
 .date-selector{
 	border: none;
+	outline-style:none;
+	box-shadow:none;
+	border-color:transparent;
 	font-size: 1.75rem;
 	font-weight: 500;
     line-height: 1.2;
@@ -386,10 +389,18 @@ dt, dd{
 	color: #222;
 	text-align: right;
 }
+
+.daterangepicker{
+    -webkit-box-shadow: 5px 5px 15px rgba(0,0,0,.25);
+    box-shadow: 5px 5px 15px rgba(0,0,0,.25);
+    font-weight: 600;
+    width: 100%;
+    background: #f5f5f5;
+}
 .down-arrow{
 	float:right;
 	color: #222;
-	margin: 7px;
+	margin: 10px;
 }
 
 [name="numberOfDaysInput"]{
@@ -407,6 +418,10 @@ dt, dd{
 		float:none;
 		text-align: left;
 	}
+}
+
+.ranges li.active, .daterangepicker td.active, .daterangepicker td.active:hover  {
+	background: #007bff !important;
 }
 
 .save{

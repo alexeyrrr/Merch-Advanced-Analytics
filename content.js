@@ -987,6 +987,10 @@ function renderDailyView(unixFromDate, unixToDate, callback){
 
 				$('input[name="datefilter"]').daterangepicker(
 					{  
+						showDropdowns: true,
+						opens: 'left',
+						autoApply: true,
+						alwaysShowCalendars: true,
 						maxDate: new Date,
 						minDate: new Date().adjustDate(-89),
 						ranges: {
