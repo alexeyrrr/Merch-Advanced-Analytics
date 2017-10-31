@@ -1,4 +1,8 @@
 /*Sidebar Styling */
+html, body{
+	font-size: 11pt;
+}
+
 .panel-heading>.nav-tabs {
     border-bottom: none;
     margin-bottom: -10px;
@@ -401,6 +405,14 @@ dt, dd{
 	float:right;
 	color: #222;
 	margin: 10px;
+}
+
+.no-pading-top{
+	padding-top: 0;
+}
+
+.no-card-bottom .card{
+	margin-bottom: 0;
 }
 
 [name="numberOfDaysInput"]{

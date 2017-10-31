@@ -460,24 +460,26 @@ function dailySalesPage(fromDate, toDate){
 							'</center>' +
 							'</div>' +
 							'<div class="tab-pane" role="tabpanel" id="niche">' +
-								'<div class="col-xs-6">' +
-									'<center>' +
-										'<div class="canvas-wrapper" style="width: 100%;">'+
-											'<canvas id="canvas6" height="350" width="280" style="padding:10px"></canvas>'+
-											'<h5 class="canvas-title">Niche Distribution (Number Sold)</h5>' +
-										'</div>' +
-									'</center>' +
-								'</div>' +
-								'<div class="col-xs-6">' +
-									'<center>' +
-										'<div class="canvas-wrapper" style="width: 100%;">'+
-											'<canvas id="canvas7" height="350" width="280" style="padding:10px"></canvas>'+
-											'<div class="canvas-title">' +
-												'<h5>Normalized Niche Distribution (%)</h5>' +
-												'<i class="fa fa-info-circle" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="A normalized distribution takes into account the number of shirts for each niche and factors out the relative availablilty of each niche. (i.e. think like comparing a country\'s GDP vs GDP Per Capita)"></i>'+
+								'<div class="container row">' +
+									'<div class="col-xs-6 col-sm-6">' +
+										'<center>' +
+											'<div class="canvas-wrapper" style="width: 100%;">'+
+												'<canvas id="canvas6" height="350" width="280" style="padding:10px"></canvas>'+
+												'<h5 class="canvas-title">Niche Distribution (Number Sold)</h5>' +
 											'</div>' +
-										'</div>' +
-									'</center>' +
+										'</center>' +
+									'</div>' +
+									'<div class="col-xs-6 col-sm-6">' +
+										'<center>' +
+											'<div class="canvas-wrapper" style="width: 100%;">'+
+												'<canvas id="canvas7" height="350" width="280" style="padding:10px"></canvas>'+
+												'<div class="canvas-title">' +
+													'<h5>Normalized Niche Distribution (%)</h5>' +
+													'<i class="fa fa-info-circle" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="A normalized distribution takes into account the number of shirts for each niche and factors out the relative availablilty of each niche. (i.e. think like comparing a country\'s GDP vs GDP Per Capita)"></i>'+
+												'</div>' +
+											'</div>' +
+										'</center>' +
+									'</div>' +
 								'</div>' +
 							'</div>' +
 						'</div>' +
@@ -859,7 +861,7 @@ function renderDailyView(unixFromDate, unixToDate, callback){
 				toDateString = moment.unix(localUnixToDate2/1000).format("MM/DD/YYYY");
 				
 				
-				stats = '<div class="container row">'+
+				stats = '<div class="container row no-pading-top">'+
 							'<div class="col-sm-6 col-xs-6">' +
 								'<h3>Daily Statistics</h3>' +
 							'</div>' +
@@ -931,7 +933,7 @@ function renderDailyView(unixFromDate, unixToDate, callback){
 							'</div>'+
 						'</div>'+
 						
-						'<div class="col-lg-2 col-sm-3 col-xs-12 offset-lg-3 offset-sm-1">'+
+						'<div class="col-lg-2 col-sm-3 col-xs-12 offset-lg-3 offset-sm-1 no-card-bottom">'+
 							'<div class="card">'+
 								'<div class="card-body">'+                                                                       
 									'<div class="row">'+
@@ -946,7 +948,7 @@ function renderDailyView(unixFromDate, unixToDate, callback){
 							'</div>'+
 						'</div>'+
 						
-						'<div class="col-lg-2 col-sm-3 col-xs-12 ">'+
+						'<div class="col-lg-2 col-sm-3 col-xs-12 no-card-bottom ">'+
 							'<div class="card">'+
 								'<div class="card-body">'+                                                                       
 									'<div class="row">'+
@@ -961,7 +963,7 @@ function renderDailyView(unixFromDate, unixToDate, callback){
 							'</div>'+
 						'</div>'+
 						
-												'<div class="col-lg-2 col-sm-3 col-xs-12 ">'+
+						'<div class="col-lg-2 col-sm-3 col-xs-12 no-card-bottom ">'+
 							'<div class="card">'+
 								'<div class="card-body">'+                                                                       
 									'<div class="row">'+
@@ -1076,10 +1078,15 @@ function renderDailyView(unixFromDate, unixToDate, callback){
 							return normalizedPercentageArray[b]-normalizedPercentageArray[a]
 					});
 					
+					//Not a great execution
+					if (topSellingNiches.length < 3){
+						topSellingNiches = ['Unknown Niche', 'Unknown Niche', 'Unknown Niche' ];
+					}
+					
 					
 					//Generate Top Niches
 					topNichesData = '<div class="container row">' +					
-										'<div class="col-lg-2 col-sm-3 col-xs-12 ">'+
+										'<div class="col-lg-2 col-sm-3 col-xs-12 offset-sm-3">'+
 											'<div class="card">'+
 												'<div class="card-body">'+                                                                       
 													'<div class="row">'+
@@ -1131,7 +1138,7 @@ function renderDailyView(unixFromDate, unixToDate, callback){
 					
 					
 					
-					$("#niche").append(topNichesData);
+					$("#niche").prepend(topNichesData);
 					
 					
 
@@ -1459,7 +1466,7 @@ function productManager() {
 						'<div class="container">' + 
 							'<div class="card">' +
 								'<center><h2>Product Manager</h2></center>' +
-								'<div class="card-block" id="manager-stats"><center><h3>Loading...</h3></center></div>' + 
+								'<div class="card-block" id="manager-stats"><center><h3>Loading...</h3><i class="fa fa-spinner fa-spin fa-4"></i></center></div>' + 
 							'</div>'+ 
 							'<div class="card">' +
 								'<div class="card-header clear"><strong> Use  CTRL + F (PC) or ⌘ + F (MAC) to open the search bar.</strong>' +
