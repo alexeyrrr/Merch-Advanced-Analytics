@@ -245,7 +245,7 @@ function logincheck(cmd, queryParams = null) {
 
 					} else {
 						//Add header and sidebar
-						
+						globalInit();
 						
 						
 						
@@ -316,12 +316,10 @@ if (cmd.indexOf("IndividualProductPage") !== -1 && parsedParams) {
 /********************* Global HTML  / Options ******************/
 /***************************************************************/
 var globalHeader = '<head><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"></head>';
-
-var sidebarHTML = '<nav id="sidebar">' +
+var globalSidebar = '<nav id="sidebar">' +
 						'<div class="sidebar-header">' +
-							'<h3>Merch Analytics</div>' +
+							'<h3>Merch Analytics</h3>' +
 						'</div>' +
-
 						'<ul class="list-unstyled components">' +
 							'<li><a id="dailySales"><i class="fa fa-calendar-o" aria-hidden="true"></i> Daily Sales</a></li>' +
 							'<li><a id="monthlySales"><i class="fa fa-calendar" aria-hidden="true"></i> Monthly Sales</a></li>' +
@@ -330,7 +328,15 @@ var sidebarHTML = '<nav id="sidebar">' +
 							'<li><a id="settingsPage"><i class="fa fa-cogs" aria-hidden="true"></i> Settings</a></li>' +
 						'</ul>' +
 				'</nav>';
-				
+var globalBody = '<body><div class="wrapper">' + globalSidebar +  '</div></body>';
+		
+function globalInit(){
+	document.head.innerHTML = globalHeader;
+	document.body.innerHTML = globalBody
+	document.body.style.backgroundColor = "#ecf1f2";  
+	initSidebar();
+}
+		
 var globalLineChartOptions = {
 						responsive: false,
 						animation: {
@@ -390,18 +396,9 @@ function fetchAllLiveProducts(callback){
 /***************************************************************/
 /********************** Daily Sales Page ***********************/
 /***************************************************************/	
-function dailySalesPage(fromDate, toDate){
-	document.head.innerHTML = globalHeader;
-
-	
-    document.body.style.backgroundColor = "#ecf1f2";  
-	
-	
-	
+function dailySalesPage(fromDate, toDate){	
 	document.title = "Daily View - Merch Advanced Analytics";
-	document.body.innerHTML = '<body>' +
-			'<div class="wrapper">' +
-				'<div class="container">' +
+	var pageContent = '<div class="container">' +
 					'<div class="card"></center>'+
 						'<div class="card-block" id="dailystats"><center><h3>Loading...</h3><i class="fa fa-spinner fa-spin fa-4"></i></center></div>'+ 
 					'</div>' +
@@ -474,13 +471,9 @@ function dailySalesPage(fromDate, toDate){
 						'<div class="card-header">Shirts Sold During Selected Period</div>' +
 						'<div class="card-block" id="shirtlist"></div>' +
 					'</div>' + 
-				'</div>' + 
-			'</div>' +
-		'</body>';
+				'</div>';
 			
-	var pageContent = document.querySelector(".wrapper");
-	pageContent.innerHTML += sidebarHTML;
-	initSidebar();
+	$(".wrapper").append(pageContent);
 		
 	renderDailyView(fromDate, toDate);
 }
@@ -1408,25 +1401,20 @@ function merchmonths(count, m, salesData, cancelData, returnData, rev, roy, chla
 }
 
 function merchmonthsall(numberOfMonths) {
-    document.head.innerHTML = globalHeader;
     var d = new Date();
     n = d.toString();
-    document.body.innerHTML = '<body>' + 
-									'<div class="wrapper">' +
-										'<div class="container"><div class="card"></center><div class="card-block" id="twoweeksstats"><center><h3>Loading..</h3></center></div></div>' +
-										' <div class="card">    <div class="card-header">Sales/Cancellations</div>    <div class="card-block"><center><canvas id="canvas1" height="450" width="800" ></canvas></center></div> </div>' +
-										' <div class="card">    <div class="card-header">Revenue/Royalties</div>    <div class="card-block"><center><canvas id="canvas2" height="450" width="800" ></canvas></center></div> </div>' +
-										'<br></div>' + 
-									'</div>' +
-								'</body>';
+	
+    var pageContent = '<div class="container"><div class="card"></center><div class="card-block" id="twoweeksstats"><center><h3>Loading..</h3></center></div></div>' +
+						' <div class="card">    <div class="card-header">Sales/Cancellations</div>    <div class="card-block"><center><canvas id="canvas1" height="450" width="800" ></canvas></center></div> </div>' +
+						' <div class="card">    <div class="card-header">Revenue/Royalties</div>    <div class="card-block"><center><canvas id="canvas2" height="450" width="800" ></canvas></center></div> </div>' +
+						'<br>' + 
+					'</div>';
 		
-	var pageContent = document.querySelector(".wrapper");
-	pageContent.innerHTML += sidebarHTML;
-	initSidebar();
 		
-
+	$(".wrapper").children().filter(":not(#sidebar)").remove();
+	$(".wrapper").append(pageContent);	
     document.title = "Monthly View - Merch Analytics";
-    document.body.style.backgroundColor = "#ecf1f2";
+    
     salesData = [];
     cancelData = [];
     returnData = [];
@@ -1442,40 +1430,25 @@ function merchmonthsall(numberOfMonths) {
 /******************* Product Manager Page **********************/
 /***************************************************************/
 function productManager() {
-    document.head.innerHTML = globalHeader;
-	document.body.style.backgroundColor = "#ecf1f2";  
-	
-	
 	document.title = "Manage Products - Merch Advanced Analytics";
-	
-	
-	
-	bodyHTML = '<body>' + 
-					'<div class="wrapper">' +
-						'<div class="container">' + 
+		
+	var pageContent = '<div class="container">' + 
 							'<div class="card">' +
 								'<center><h2>Product Manager</h2></center>' +
 								'<div class="card-block" id="manager-stats"><center><h3>Loading...</h3><i class="fa fa-spinner fa-spin fa-4"></i></center></div>' + 
 							'</div>'+ 
 							'<div class="card">' +
-								'<div class="card-header clear"> Live Products' +
+								'<div class="card-header clear"><strong>Live Products</strong>' +
 									'<div class="btn btn-default" id="reset-button">Clear All Niche Data</div>' +
 								'</div>' + 
 								'<div class="card-block" id="shirtlist"></div>' + 
 							'</div>'+ 
-						'</div>' + 
-					'</div>' +
-				'</body>';
+						'</div>';
 	
-    document.body.innerHTML = bodyHTML;
-    
+	$(".wrapper").children().filter(":not(#sidebar)").remove();
+	$(".wrapper").append(pageContent);	
     
 	
-	var pageContent = document.querySelector(".wrapper");
-	pageContent.innerHTML += sidebarHTML;
-	initSidebar();
-	
-
 	fetchAllLiveProducts(function(ts){
 		var cp2 = ' ' + //'<h3>Live Shirt Listings:</h3>' +
 					'<div id="status"></div>' +
@@ -1624,7 +1597,7 @@ function individualProductPage(queryParams){
     document.body.innerHTML = bodyHTML;
 		
 	var pageContent = document.querySelector(".wrapper");
-	pageContent.innerHTML += sidebarHTML;
+	pageContent.innerHTML += globalSidebar;
 	initSidebar();
 			
 	renderIndividualProductSales(queryParams);
@@ -1869,7 +1842,7 @@ function settingsPage (e) {
 								'</div>' +
 							'</body>';
 	var pageContent = document.querySelector(".wrapper");
-	pageContent.innerHTML += sidebarHTML;
+	pageContent.innerHTML += globalSidebar;
 	initSidebar();
 
     document.title = "Settings  - Merch Advanced Analytics";
@@ -2149,7 +2122,8 @@ function initSidebar(){
 			settingsPage();
 		})
 		
-		$("#sidebar a").click(function(){
+		$("#sidebar li").click(function(){
+			$("#sidebar li").removeClass("active");
 			$(this).addClass("active");
 		});
 								
