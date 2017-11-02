@@ -251,13 +251,10 @@ function logincheck(cmd, queryParams = null) {
 						var toDate = today.getTime();
 						
 						switch (cmd) {
-							case "twoweekssales":
+							case "dailySales":
 								dailySalesPage(fromDate14, toDate);
 								break;
-							case "todaysales":
-								dailySalesPage(fromDate1, toDate);
-								break;
-							case "merchall":
+							case "monthlySales":
 								merchmonthsall(12);
 								break;
 							case "productManager":
@@ -301,16 +298,12 @@ var parseQueryString = function( funcQueryString ) {
 parsedParams = parseQueryString(queryString);
 //End Parsing Query Params
 
-if (cmd.indexOf("MerchAnalyticsTodaySales") !== -1) {
-    logincheck("todaysales");
-};
-
-if (cmd.indexOf("MerchAnalyticsTwoWeekSales") !== -1) {
-    logincheck("twoweekssales");
+if (cmd.indexOf("MerchAnalyticsDailySales") !== -1) {
+    logincheck("dailySales");
 };
 
 if (cmd.indexOf("MerchAnalyticsAllMonthsSales") !== -1) {
-    logincheck("merchall");
+    logincheck("monthlySales");
 };
 
 if (cmd.indexOf("MerchAnalyticsProductManager") !== -1) {
@@ -336,15 +329,13 @@ var sidebarHTML = '<nav id="sidebar">' +
 						'</div>' +
 
 						'<ul class="list-unstyled components">' +
-							'<li><a href="/MerchAnalyticsTodaySales"><i class="fa fa-calendar-o" aria-hidden="true"></i> Today\'s Sales</a></li>' +
-							'<li><a href="/MerchAnalyticsTwoWeekSales"><i class="fa fa-calendar" aria-hidden="true"></i> 14 Day Sales</a></li>' +
-							'<li><a href="/MerchAnalyticsAllMonthsSales"><i class="fa fa-area-chart" aria-hidden="true"></i> Monthly Sales</a></li>' +
-							'<li><a href="/MerchAnalyticsProductManager"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Manage Products</a></li>' +
-							'<li style="display:none;"><a href="/IndividualProductPage/"><i class="fa fa-crosshairs" aria-hidden="true"></i> Individual Product Info</a></li>' +
-							'<li><a href="/MerchAnalyticsSettings"><i class="fa fa-cogs" aria-hidden="true"></i> Settings</a></li>' +
+							'<li><a id="dailySales"><i class="fa fa-calendar-o" aria-hidden="true"></i> Daily Sales</a></li>' +
+							'<li><a id="monthlySales"><i class="fa fa-calendar" aria-hidden="true"></i> Monthly Sales</a></li>' +
+							'<li><a id="productManager"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Manage Products</a></li>' +
+							'<li style="display:none;"><a><i class="fa fa-crosshairs" aria-hidden="true"></i> Individual Product Info</a></li>' +
+							'<li><a id="settingsPage"><i class="fa fa-cogs" aria-hidden="true"></i> Settings</a></li>' +
 						'</ul>' +
-				'</nav>' +
-				'<script src="navscript.js"></script>';
+				'</nav>';
 				
 var globalLineChartOptions = {
 						responsive: false,
@@ -497,6 +488,7 @@ function dailySalesPage(fromDate, toDate){
 			
 	var pageContent = document.querySelector(".wrapper");
 	pageContent.innerHTML += sidebarHTML;
+	initSidebar();
 		
 	renderDailyView(fromDate, toDate);
 }
@@ -981,9 +973,6 @@ function renderDailyView(unixFromDate, unixToDate, callback){
 												
 						
 						
-							
-						
-									
 				document.getElementById("dailystats")
 					.innerHTML = stats;
 				
@@ -1441,6 +1430,7 @@ function merchmonthsall(numberOfMonths) {
 		
 	var pageContent = document.querySelector(".wrapper");
 	pageContent.innerHTML += sidebarHTML;
+	initSidebar();
 		
 
     document.title = "Monthly View - Merch Analytics";
@@ -1485,6 +1475,7 @@ function productManager() {
 	
 	var pageContent = document.querySelector(".wrapper");
 	pageContent.innerHTML += sidebarHTML;
+	initSidebar();
 	
 
 	fetchAllLiveProducts(function(ts){
@@ -1636,6 +1627,7 @@ function individualProductPage(queryParams){
 		
 	var pageContent = document.querySelector(".wrapper");
 	pageContent.innerHTML += sidebarHTML;
+	initSidebar();
 			
 	renderIndividualProductSales(queryParams);
 }
@@ -1880,6 +1872,7 @@ function settingsPage (e) {
 							'</body>';
 	var pageContent = document.querySelector(".wrapper");
 	pageContent.innerHTML += sidebarHTML;
+	initSidebar();
 
     document.title = "Settings  - Merch Advanced Analytics";
     document.body.style.backgroundColor = "#ecf1f2";  
@@ -2142,5 +2135,25 @@ function initSaveButtons(){ //Adds event listeners to all buttons
 				
 		
 		readShirtNiche();		
+	})
+}
+
+function initSidebar(){	
+	$(function(){
+		$("#dailySales").click(function(){
+			logincheck("dailySales");			
+		});
+		
+		$("#monthlySales").click(function(){
+			logincheck("monthlySales");			
+		});
+		
+		$("#productManager").click(function(){
+			logincheck("productManager");			
+		});
+		
+		$("#settingsPage").click(function(){
+			logincheck("settings");			
+		})
 	})
 }

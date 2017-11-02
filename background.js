@@ -1,12 +1,6 @@
 /*Created by Alexey Rom, Based on MerchTool by HandyTools */
-function gotodaysales(info, tab) {
-	l2 = "https://merch.amazon.com/MerchAnalyticsTodaySales";
-	chrome.tabs.create({ url: l2 });
-};
-
-
 function gotwoweeksssales(info, tab) {
-	l2 = "https://merch.amazon.com/MerchAnalyticsTwoWeekSales";
+	l2 = "https://merch.amazon.com/MerchAnalyticsDailySales";
 	chrome.tabs.create({ url: l2 });
 };
 
@@ -27,12 +21,6 @@ function settings(info, tab) {
 };
 
 	
-chrome.contextMenus.create({
-	"title": "Sales: Today", contexts:["browser_action"], onclick: function(info, tab) { 
-		gotodaysales(); 
-	}
-});
-
 chrome.contextMenus.create({
 	"title": "Sales: 14 days", contexts:["browser_action"], onclick: function(info, tab) { 
 		gotwoweeksssales(); 

@@ -6,6 +6,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
 });
 
 function gotodaysales(info, tab) {
-	l2 = "https://merch.amazon.com/MerchAnalyticsTodaySales";
+	l2 = "https://merch.amazon.com/MerchAnalyticsDailySales";
 	chrome.tabs.create({ url: l2 });
 };
