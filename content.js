@@ -244,6 +244,11 @@ function logincheck(cmd, queryParams = null) {
 
 
 					} else {
+						//Add header and sidebar
+						
+						
+						
+						
 						//Calculate Unix Timestamps
 						var today = new Date(new Date().getTime() + OPTION_TIMEZONE_OFFSET);	
 						var fromDate14 = today.adjustDate(-13).getTime();
@@ -298,25 +303,14 @@ var parseQueryString = function( funcQueryString ) {
 parsedParams = parseQueryString(queryString);
 //End Parsing Query Params
 
-if (cmd.indexOf("MerchAnalyticsDailySales") !== -1) {
+if (cmd.indexOf("MerchAnalytics") !== -1) {
     logincheck("dailySales");
-};
-
-if (cmd.indexOf("MerchAnalyticsAllMonthsSales") !== -1) {
-    logincheck("monthlySales");
-};
-
-if (cmd.indexOf("MerchAnalyticsProductManager") !== -1) {
-    logincheck("productManager");
 };
 
 if (cmd.indexOf("IndividualProductPage") !== -1 && parsedParams) {
     logincheck("individualProductPage", parsedParams);
 };
 
-if (cmd.indexOf("MerchAnalyticsSettings") !== -1) {
-    logincheck("settings");
-};
 
 /***************************************************************/
 /********************* Global HTML  / Options ******************/
@@ -399,14 +393,12 @@ function fetchAllLiveProducts(callback){
 function dailySalesPage(fromDate, toDate){
 	document.head.innerHTML = globalHeader;
 
-	document.title = "Daily View - Merch Advanced Analytics";
+	
     document.body.style.backgroundColor = "#ecf1f2";  
 	
-	var style = document.createElement('link');
-	style.rel = 'stylesheet';
-	style.type = 'text/css';
-	style.href = chrome.extension.getURL('css.css');
 	
+	
+	document.title = "Daily View - Merch Advanced Analytics";
 	document.body.innerHTML = '<body>' +
 			'<div class="wrapper">' +
 				'<div class="container">' +
@@ -1451,7 +1443,13 @@ function merchmonthsall(numberOfMonths) {
 /***************************************************************/
 function productManager() {
     document.head.innerHTML = globalHeader;
-				
+	document.body.style.backgroundColor = "#ecf1f2";  
+	
+	
+	document.title = "Manage Products - Merch Advanced Analytics";
+	
+	
+	
 	bodyHTML = '<body>' + 
 					'<div class="wrapper">' +
 						'<div class="container">' + 
@@ -1460,7 +1458,7 @@ function productManager() {
 								'<div class="card-block" id="manager-stats"><center><h3>Loading...</h3><i class="fa fa-spinner fa-spin fa-4"></i></center></div>' + 
 							'</div>'+ 
 							'<div class="card">' +
-								'<div class="card-header clear"><strong> Use  CTRL + F (PC) or ⌘ + F (MAC) to open the search bar.</strong>' +
+								'<div class="card-header clear"> Live Products' +
 									'<div class="btn btn-default" id="reset-button">Clear All Niche Data</div>' +
 								'</div>' + 
 								'<div class="card-block" id="shirtlist"></div>' + 
@@ -1470,8 +1468,8 @@ function productManager() {
 				'</body>';
 	
     document.body.innerHTML = bodyHTML;
-    document.title = "Manage Products - Merch Advanced Analytics";
-    document.body.style.backgroundColor = "#ecf1f2";  
+    
+    
 	
 	var pageContent = document.querySelector(".wrapper");
 	pageContent.innerHTML += sidebarHTML;
@@ -1877,11 +1875,6 @@ function settingsPage (e) {
     document.title = "Settings  - Merch Advanced Analytics";
     document.body.style.backgroundColor = "#ecf1f2";  
 	
-	var style = document.createElement('link');
-	style.rel = 'stylesheet';
-	style.type = 'text/css';
-	style.href = chrome.extension.getURL('css.css');
-
 
 	var con = document.querySelector('.wrapper'), xhr = new XMLHttpRequest();
 
@@ -2145,15 +2138,20 @@ function initSidebar(){
 		});
 		
 		$("#monthlySales").click(function(){
-			logincheck("monthlySales");			
+			merchmonthsall(12);	
 		});
 		
 		$("#productManager").click(function(){
-			logincheck("productManager");			
+			productManager();	
 		});
 		
 		$("#settingsPage").click(function(){
-			logincheck("settings");			
+			settingsPage();
 		})
+		
+		$("#sidebar a").click(function(){
+			$(this).addClass("active");
+		});
+								
 	})
 }

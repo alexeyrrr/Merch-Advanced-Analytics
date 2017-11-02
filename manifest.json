@@ -10,7 +10,7 @@
    "content_scripts": [ {
       "css": [ "bootstrap.min.css", "css.css", "font-awesome.css", "daterangepicker.css" ],
       "js": [ "jquery-3.2.1.slim.min.js", "popper.min.js", "bootstrap.min.js", "Chart.min.js", "tablesort.min.js", "tablesort.number.js", "moment.min.js", "daterangepicker.js", "popup.js", "content.js"  ],
-      "matches": [ "https://*/MerchAnalyticsDailySales/*", "https://*/MerchAnalyticsAllMonthsSales/*", "https://*/MerchAnalyticsProductManager/*", "https://*/IndividualProductPage/*", "https://*/MerchAnalyticsSettings/*" ],
+      "matches": [ "https://*/MerchAnalytics/*", "https://*/IndividualProductPage/*" ],
       "run_at": "document_end"
    } ],
    "description": "Merch by Amazon Analytics tool to discover your top-selling niches. Spend less time designs, and more time making money.",

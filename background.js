@@ -1,47 +1,12 @@
 /*Created by Alexey Rom, Based on MerchTool by HandyTools */
-function gotwoweeksssales(info, tab) {
-	l2 = "https://merch.amazon.com/MerchAnalyticsDailySales";
+function openMerchAnalytics(info, tab) {
+	l2 = "https://merch.amazon.com/MerchAnalytics";
 	chrome.tabs.create({ url: l2 });
 };
-
-
-function allmonthssales(info, tab) {
-	l2 = "https://merch.amazon.com/MerchAnalyticsAllMonthsSales";
-	chrome.tabs.create({ url: l2 });
-};
-
-function quickeditor(info, tab) {
-	l2 = "https://merch.amazon.com/MerchAnalyticsProductManager";
-	chrome.tabs.create({ url: l2 });
-};
-
-function settings(info, tab) {
-	l2 = "https://merch.amazon.com/MerchAnalyticsSettings";
-	chrome.tabs.create({ url: l2 });
-};
-
 	
 chrome.contextMenus.create({
-	"title": "Sales: 14 days", contexts:["browser_action"], onclick: function(info, tab) { 
-		gotwoweeksssales(); 
-	}
-});
-
-chrome.contextMenus.create({
-	"title": "Sales: All Months", contexts:["browser_action"] , onclick: function(info, tab) { 
-		allmonthssales(); 
-	}
-});
-
-chrome.contextMenus.create({
-	"title":  "Manage Products", contexts:["browser_action"], onclick: function(info, tab) { 
-		quickeditor(); 
-	}
-});
-
-chrome.contextMenus.create({
-	"title":  "Settings", contexts:["browser_action"], onclick: function(info, tab) { 
-		settings(); 
+	"title": "Open Merch Analytics", contexts:["browser_action"], onclick: function(info, tab) { 
+		openMerchAnalytics(); 
 	}
 });
 
