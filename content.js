@@ -1490,7 +1490,7 @@ function productManager() {
 	fetchAllLiveProducts(function(ts){
 		var cp2 = ' ' + //'<h3>Live Shirt Listings:</h3>' +
 					'<div id="status"></div>' +
-					'<table id="quickEditor" class="sortable table table-striped"><thead><tr><th>#</th>'
+					'<table id="quickEditor" class="sortable table table-striped"><thead><tr>'
 					+ '<th>Title</th>'
 					+ '<th class="text-center">Niche</th>'
 					+ '<th class="text-center">Creation Date</th>'
@@ -1536,7 +1536,6 @@ function productManager() {
 				
 				
 				cp2 += '<tr data-lifetime-sales="'+ hasLifetimeSales.toString() + '" data-href="\/IndividualProductPage\/?ASIN=' + ts[i].marketplaceAsinMap.US  + '">' +
-					'<th scope="row">' + k + '</th>' + 
 					'<td class="product-name"><span>' + ts[i].name + '</span></td>' + 
 						
 					'<td class="text-center btn-inside">' +
@@ -2089,7 +2088,7 @@ function initSaveButtons(){ //Adds event listeners to all buttons
 		
 		//Enter key goes to next field
 		$('#shirtlist input[type="text"]').keydown(function(e) {
-			if (e.which == 13) { //Enter Key
+			if (e.which == 13 || e.which == 9) { //Enter Key
 				e.preventDefault();
 				
 				var targetButton = $(this).siblings('.save');
@@ -2119,6 +2118,28 @@ function initSaveButtons(){ //Adds event listeners to all buttons
 			}
 		});
 		
+		//Unfocus auto saves
+		$('#shirtlist input[type="text"]').focusout(function() {
+			//e.preventDefault();
+			
+			console.log("element unfocused");
+			
+			var targetButton = $(this).siblings('.save');
+			
+			targetButton.click(); //Click Submit Button
+			//$(this).closest("tr").next().find('input[type="text"]').focus(); //Focus on Next Field
+			
+			targetButton.text('Saved');
+			targetButton.removeClass('btn-primary');
+			targetButton.addClass('btn-success');
+			
+			setTimeout(function() {
+				targetButton.text('Save');
+				targetButton.removeClass('btn-success');
+				targetButton.addClass('btn-primary');
+			}, 750);
+		  })
+				
 		
 		readShirtNiche();		
 	})
