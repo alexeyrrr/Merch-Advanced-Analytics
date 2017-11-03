@@ -476,3 +476,10 @@ input[type="text"]{
 	right: 0;
 	pointer-events: none;
 }
+
+.subheading{
+	color: rgb(134, 142, 150);
+	font-weight: 400;
+	font-size: 1rem;
+    text-transform: uppercase;
+}

@@ -887,7 +887,8 @@ function renderDailyView(unixFromDate, unixToDate, callback){
 				
 				stats = '<div class="container row no-pading-top">'+
 							'<div class="col-sm-6 col-xs-6">' +
-								'<h3>Daily Statistics (' + daysDuration +' Day Range)</h3>' +
+								'<h3>Daily Statistics</h3>' +
+								'<h4 class="subheading">' + daysDuration +' Day Range</h4>' +
 							'</div>' +
 							'<div class="col-sm-6 col-xs-6">' +
 								'<div class="dropdown">' +
