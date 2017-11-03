@@ -105,7 +105,7 @@ var checkforsales = function() {
 							chrome.browserAction.setBadgeText({ text: sales.productsSold }); 
 							chrome.browserAction.setBadgeBackgroundColor({ color: '#cc0000' });
 							currentsales = req.responseText;
-							}
+						}
 						
 						if (chng == 1) {
 							if(!firstInstallInner){
@@ -128,7 +128,8 @@ var checkforsales = function() {
 								color: '#008000' 
 							});
 							currentsales = req.responseText;
-						   }
+						}
+					   
 						if (chng > 1) {
 							if(!firstInstallInner){
 								if(option.playSound) {  

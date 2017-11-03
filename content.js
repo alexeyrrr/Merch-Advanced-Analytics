@@ -283,6 +283,31 @@ var DAYLIGHT_SAVINGS = false;
 })();
 
 
+function generateLoginModal(){
+	loginerr = '<div id="myModal" class="modal fade" role="dialog">' +
+	'<div class="modal-dialog">' +
+	'<div class="modal-content">' +
+	'<div class="modal-header">' +
+	'<h4 class="modal-title">Please Login </h4>' +
+	' </div>' +
+	'<div class="modal-body">' +
+	'<h6><a href="https://merch.amazon.com/dashboard" target="_blank"><p>>>Click here to open Merch by Amazon Login<<</p></a></h6>' +
+	'</div>' +
+	'<div class="modal-footer">' +
+	'<button type="button" class="btn btn-success" data-dismiss="modal">Done, Reload The Page!</button>' +
+	'</div></div></div></div>';
+
+	document.body.innerHTML = loginerr;
+
+	$('#myModal')
+		.modal('show');
+
+	$(document)
+		.on('hide.bs.modal', '#myModal', function() {
+			location.reload();
+	});
+}
+
 function logincheck(cmd, queryParams = null) {
 	chrome.storage.sync.get("Settings", function(items) {
 		if(Object.values(items).length != 0){
@@ -305,29 +330,7 @@ function logincheck(cmd, queryParams = null) {
 				} else {
 					if (reqs.responseText.indexOf('AuthenticationPortal') != -1) {
 
-						loginerr = '<div id="myModal" class="modal fade" role="dialog">' +
-							'<div class="modal-dialog">' +
-							'<div class="modal-content">' +
-							'<div class="modal-header">' +
-							'<h4 class="modal-title">Please Login </h4>' +
-							' </div>' +
-							'<div class="modal-body">' +
-							'<h6><a href="https://merch.amazon.com/dashboard" target="_blank"><p>>>Click here to open Merch by Amazon Login<<</p></a></h6>' +
-							'</div>' +
-							'<div class="modal-footer">' +
-							'<button type="button" class="btn btn-success" data-dismiss="modal">Done, Reload The Page!</button>' +
-							'</div></div></div></div>';
-
-						document.body.innerHTML = loginerr;
-
-						$('#myModal')
-							.modal('show');
-
-						$(document)
-							.on('hide.bs.modal', '#myModal', function() {
-								location.reload();
-							});
-
+						generateLoginModal();
 
 					} else {
 						//Calculate Unix Timestamps
@@ -404,8 +407,13 @@ function fetchSalesDataCSV(fromDate, toDate, callback){
     reqs.open("GET", sls, true);
     reqs.onreadystatechange = function() {
         if (reqs.readyState == 4) {
-            if ([200, 201, 202, 203, 204, 205, 206, 207, 226].indexOf(reqs.status) === -1) {
-            } else {
+			if ([200, 201, 202, 203, 204, 205, 206, 207, 226].indexOf(reqs.status) === -1) {
+
+			} else {
+				if (reqs.responseText.indexOf('AuthenticationPortal') != -1) {
+					generateLoginModal();
+				}
+			
                 var responseArray = csvToJSON(reqs.responseText);
 				//Run Callback
 				callback(responseArray);
@@ -425,6 +433,9 @@ function fetchAllLiveProducts(callback){
             if ([200, 201, 202, 203, 204, 205, 206, 207, 226].indexOf(reqs.status) === -1) {
 
             } else {
+				if (reqs.responseText.indexOf('AuthenticationPortal') != -1) {
+					generateLoginModal();
+				}
                 var result = JSON.parse(reqs.responseText);
 				callback(result);
             }
@@ -1250,6 +1261,10 @@ function merchmonths(count, m, salesData, cancelData, returnData, rev, roy, chla
                     alert("Amazon Server Response Error");
 
                 } else {
+					if (reqs.responseText.indexOf('AuthenticationPortal') != -1) {
+						generateLoginModal();
+					}
+					
                     var tots = 0;
                     var totr = 0;
                     var totc = 0;
