@@ -10,6 +10,12 @@ chrome.contextMenus.create({
 	}
 });
 
+//Make Analytics Clickable
+chrome.notifications.onClicked.addListener(function(notificationId, byUser) {
+	openMerchAnalytics();
+});
+
+
 var option = {
 		playSound: true, //change to true 
 		showNotif: true
@@ -23,6 +29,33 @@ var losssound  = new Audio();
 
 var currentsales = '{"royaltySymbol":"$","revenueValue":"0","royaltyValue":"0","productsSold":"0","revenueSymbol":"$"}';
 var chng = 0 ;
+
+//Disable sales notification first time
+var firstInstall = false;	
+	
+chrome.runtime.onInstalled.addListener(function(details){
+	if (details.reason === "update" && details.previousVersion) {
+		let newVersion = chrome.runtime.getManifest().version;
+
+
+		chrome.notifications.create(undefined, {
+			type: 'basic',
+			title: 'Merch Advanced Analytics Updated',
+			isClickable: true,
+			iconUrl: '/img/logo-square.png',
+			message: "If you have any suggestions for new features or use, please contact alex@venmarkstudio.com"
+		});	
+	} else {
+		firstInstall = true;
+		chrome.notifications.create(undefined, {
+			type: 'basic',
+			title: 'Welcome To Merch Advanced Analytics',
+			isClickable: true,
+			iconUrl: '/img/logo-square.png',
+			message: "Your niche optimization journey begins! Click to go to dashboard."
+		});	
+	}
+});
 
 
 
@@ -44,7 +77,7 @@ var checkforsales = function() {
 								
 			 } else {
 				if (req.responseText.indexOf('AuthenticationPortal') != -1) {
-					chrome.browserAction.setBadgeText({ text: "#" });
+					chrome.browserAction.setBadgeText({ text: "?" });
 					chrome.browserAction.setBadgeBackgroundColor({color: '#FFD700' });
 				} else{
 					chrome.browserAction.setBadgeBackgroundColor({ color: '#008000' }); 
@@ -54,10 +87,10 @@ var checkforsales = function() {
 						chng = parseInt(sales.productsSold) - parseInt(xsales.productsSold);
 						
 						if (chng < 0 ){
-							if(option.playSound) {  
+							if(option.playSound && !firstInstall) {  
 								losssound.play();    
 							}
-							if(option.showNotif) {  
+							if(option.showNotif && !firstInstall) {  
 								chrome.notifications.create(undefined, {
 									type: 'basic',
 									title: 'Sales Decreased ',
@@ -71,10 +104,10 @@ var checkforsales = function() {
 							}
 						
 						if (chng == 1) {
-							if(option.playSound) { 
+							if(option.playSound && !firstInstall) { 
 								SaleSound.play();    
 							}
-							if(option.showNotif) {  
+							if(option.showNotif && !firstInstall) {  
 								chrome.notifications.create(undefined, {
 									type: 'basic',
 									title: 'New Sale!',
@@ -91,17 +124,18 @@ var checkforsales = function() {
 							currentsales = req.responseText;
 						   }
 						if (chng > 1) {
-							if(option.playSound) {  
+							if(option.playSound && !firstInstall) {  
 								SaleSound.play();    
 							}
 							
-							if(option.showNotif) {  
+							if(option.showNotif && !firstInstall) {  
 								chrome.notifications.create(undefined, {
 									type: 'basic',
 									title: 'New Sales!',
+									isClickable: true,
 									iconUrl: '/img/sales.png',
 									message: "Good Job! "+chng +" new sales."
-								});
+								});								
 							}
 							chrome.browserAction.setBadgeText({ 
 								text: sales.productsSold
