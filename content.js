@@ -812,7 +812,7 @@ function renderDailyView(unixFromDate, unixToDate, callback){
 					'<th class="text-center">Revenue</th>' +
 					'<th class="text-center">Royalties</th>' +
 					'<th class="text-center">Avg Royalties / Shirt </th>' +
-					'<th class="text-center">Listing Page</th>' +
+					'<th class="text-center">Product Details</th>' +
 					'</tr></thead><tbody>';
 
 				for (i=0; i < resultSumSales.length; i++){
@@ -824,7 +824,7 @@ function renderDailyView(unixFromDate, unixToDate, callback){
 						specificNiche = "unknown niche";
 					}
 						
-					cp2 += '<tr data-href="' + '/IndividualProductPage/?ASIN=' + resultSumSales[i]["ASIN"]  + '">' + 
+					cp2 += '<tr data-href="https://www.amazon.com/dp/' + resultSumSales[i]["ASIN"]  +   '">' + 
 						'<th scope="row">' + (i + 1) + '</th>' + 
 						'<td>' + 
 							resultSumSales[i]["Name"]  + 
@@ -854,10 +854,8 @@ function renderDailyView(unixFromDate, unixToDate, callback){
 							(resultSumSales[i]["Royalty"].toFixed(2) / (resultSumSales[i]["Units"] - resultSumSales[i]["Cancellations"] + 0.00001)).toFixed(2)  +
 						'</td>' +
 						
-						'<td class="text-center btn-inside">' +
-							'<a target="_blank" href="https://www.amazon.com/dp/' + 
-								resultSumSales[i]["ASIN"]  +
-							'" class="btn btn-primary">Preview</a>' +
+						'<td class="text-center btn-inside">' +						
+							'<a target="_blank" href="' + '/IndividualProductPage/?ASIN=' + resultSumSales[i]["ASIN"]  + '" class="btn btn-primary">Details</a>' +
 						'</td>' 
 				}
 							
@@ -1541,14 +1539,15 @@ function productManager() {
     
 	
 	fetchAllLiveProducts(function(ts){
-		var cp2 = ' ' + //'<h3>Live Shirt Listings:</h3>' +
+		var cp2 = ' ' + 
 					'<div id="status"></div>' +
 					'<table id="quickEditor" class="sortable table table-striped"><thead><tr>'
+					+ '<th class="text-center">Design</th>'
 					+ '<th>Title</th>'
-					+ '<th class="text-center">Niche</th>'
+					+ '<th>Niche</th>'
 					+ '<th class="text-center">Creation Date</th>'
 					+ '<th class="text-center">Days Until Deletion</th>'
-					+ '<th class="text-center">Listing page</th>'
+					+ '<th class="text-center">Product Details</th>'
 					+ '<th class="text-center">Price</th>' 
 					+ '<th class="text-center">Edit</th>'
 					+ '</tr></thead><tbody>';
@@ -1588,7 +1587,12 @@ function productManager() {
 				
 				
 				
-				cp2 += '<tr data-lifetime-sales="'+ hasLifetimeSales.toString() + '" data-href="\/IndividualProductPage\/?ASIN=' + ts[i].marketplaceAsinMap.US  + '">' +
+				cp2 += '<tr data-lifetime-sales="'+ hasLifetimeSales.toString() + '" data-href="https://www.amazon.com/dp/' + ts[i].marketplaceAsinMap.US + '">' +
+					'<td class="text-center">' +	
+						'<img class="img-thumbnail design-preview" src="' +   ts[i].imageURL + '">' +
+						'<img class="floated-preview img-thumbnail" style="display:none" src="' +   ts[i].imageURL + '">' +
+					'</td>' +
+					
 					'<td class="product-name"><span>' + ts[i].name + '</span></td>' + 
 						
 					'<td class="text-center btn-inside">' +
@@ -1608,7 +1612,7 @@ function productManager() {
 					'</td>' +
 					
 					'<td class="text-center btn-inside">' +
-						'<a target="_blank" href="https://www.amazon.com/dp/' + ts[i].marketplaceAsinMap.US + '" class="btn btn-primary">Preview</a>' +
+						'<a target="_blank" href="\/IndividualProductPage\/?ASIN=' + ts[i].marketplaceAsinMap.US  + '" class="btn btn-primary">Detail</a>' +
 					'</td>' +
 					
 					'<td class="text-center">' + ts[i].listPrice + '</td>' +
@@ -1635,7 +1639,16 @@ function productManager() {
 			
 		document.getElementById("manager-stats")
 			.innerHTML = managerStats;
-					
+				
+		//Hover Images
+		$('.design-preview').mouseenter(function() {
+			$(this).siblings('.floated-preview').show();
+		});
+		
+		$('.floated-preview').mouseleave(function (){ //Hover Out
+			$(this).hide();
+		});
+				
 		new Tablesort(document.getElementById('quickEditor'));
 		
 		//Make Entire Row Clickable & Link to Individual Product Page				

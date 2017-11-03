@@ -37,12 +37,13 @@ chrome.runtime.onInstalled.addListener(function(details){
 	if (details.reason === "update" && details.previousVersion) {
 		let newVersion = chrome.runtime.getManifest().version;
 
+		//UPDATE MESSAGE
 		chrome.notifications.create(undefined, {
 			type: 'basic',
 			title: 'Merch Advanced Analytics Updated',
 			isClickable: true,
 			iconUrl: '/img/logo-square.png',
-			message: "If you have any suggestions for new features or use, please contact alex@venmarkstudio.com"
+			message: "We've added image previews to the Manage Products Page & much more. For other suggestions: alex@venmarkstudio.com"
 		});	
 	} else {
 		chrome.notifications.create(undefined, {
