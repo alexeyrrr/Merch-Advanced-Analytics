@@ -1311,22 +1311,48 @@ function merchmonths(count, m, salesData, cancelData, returnData, rev, roy, chla
 		
 
 		/* Projected Sales */
+		salesLastMonth = salesData[salesData.length - 2];
 		salesThisMonthSoFar = salesData[salesData.length - 1];
 		projectedSales = (salesThisMonthSoFar * 30 / daysSinceStartOfMonth).toFixed(2); //Calculate Projection
+		
+		//Set Limits
+		if (projectedSales >= salesLastMonth*3){
+			projectedSales = salesLastMonth*3;
+		} else if (projectedSales <= salesLastMonth*0.5){
+			projectedSales = salesLastMonth*0.5;
+		}
 		
 		projectionSalesArray[projectionSalesArray.length - 1] = projectedSales; 
 		
 		
 		/* Projected Revenue */
+		revenueLastMonth = rev[rev.length - 2];		
 		revenueThisMonthSoFar = rev[rev.length - 1];
 		projectedRevenue = (revenueThisMonthSoFar * 30 / daysSinceStartOfMonth).toFixed(2); //Calculate Projection
+		
+		//Set Limits
+		if (projectedRevenue >= revenueLastMonth*3){
+			projectedRevenue = revenueLastMonth*3;
+		} else if (projectedRevenue <= revenueLastMonth*0.5){
+			projectedRevenue = revenueLastMonth*0.5;
+		}
 		
 		projectionRevenueArray[projectionRevenueArray.length - 1] = projectedRevenue; 
 		
 		
 		/* Projected Profit */
+		royaltiesLastMonth = roy[roy.length - 2];
 		royaltiesThisMonthSoFar = roy[roy.length - 1];
 		projectedRoyalties = (royaltiesThisMonthSoFar * 30 / daysSinceStartOfMonth).toFixed(2); //Calculate Projection
+		
+		
+		//Set Limits
+		if (projectedRoyalties >= royaltiesLastMonth*3){
+			projectedRoyalties = royaltiesLastMonth*3;
+		} else if (projectedRoyalties <= royaltiesLastMonth*0.5){
+			projectedRoyalties = royaltiesLastMonth*0.5;
+		}
+		
 		
 		projectionRoyaltiesArray[projectionRoyaltiesArray.length - 1] = projectedRoyalties; 
 
@@ -1481,12 +1507,14 @@ function productManager() {
 		
 	var pageContent = '<div class="container">' + 
 							'<div class="card">' +
-								'<center><h2>Product Manager</h2></center>' +
-								'<div class="card-block" id="manager-stats"><center><h3>Loading...</h3><i class="fa fa-spinner fa-spin fa-4"></i></center></div>' + 
+								'<div class="card-block">'+
+									'<center><h2>Product Manager</h2></center>' +
+									'<div id="manager-stats"><center><h3>Loading...</h3><i class="fa fa-spinner fa-spin fa-4"></i></center></div>' + 
+								'</div>' +
 							'</div>'+ 
 							'<div class="card">' +
 								'<div class="card-header clear"><strong>Live Products</strong>' +
-									'<div class="btn btn-default" id="reset-button">Clear All Niche Data</div>' +
+									'<div id="reset-button">Clear All Niche Data</div>' +
 								'</div>' + 
 								'<div class="card-block" id="shirtlist"></div>' + 
 							'</div>'+ 

@@ -192,7 +192,7 @@ div.desc {
 
 .fa-info-circle{
 	margin: 0 6px;
-    font-size: 1.5rem;
+    font-size: 1.2rem;
 }
 .panel-heading .fa-info-circle{
 	margin: 0;
@@ -202,6 +202,10 @@ div.desc {
 .niche-input{
 	float: left;
     width: calc(100% - 80px);
+}
+
+table th{
+	border-top: none !important;
 }
 
 table.sortable th, table.sortable tr{
