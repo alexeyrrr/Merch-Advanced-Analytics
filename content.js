@@ -1577,9 +1577,11 @@ function productManager() {
 					'<td class="product-name"><span>' + ts[i].name + '</span></td>' + 
 						
 					'<td class="text-center btn-inside">' +
-						  '<input type="text" name="nicheName" class="niche-input"/>' +
+						'<div class="form-group has-success">' +
+						  '<input type="text" name="nicheName" class="form-control niche-input"/>' +
 						  '<input type="hidden" name="parentASIN" value='+ ts[i].marketplaceAsinMap.US + '>' +
-						  '<button class="btn btn-primary save"/>Save</button>' +
+						  //'<button class="btn btn-primary save"/>Save</button>' +
+						'</div>' +
 					'</td>' +
 					
 					'<td class="text-center">' +	
@@ -2051,11 +2053,10 @@ function readShirtNiche(){
 		
 		//Fetch Matching Niche
 		chrome.storage.sync.get(myKey, function(items) {
-			if (typeof(items[myKey]) != 'undefined'){
+			if (typeof(items[myKey]) != 'undefined' && items[myKey].length > 1){
 				parsedJson = JSON.parse(items[myKey]);
 				that.val(parsedJson["niche"]);
-			} else{
-				that.siblings('input[type="submit"]').addClass("btn-danger");
+				that.addClass("form-control-success");
 			}
 		});
 	});
@@ -2086,28 +2087,7 @@ function clearAllNicheData(){
 }
 
 function initSaveButtons(){ //Adds event listeners to all buttons	
-	$(function(){
-		$('.save').on('click',function(){
-			nicheName = $(this).closest('td').find('[name="nicheName"]').val();
-			parentASIN = $(this).closest('td').find('[name="parentASIN"]').val();
-			saveShirtNiche(nicheName, parentASIN);
-			
-			//Remove class than makes button red
-			$(this).removeClass("btn-danger");
-			
-			$(this).text('Saved');
-			$(this).removeClass('btn-primary');
-			$(this).addClass('btn-success');
-			
-			var that  = $(this); // Need to reset scope
-			setTimeout(function() {
-				that.text('Save');
-				that.removeClass('btn-success');
-				that.addClass('btn-primary');
-			}, 750);
-			
-		});
-			
+	$(function(){			
 		//Listener for reset button
 		document.getElementById('reset-button').addEventListener("click", function(){
 			var confirmResponse = confirm("This will clear all the data you have entered. Are you sure you want to clear all niches?");
@@ -2116,25 +2096,40 @@ function initSaveButtons(){ //Adds event listeners to all buttons
 			} 
 		}, false);
 		
+		
+		//Unfocus auto saves
+		$('#shirtlist input[type="text"]').focusout(function() {
+			if ($(this).val().length > 1){
+				nicheName = $(this).closest('td').find('[name="nicheName"]').val();
+				parentASIN = $(this).closest('td').find('[name="parentASIN"]').val();
+				saveShirtNiche(nicheName, parentASIN);
+				
+				$(this).addClass("form-control-success");
+			}
+		})
+		
+		
 		//Enter key goes to next field
 		$('#shirtlist input[type="text"]').keydown(function(e) {
 			if (e.which == 13 || e.which == 9) { //Enter Key
 				e.preventDefault();
+								
+				nicheName = $(this).closest('td').find('[name="nicheName"]').val();
+				parentASIN = $(this).closest('td').find('[name="parentASIN"]').val();
+				saveShirtNiche(nicheName, parentASIN);
 				
-				var targetButton = $(this).siblings('.save');
+				$(this).addClass("form-control-success");
 				
-				targetButton.click(); //Click Submit Button
 				$(this).closest("tr").next().find('input[type="text"]').focus(); //Focus on Next Field
 				
-				targetButton.text('Saved');
-				targetButton.removeClass('btn-primary');
-				targetButton.addClass('btn-success');
 				
+				/*
 				setTimeout(function() {
 					targetButton.text('Save');
 					targetButton.removeClass('btn-success');
 					targetButton.addClass('btn-primary');
 				}, 750);
+				*/
 			}
 			
 			if (e.which == 38) { //Up Key
@@ -2148,27 +2143,7 @@ function initSaveButtons(){ //Adds event listeners to all buttons
 			}
 		});
 		
-		//Unfocus auto saves
-		$('#shirtlist input[type="text"]').focusout(function() {
-			//e.preventDefault();
-			
-			console.log("element unfocused");
-			
-			var targetButton = $(this).siblings('.save');
-			
-			targetButton.click(); //Click Submit Button
-			//$(this).closest("tr").next().find('input[type="text"]').focus(); //Focus on Next Field
-			
-			targetButton.text('Saved');
-			targetButton.removeClass('btn-primary');
-			targetButton.addClass('btn-success');
-			
-			setTimeout(function() {
-				targetButton.text('Save');
-				targetButton.removeClass('btn-success');
-				targetButton.addClass('btn-primary');
-			}, 750);
-		  })
+
 				
 		
 		readShirtNiche();		

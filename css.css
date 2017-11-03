@@ -199,10 +199,22 @@ div.desc {
 	margin-left: 5px;
 	float: none;
 }
-.niche-input{
-	float: left;
-    width: calc(100% - 80px);
+
+.btn-inside .form-group{
+	margin: 0;
 }
+
+.has-success .form-control-success {
+    background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3E%3Cpath fill='%235cb85c' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3E%3C/svg%3E");
+	padding-right: 2.25rem;
+    background-repeat: no-repeat;
+    background-position: center right .5625rem;
+    -webkit-background-size: 1.125rem 1.125rem;
+    background-size: 1.125rem 1.125rem;
+	
+	border-color: #5cb85c;
+}
+
 
 table th{
 	border-top: none !important;
