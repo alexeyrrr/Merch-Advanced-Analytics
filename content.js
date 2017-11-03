@@ -321,7 +321,7 @@ var globalSidebar = '<nav id="sidebar">' +
 							'<h3>Merch Analytics</h3>' +
 						'</div>' +
 						'<ul class="list-unstyled components">' +
-							'<li><a id="dailySales"><i class="fa fa-calendar-o" aria-hidden="true"></i> Daily Sales</a></li>' +
+							'<li class="active"><a id="dailySales"><i class="fa fa-calendar-o" aria-hidden="true"></i> Daily Sales</a></li>' +
 							'<li><a id="monthlySales"><i class="fa fa-calendar" aria-hidden="true"></i> Monthly Sales</a></li>' +
 							'<li><a id="productManager"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Manage Products</a></li>' +
 							'<li style="display:none;"><a><i class="fa fa-crosshairs" aria-hidden="true"></i> Individual Product Info</a></li>' +
@@ -1836,20 +1836,14 @@ function fetchIndividualProductSales(targetASIN, callback){
 /***************************************************************/
 function settingsPage (e) {
 	(e || window.event).preventDefault();
-	document.head.innerHTML = globalHeader;
-	document.body.innerHTML = '<body>'+
-								'<div class="wrapper">' +
-								'</div>' +
-							'</body>';
-	var pageContent = document.querySelector(".wrapper");
-	pageContent.innerHTML += globalSidebar;
-	initSidebar();
 
     document.title = "Settings  - Merch Advanced Analytics";
-    document.body.style.backgroundColor = "#ecf1f2";  
+
+	
+	$(".wrapper").children().filter(":not(#sidebar)").remove();
 	
 
-	var con = document.querySelector('.wrapper'), xhr = new XMLHttpRequest();
+	var xhr = new XMLHttpRequest();
 
 	xhr.open("GET", chrome.extension.getURL('options.html'), true);
 	xhr.setRequestHeader('Content-type', 'text/html');
@@ -1858,7 +1852,8 @@ function settingsPage (e) {
             if ([200, 201, 202, 203, 204, 205, 206, 207, 226].indexOf(xhr.status) === -1) {
 
             } else {
-				con.innerHTML += xhr.responseText;
+				var response = xhr.responseText;
+				$(".wrapper").append(response);	
 				
 				$(function(){
 					restore_options();
@@ -2105,7 +2100,7 @@ function initSaveButtons(){ //Adds event listeners to all buttons
 }
 
 function initSidebar(){	
-	$(function(){
+	$(function(){		
 		$("#dailySales").click(function(){
 			logincheck("dailySales");			
 		});
