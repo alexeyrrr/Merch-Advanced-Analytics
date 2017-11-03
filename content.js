@@ -2097,6 +2097,12 @@ function initSaveButtons(){ //Adds event listeners to all buttons
 		}, false);
 		
 		
+		//Remove success on focus 
+		$('#shirtlist input[type="text"]').focusin(function() {
+			$(this).removeClass("form-control-success");
+		})
+		
+		
 		//Unfocus auto saves
 		$('#shirtlist input[type="text"]').focusout(function() {
 			if ($(this).val().length > 1){
@@ -2113,23 +2119,25 @@ function initSaveButtons(){ //Adds event listeners to all buttons
 		$('#shirtlist input[type="text"]').keydown(function(e) {
 			if (e.which == 13 || e.which == 9) { //Enter Key
 				e.preventDefault();
-								
-				nicheName = $(this).closest('td').find('[name="nicheName"]').val();
-				parentASIN = $(this).closest('td').find('[name="parentASIN"]').val();
-				saveShirtNiche(nicheName, parentASIN);
-				
-				$(this).addClass("form-control-success");
-				
-				$(this).closest("tr").next().find('input[type="text"]').focus(); //Focus on Next Field
-				
-				
-				/*
-				setTimeout(function() {
-					targetButton.text('Save');
-					targetButton.removeClass('btn-success');
-					targetButton.addClass('btn-primary');
-				}, 750);
-				*/
+						
+				if ($(this).val().length > 1){
+					nicheName = $(this).closest('td').find('[name="nicheName"]').val();
+					parentASIN = $(this).closest('td').find('[name="parentASIN"]').val();
+					saveShirtNiche(nicheName, parentASIN);
+					
+					$(this).addClass("form-control-success");
+					
+					$(this).closest("tr").next().find('input[type="text"]').focus(); //Focus on Next Field
+					
+					
+					/*
+					setTimeout(function() {
+						targetButton.text('Save');
+						targetButton.removeClass('btn-success');
+						targetButton.addClass('btn-primary');
+					}, 750);
+					*/
+				}
 			}
 			
 			if (e.which == 38) { //Up Key
