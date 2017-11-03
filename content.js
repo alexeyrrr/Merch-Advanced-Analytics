@@ -315,10 +315,12 @@ if (cmd.indexOf("IndividualProductPage") !== -1 && parsedParams) {
 /***************************************************************/
 /********************* Global HTML  / Options ******************/
 /***************************************************************/
+
+var logoURL = chrome.extension.getURL("/img/logo.png");
 var globalHeader = '<head><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"></head>';
 var globalSidebar = '<nav id="sidebar">' +
 						'<div class="sidebar-header">' +
-							'<h3>Merch Analytics</h3>' +
+							'<img class="img-fluid" src="'+ logoURL +'"></img>' +
 						'</div>' +
 						'<ul class="list-unstyled components">' +
 							'<li class="active"><a id="dailySales"><i class="fa fa-calendar-o" aria-hidden="true"></i> Daily Sales</a></li>' +
@@ -2101,7 +2103,11 @@ function initSaveButtons(){ //Adds event listeners to all buttons
 }
 
 function initSidebar(){	
-	$(function(){		
+	$(function(){	
+		$("#logo").click(function(){
+			logincheck("dailySales");			
+		});
+	
 		$("#dailySales").click(function(){
 			logincheck("dailySales");			
 		});
