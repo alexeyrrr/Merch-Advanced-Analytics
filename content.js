@@ -260,7 +260,7 @@ function logincheck(cmd, queryParams = null) {
 								dailySalesPage(fromDate14, toDate);
 								break;
 							case "monthlySales":
-								merchmonthsall(12);
+								merchmonthsall(6);
 								break;
 							case "productManager":
 								productManager();
@@ -976,7 +976,8 @@ function renderDailyView(unixFromDate, unixToDate, callback){
 						   'Last 14 Days': [moment().subtract(13, 'days'), moment()],
 						   'Last 30 Days': [moment().subtract(29, 'days'), moment()],
 						   'This Month': [moment().startOf('month'), moment().endOf('month')],
-						   'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+						   'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
+						   'Last 90 Days': [moment().subtract(89, 'days'), moment()]
 						}
 					}
 				);
@@ -2106,7 +2107,7 @@ function initSidebar(){
 		});
 		
 		$("#monthlySales").click(function(){
-			merchmonthsall(12);	
+			merchmonthsall(6);	
 		});
 		
 		$("#productManager").click(function(){
