@@ -37,7 +37,6 @@ chrome.runtime.onInstalled.addListener(function(details){
 	if (details.reason === "update" && details.previousVersion) {
 		let newVersion = chrome.runtime.getManifest().version;
 
-
 		chrome.notifications.create(undefined, {
 			type: 'basic',
 			title: 'Merch Advanced Analytics Updated',
@@ -46,7 +45,6 @@ chrome.runtime.onInstalled.addListener(function(details){
 			message: "If you have any suggestions for new features or use, please contact alex@venmarkstudio.com"
 		});	
 	} else {
-		firstInstall = true;
 		chrome.notifications.create(undefined, {
 			type: 'basic',
 			title: 'Welcome To Merch Advanced Analytics',
@@ -55,6 +53,9 @@ chrome.runtime.onInstalled.addListener(function(details){
 			message: "Your niche optimization journey begins! Click to go to dashboard."
 		});	
 	}
+	
+	//For disabling a few things on first install / update
+	firstInstall = true;
 });
 
 
@@ -80,6 +81,7 @@ var checkforsales = function() {
 					chrome.browserAction.setBadgeText({ text: "?" });
 					chrome.browserAction.setBadgeBackgroundColor({color: '#FFD700' });
 				} else{
+					var firstInstallInner = firstInstall; //Reset Scope
 					chrome.browserAction.setBadgeBackgroundColor({ color: '#008000' }); 
 					if(currentsales != req.responseText) {
 						var sales = JSON.parse(req.responseText);
@@ -87,16 +89,18 @@ var checkforsales = function() {
 						chng = parseInt(sales.productsSold) - parseInt(xsales.productsSold);
 						
 						if (chng < 0 ){
-							if(option.playSound && !firstInstall) {  
-								losssound.play();    
-							}
-							if(option.showNotif && !firstInstall) {  
-								chrome.notifications.create(undefined, {
-									type: 'basic',
-									title: 'Sales Decreased ',
-									iconUrl: '/img/can.png',
-									message: "New day maybe? ("+chng +")."
-								});
+							if(!firstInstallInner){								
+								if(option.playSound) {  
+									losssound.play();    
+								}
+								if(option.showNotif) {  
+									chrome.notifications.create(undefined, {
+										type: 'basic',
+										title: 'Sales Decreased ',
+										iconUrl: '/img/can.png',
+										message: "New day maybe? ("+chng +")."
+									});
+								}
 							}
 							chrome.browserAction.setBadgeText({ text: sales.productsSold }); 
 							chrome.browserAction.setBadgeBackgroundColor({ color: '#cc0000' });
@@ -104,16 +108,18 @@ var checkforsales = function() {
 							}
 						
 						if (chng == 1) {
-							if(option.playSound && !firstInstall) { 
-								SaleSound.play();    
-							}
-							if(option.showNotif && !firstInstall) {  
-								chrome.notifications.create(undefined, {
-									type: 'basic',
-									title: 'New Sale!',
-									iconUrl: '/img/sales.png',
-									message: "Another one! New sale.(+"+chng +")"
-								});
+							if(!firstInstallInner){
+								if(option.playSound) { 
+									SaleSound.play();    
+								}
+								if(option.showNotif) {  
+									chrome.notifications.create(undefined, {
+										type: 'basic',
+										title: 'New Sale!',
+										iconUrl: '/img/sales.png',
+										message: "Another one! New sale.(+"+chng +")"
+									});
+								}
 							}
 							chrome.browserAction.setBadgeText({ 
 								text: sales.productsSold
@@ -124,19 +130,22 @@ var checkforsales = function() {
 							currentsales = req.responseText;
 						   }
 						if (chng > 1) {
-							if(option.playSound && !firstInstall) {  
-								SaleSound.play();    
+							if(!firstInstallInner){
+								if(option.playSound) {  
+									SaleSound.play();    
+								}
+								
+								if(option.showNotif) {  
+									chrome.notifications.create(undefined, {
+										type: 'basic',
+										title: 'New Sales!',
+										isClickable: true,
+										iconUrl: '/img/sales.png',
+										message: "Good Job! "+chng +" new sales."
+									});								
+								}
 							}
 							
-							if(option.showNotif && !firstInstall) {  
-								chrome.notifications.create(undefined, {
-									type: 'basic',
-									title: 'New Sales!',
-									isClickable: true,
-									iconUrl: '/img/sales.png',
-									message: "Good Job! "+chng +" new sales."
-								});								
-							}
 							chrome.browserAction.setBadgeText({ 
 								text: sales.productsSold
 							}); 
@@ -150,7 +159,13 @@ var checkforsales = function() {
 							text: sales.productsSold
 						});
 						currentsales = req.responseText;
+						
+						
+						
+						firstInstall = false;
 					}
+					
+					
 				   
 				}
 				
