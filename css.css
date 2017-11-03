@@ -28,7 +28,7 @@ html, body{
     transition: all 0.3s;
 }
 
-#sidebar a{
+#sidebar a, #sidebar #logo{
 	cursor: pointer;
 }
 
@@ -400,10 +400,12 @@ input[type="text"]{
 	font-size: 1.75rem;
 	font-weight: 500;
     line-height: 1.2;
-	width: calc(100% - 40px);
+	width: 100%;
 	float:right;
 	color: #222;
 	text-align: right;
+	padding-right: 20px !important;
+	cursor: pointer;
 }
 
 .daterangepicker{
@@ -458,4 +460,15 @@ input[type="text"]{
 
 .card-block{ /* Temp Solution for now */
 	padding: 27px;
+}
+
+.dropdown{
+	position: relative;
+	width: 100%;
+}
+.dropdown .fa{
+	position: absolute;
+	top: 0px;
+	right: 0;
+	pointer-events: none;
 }

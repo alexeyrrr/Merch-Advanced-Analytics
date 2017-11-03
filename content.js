@@ -251,7 +251,7 @@ function logincheck(cmd, queryParams = null) {
 						
 						//Calculate Unix Timestamps
 						var today = new Date(new Date().getTime() + OPTION_TIMEZONE_OFFSET);	
-						var fromDate14 = today.adjustDate(-13).getTime();
+						var fromDate14 = today.adjustDate(-14).getTime();
 						var fromDate1 = today.adjustDate(0).getTime();
 						var toDate = today.getTime();
 						
@@ -319,7 +319,7 @@ if (cmd.indexOf("IndividualProductPage") !== -1 && parsedParams) {
 var logoURL = chrome.extension.getURL("/img/logo.png");
 var globalHeader = '<head><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"></head>';
 var globalSidebar = '<nav id="sidebar">' +
-						'<div class="sidebar-header">' +
+						'<div id="logo" class="sidebar-header">' +
 							'<img class="img-fluid" src="'+ logoURL +'"></img>' +
 						'</div>' +
 						'<ul class="list-unstyled components">' +
@@ -475,6 +475,7 @@ function dailySalesPage(fromDate, toDate){
 					'</div>' + 
 				'</div>';
 			
+	$(".wrapper").children().filter(":not(#sidebar)").remove();
 	$(".wrapper").append(pageContent);
 		
 	renderDailyView(fromDate, toDate);
@@ -836,20 +837,25 @@ function renderDailyView(unixFromDate, unixToDate, callback){
 				totals.royalty = royaltyData.reduce(function(a, b) { return a + b; }, 0).toFixed(2);
 				
 
-				
-				
 				fromDateString = moment.unix(localUnixFromDate2/1000).format("MM/DD/YYYY");
 				toDateString = moment.unix(localUnixToDate2/1000).format("MM/DD/YYYY");
 				
+				//Show User the date range they've selected
+				var now = moment(localUnixToDate2); 
+				var end = moment(localUnixFromDate2);
+				var duration = moment.duration(now.diff(end));
+				var daysDuration = Math.round(duration.asDays());
+
 				
 				stats = '<div class="container row no-pading-top">'+
 							'<div class="col-sm-6 col-xs-6">' +
-								'<h3>Daily Statistics</h3>' +
+								'<h3>Daily Statistics (' + daysDuration +' Day Range)</h3>' +
 							'</div>' +
 							'<div class="col-sm-6 col-xs-6">' +
-								'<i class="fa fa-caret-down float-right down-arrow" aria-hidden="true"></i>' +
-								'<input class="date-selector" type="text" name="datefilter" class="form-control" value="' + fromDateString + " - " + toDateString + '" />' +
-								
+								'<div class="dropdown">' +
+									'<input class="date-selector" type="text" name="datefilter" class="form-control" value="' + fromDateString + " - " + toDateString + '" />' +
+									'<i class="fa fa-caret-down down-arrow" aria-hidden="true"></i>' +
+								'</div>' +
 							'</div>' +	
 						'</div>';	
 				stats += '<div class="container row no-gutters row-eq-height">' +
@@ -2109,7 +2115,13 @@ function initSidebar(){
 		});
 	
 		$("#dailySales").click(function(){
-			logincheck("dailySales");			
+			//Calculate Unix Timestamps
+			var today = new Date(new Date().getTime() + OPTION_TIMEZONE_OFFSET);	
+			var fromDate14 = today.adjustDate(-14).getTime();
+			var fromDate1 = today.adjustDate(0).getTime();
+			var toDate = today.getTime();
+			
+			dailySalesPage(fromDate14, toDate);
 		});
 		
 		$("#monthlySales").click(function(){
