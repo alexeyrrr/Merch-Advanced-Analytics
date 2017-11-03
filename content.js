@@ -181,7 +181,93 @@ Date.prototype.setUTC = function(reset) {
         new Date(Date.UTC(this.getFullYear(), this.getMonth(), this.getDate(), this.getHours(), this.getMinutes(), this.getSeconds(), this.getMilliseconds()));
 };
 
+/***************************************************************/
+/********************* Global HTML  / Options ******************/
+/***************************************************************/
 
+var logoURL = chrome.extension.getURL("/img/logo.png");
+var globalHeader = '<head><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"></head>';
+var globalSidebar = '<nav id="sidebar">' +
+						'<div id="logo" class="sidebar-header">' +
+							'<img class="img-fluid" src="'+ logoURL +'"></img>' +
+						'</div>' +
+						'<ul class="list-unstyled components">' +
+							'<li class="active"><a id="dailySales"><i class="fa fa-calendar-o" aria-hidden="true"></i> Daily Sales</a></li>' +
+							'<li><a id="monthlySales"><i class="fa fa-calendar" aria-hidden="true"></i> Monthly Sales</a></li>' +
+							'<li><a id="productManager"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Manage Products</a></li>' +
+							'<li style="display:none;"><a><i class="fa fa-crosshairs" aria-hidden="true"></i> Individual Product Info</a></li>' +
+							'<li><a id="settingsPage"><i class="fa fa-cogs" aria-hidden="true"></i> Settings</a></li>' +
+						'</ul>' +
+				'</nav>';
+var globalLoading = '<div class="container">' +
+						'<div class="card"></center>'+
+							'<div class="card-block"><center><h3>Loading...</h3><i class="fa fa-spinner fa-spin fa-4"></i></center></div>'+ 
+						'</div>' +
+					'</div>';
+var globalBody = '<body><div class="wrapper">' + globalSidebar + globalLoading + '</div></body>';
+		
+function globalInit(){
+	document.head.innerHTML = globalHeader;
+	document.body.innerHTML = globalBody;
+	document.body.style.backgroundColor = "#ecf1f2";  
+	initSidebar();
+}
+
+function initSidebar(){	
+	$(function(){	
+		$("#logo").click(function(){
+			logincheck("dailySales");			
+		});
+	
+		$("#dailySales").click(function(){
+			//Calculate Unix Timestamps
+			var today = new Date(new Date().getTime() + OPTION_TIMEZONE_OFFSET);	
+			var fromDate14 = today.adjustDate(-14).getTime();
+			var fromDate1 = today.adjustDate(0).getTime();
+			var toDate = today.getTime();
+			
+			dailySalesPage(fromDate14, toDate);
+		});
+		
+		$("#monthlySales").click(function(){
+			merchmonthsall(6);	
+		});
+		
+		$("#productManager").click(function(){
+			productManager();	
+		});
+		
+		$("#settingsPage").click(function(){
+			settingsPage();
+		})
+		
+		$("#sidebar li").click(function(){
+			$("#sidebar li").removeClass("active");
+			$(this).addClass("active");
+		});
+								
+	})
+}
+		
+var globalLineChartOptions = {
+						responsive: false,
+						animation: {
+							duration: 0, // general animation time
+						},
+						hover: {
+							animationDuration: 0, // duration of animations when hovering an item
+						},
+						responsiveAnimationDuration: 0, // animation duration after a resize
+						tooltips: {
+							mode: 'index'
+						},
+						legend: {
+							display: false
+						}
+					};
+				
+				
+				
 /***************************************************************/
 /******* Login Functions / Timezone Global Options *************/
 /***************************************************************/
@@ -244,11 +330,6 @@ function logincheck(cmd, queryParams = null) {
 
 
 					} else {
-						//Add header and sidebar
-						globalInit();
-						
-						
-						
 						//Calculate Unix Timestamps
 						var today = new Date(new Date().getTime() + OPTION_TIMEZONE_OFFSET);	
 						var fromDate14 = today.adjustDate(-14).getTime();
@@ -283,6 +364,9 @@ function logincheck(cmd, queryParams = null) {
 
 };
 
+//Add header and sidebar
+globalInit();
+
 //Get Base Path
 var cmd = window.location.href.split('?')[0];
 
@@ -310,53 +394,7 @@ if (cmd.indexOf("MerchAnalytics") !== -1) {
 if (cmd.indexOf("IndividualProductPage") !== -1 && parsedParams) {
     logincheck("individualProductPage", parsedParams);
 };
-
-
-/***************************************************************/
-/********************* Global HTML  / Options ******************/
-/***************************************************************/
-
-var logoURL = chrome.extension.getURL("/img/logo.png");
-var globalHeader = '<head><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"></head>';
-var globalSidebar = '<nav id="sidebar">' +
-						'<div id="logo" class="sidebar-header">' +
-							'<img class="img-fluid" src="'+ logoURL +'"></img>' +
-						'</div>' +
-						'<ul class="list-unstyled components">' +
-							'<li class="active"><a id="dailySales"><i class="fa fa-calendar-o" aria-hidden="true"></i> Daily Sales</a></li>' +
-							'<li><a id="monthlySales"><i class="fa fa-calendar" aria-hidden="true"></i> Monthly Sales</a></li>' +
-							'<li><a id="productManager"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Manage Products</a></li>' +
-							'<li style="display:none;"><a><i class="fa fa-crosshairs" aria-hidden="true"></i> Individual Product Info</a></li>' +
-							'<li><a id="settingsPage"><i class="fa fa-cogs" aria-hidden="true"></i> Settings</a></li>' +
-						'</ul>' +
-				'</nav>';
-var globalBody = '<body><div class="wrapper">' + globalSidebar +  '</div></body>';
 		
-function globalInit(){
-	document.head.innerHTML = globalHeader;
-	document.body.innerHTML = globalBody
-	document.body.style.backgroundColor = "#ecf1f2";  
-	initSidebar();
-}
-		
-var globalLineChartOptions = {
-						responsive: false,
-						animation: {
-							duration: 0, // general animation time
-						},
-						hover: {
-							animationDuration: 0, // duration of animations when hovering an item
-						},
-						responsiveAnimationDuration: 0, // animation duration after a resize
-						tooltips: {
-							mode: 'index'
-						},
-						legend: {
-							display: false
-						}
-					};
-				
-			
 /***************************************************************/
 /********* Global Fetch Function (Sales & Live List) ***********/
 /***************************************************************/	
@@ -2105,41 +2143,5 @@ function initSaveButtons(){ //Adds event listeners to all buttons
 				
 		
 		readShirtNiche();		
-	})
-}
-
-function initSidebar(){	
-	$(function(){	
-		$("#logo").click(function(){
-			logincheck("dailySales");			
-		});
-	
-		$("#dailySales").click(function(){
-			//Calculate Unix Timestamps
-			var today = new Date(new Date().getTime() + OPTION_TIMEZONE_OFFSET);	
-			var fromDate14 = today.adjustDate(-14).getTime();
-			var fromDate1 = today.adjustDate(0).getTime();
-			var toDate = today.getTime();
-			
-			dailySalesPage(fromDate14, toDate);
-		});
-		
-		$("#monthlySales").click(function(){
-			merchmonthsall(6);	
-		});
-		
-		$("#productManager").click(function(){
-			productManager();	
-		});
-		
-		$("#settingsPage").click(function(){
-			settingsPage();
-		})
-		
-		$("#sidebar li").click(function(){
-			$("#sidebar li").removeClass("active");
-			$(this).addClass("active");
-		});
-								
 	})
 }
