@@ -43,7 +43,7 @@ chrome.runtime.onInstalled.addListener(function(details){
 			title: 'Merch Advanced Analytics Updated',
 			isClickable: true,
 			iconUrl: '/img/logo-square.png',
-			message: "We've added image previews to the Manage Products Page & much more. For other suggestions: alex@venmarkstudio.com"
+			message: "Manage Products page has improved loading for high tier members. For other suggestions: alex@venmarkstudio.com"
 		});	
 	} else {
 		chrome.notifications.create(undefined, {
