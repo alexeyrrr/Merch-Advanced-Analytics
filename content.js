@@ -424,24 +424,41 @@ function fetchSalesDataCSV(fromDate, toDate, callback){
     reqs.send();
 }
 
-function fetchAllLiveProducts(callback){
-    var sls = 'https://merch.amazon.com/merchandise/all';
-    var reqs = new XMLHttpRequest();
-    reqs.open("GET", sls, true);
-    reqs.onreadystatechange = function() {
-        if (reqs.readyState == 4) {
-            if ([200, 201, 202, 203, 204, 205, 206, 207, 226].indexOf(reqs.status) === -1) {
+function fetchAllLiveProducts(page, cursor, result, callback){
+	if (cursor =='null'){ 
+		callback(result);
+    } else {                   
+		var sls = 'https://merch.amazon.com/merchandise/list?pageSize=250&pageNumber=';
+		var url = sls + page;
+		
+		
+		var reqs = new XMLHttpRequest();
+		reqs.open("GET", url, true);
+		reqs.onreadystatechange = function() {
+			if (reqs.readyState == 4) {
+				if ([200, 201, 202, 203, 204, 205, 206, 207, 226].indexOf(reqs.status) === -1) {
 
-            } else {
-				if (reqs.responseText.indexOf('AuthenticationPortal') != -1) {
-					generateLoginModal();
+				} else {
+					if (reqs.responseText.indexOf('AuthenticationPortal') != -1) {
+						generateLoginModal();
+					}
+
+					var t1 = JSON.parse(reqs.responseText);
+					myCursor=t1.nextPageCursor;
+										
+					var response = JSON.parse(reqs.responseText);
+					var merchList = response.merchandiseList;
+					
+					//Append to Array
+					Array.prototype.push.apply(result,merchList); 	
+					
+					page++;
+					fetchAllLiveProducts(page, myCursor, result, callback)
 				}
-                var result = JSON.parse(reqs.responseText);
-				callback(result);
-            }
-        };
-    };
-    reqs.send();
+			};
+		};
+		reqs.send();
+	}
 }
 	
 /***************************************************************/
@@ -1537,8 +1554,8 @@ function productManager() {
 	$(".wrapper").children().filter(":not(#sidebar)").remove();
 	$(".wrapper").append(pageContent);	
     
-	
-	fetchAllLiveProducts(function(ts){
+	var finalResult = [];
+	fetchAllLiveProducts(1, '0', finalResult, function(ts){
 		var cp2 = ' ' + 
 					'<div id="status"></div>' +
 					'<table id="quickEditor" class="sortable table table-striped"><thead><tr>'
@@ -1716,7 +1733,8 @@ function renderIndividualProductSales(queryParams){
 		// Assemble Data for Graphs 
 		
 		// Need To get First Publication Date
-		fetchAllLiveProducts( function(liveProductsArray){
+		var finalResult = [];
+		fetchAllLiveProducts(1, '0', finalResult, function(liveProductsArray){
 			var firstPublishDate = "";
 			var today = new Date(new Date().getTime() + OPTION_TIMEZONE_OFFSET);
 						
