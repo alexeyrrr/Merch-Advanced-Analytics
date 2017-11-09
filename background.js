@@ -38,6 +38,7 @@ chrome.runtime.onInstalled.addListener(function(details){
 		let newVersion = chrome.runtime.getManifest().version;
 
 		//UPDATE MESSAGE
+		/*
 		chrome.notifications.create(undefined, {
 			type: 'basic',
 			title: 'Merch Advanced Analytics Updated',
@@ -45,6 +46,7 @@ chrome.runtime.onInstalled.addListener(function(details){
 			iconUrl: '/img/logo-square.png',
 			message: "Manage Products page has improved loading for high tier members. For other suggestions: alex@venmarkstudio.com"
 		});	
+		*/
 	} else {
 		chrome.notifications.create(undefined, {
 			type: 'basic',

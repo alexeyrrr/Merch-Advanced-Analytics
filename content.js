@@ -195,12 +195,12 @@ var globalSidebar = '<nav id="sidebar">' +
 							'<li class="active"><a id="dailySales"><i class="fa fa-calendar-o" aria-hidden="true"></i> Daily Sales</a></li>' +
 							'<li><a id="monthlySales"><i class="fa fa-calendar" aria-hidden="true"></i> Monthly Sales</a></li>' +
 							'<li><a id="productManager"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Manage Products</a></li>' +
-							'<li style="display:none;"><a><i class="fa fa-crosshairs" aria-hidden="true"></i> Individual Product Info</a></li>' +
+							'<li style="display:none;"><a id="indvProduct"><i class="fa fa-crosshairs" aria-hidden="true"></i> Individual Product Info</a></li>' +
 							'<li><a id="settingsPage"><i class="fa fa-cogs" aria-hidden="true"></i> Settings</a></li>' +
 						'</ul>' +
 				'</nav>';
 var globalLoading = '<div class="container">' +
-						'<div class="card"></center>'+
+						'<div class="card">'+
 							'<div class="card-block"><center><h3>Loading...</h3><i class="fa fa-spinner fa-spin fa-4"></i></center></div>'+ 
 						'</div>' +
 					'</div>';
@@ -214,12 +214,8 @@ function globalInit(){
 }
 
 function initSidebar(){	
-	$(function(){	
-		$("#logo").click(function(){
-			logincheck("dailySales");			
-		});
-	
-		$("#dailySales").click(function(){
+	$(function(){		
+		$("#dailySales, #logo").click(function(){
 			//Calculate Unix Timestamps
 			var today = new Date(new Date().getTime() + OPTION_TIMEZONE_OFFSET);	
 			var fromDate14 = today.adjustDate(-14).getTime();
@@ -244,6 +240,7 @@ function initSidebar(){
 		$("#sidebar li").click(function(){
 			$("#sidebar li").removeClass("active");
 			$(this).addClass("active");
+			$('#indvProduct').closest("li").hide();
 		});
 								
 	})
@@ -282,7 +279,6 @@ var DAYLIGHT_SAVINGS = false;
 	DAYLIGHT_SAVINGS = Math.min(jan.getTimezoneOffset(),jul.getTimezoneOffset()) == today.getTimezoneOffset();  
 })();
 
-
 function generateLoginModal(){
 	loginerr = '<div id="myModal" class="modal fade" role="dialog">' +
 	'<div class="modal-dialog">' +
@@ -308,65 +304,6 @@ function generateLoginModal(){
 	});
 }
 
-function logincheck(cmd, queryParams = null) {
-	chrome.storage.sync.get("Settings", function(items) {
-		if(Object.values(items).length != 0){
-			parsedJson = JSON.parse(items["Settings"]);
-			OPTION_TIMEZONE_OFFSET = parseInt(parsedJson["timezone"])*60*60000;
-			
-			if (DAYLIGHT_SAVINGS){
-				OPTION_TIMEZONE_OFFSET += 1*60*60000;
-			}
-		}
-	
-		var sls = 'https://merch.amazon.com/accountSummary';
-		var reqs = new XMLHttpRequest();
-		reqs.open("GET", sls, true);
-		reqs.onreadystatechange = function() {
-			if (reqs.readyState == 4) {
-
-				if ([200, 201, 202, 203, 204, 205, 206, 207, 226].indexOf(reqs.status) === -1) {
-
-				} else {
-					if (reqs.responseText.indexOf('AuthenticationPortal') != -1) {
-
-						generateLoginModal();
-
-					} else {
-						//Calculate Unix Timestamps
-						var today = new Date(new Date().getTime() + OPTION_TIMEZONE_OFFSET);	
-						var fromDate14 = today.adjustDate(-14).getTime();
-						var fromDate1 = today.adjustDate(0).getTime();
-						var toDate = today.getTime();
-						
-						switch (cmd) {
-							case "dailySales":
-								dailySalesPage(fromDate14, toDate);
-								break;
-							case "monthlySales":
-								merchmonthsall(6);
-								break;
-							case "productManager":
-								productManager();
-								break;
-							case "individualProductPage":
-								individualProductPage(queryParams);
-								break;
-							case "settings":
-								settingsPage();
-								break;
-						};
-					};
-				};
-
-			};
-		};
-
-		reqs.send();
-	});
-
-};
-
 //Add header and sidebar
 globalInit();
 
@@ -391,11 +328,30 @@ parsedParams = parseQueryString(queryString);
 //End Parsing Query Params
 
 if (cmd.indexOf("MerchAnalytics") !== -1) {
-    logincheck("dailySales");
+	
+	chrome.storage.sync.get("Settings", function(items) {
+		if(Object.values(items).length != 0){
+			parsedJson = JSON.parse(items["Settings"]);
+			OPTION_TIMEZONE_OFFSET = parseInt(parsedJson["timezone"])*60*60000;
+			
+			if (DAYLIGHT_SAVINGS){
+				OPTION_TIMEZONE_OFFSET += 1*60*60000;
+			}
+		}
+		
+		var today = new Date(new Date().getTime() + OPTION_TIMEZONE_OFFSET);	
+		var fromDate14 = today.adjustDate(-14).getTime();
+		var fromDate1 = today.adjustDate(0).getTime();
+		var toDate = today.getTime();
+		
+		dailySalesPage(fromDate14, toDate);
+	});
+								
+
 };
 
-if (cmd.indexOf("IndividualProductPage") !== -1 && parsedParams) {
-    logincheck("individualProductPage", parsedParams);
+if (cmd.indexOf("IndividualProductPage") !== -1 && parsedParams) {	
+	individualProductPage(parsedParams);
 };
 		
 /***************************************************************/
@@ -437,29 +393,50 @@ function fetchAllLiveProducts(page, cursor, result, callback){
 		reqs.onreadystatechange = function() {
 			if (reqs.readyState == 4) {
 				if ([200, 201, 202, 203, 204, 205, 206, 207, 226].indexOf(reqs.status) === -1) {
-
+					console.log("Fetching response error");
+					
 				} else {
+					console.log("Successfully Recieved information");
 					if (reqs.responseText.indexOf('AuthenticationPortal') != -1) {
 						generateLoginModal();
+					} else {
+						var t1 = JSON.parse(reqs.responseText);
+						myCursor = t1.nextPageCursor;
+											
+						var response = JSON.parse(reqs.responseText);
+						var merchList = response.merchandiseList;
+						
+						//Append to Array
+						Array.prototype.push.apply(result,merchList); 	
+						
+						//Calculate Display Message
+						var totalNumberMerch = parseInt(response.totalMerchandiseCount);
+						var totalPages = Math.ceil(totalNumberMerch / 250);
+						setstatus("Loading... [" + page + "/" + totalPages+"]");
+						
+						page++;
+						console.log("Recursively making next call");
+						fetchAllLiveProducts(page, myCursor, result, callback)
 					}
-
-					var t1 = JSON.parse(reqs.responseText);
-					myCursor=t1.nextPageCursor;
-										
-					var response = JSON.parse(reqs.responseText);
-					var merchList = response.merchandiseList;
-					
-					//Append to Array
-					Array.prototype.push.apply(result,merchList); 	
-					
-					page++;
-					fetchAllLiveProducts(page, myCursor, result, callback)
 				}
 			};
+			
+			
 		};
 		reqs.send();
 	}
 }
+	
+function setstatus(message,type="loading"){
+		newHTML = '<center><h3>' +
+					message + 
+					'</h3>' + 
+					'<i class="fa fa-spinner fa-spin fa-4"></i>' +
+				 '</center>';
+		
+		$('.status').html(newHTML);
+	
+}	
 	
 /***************************************************************/
 /********************** Daily Sales Page ***********************/
@@ -1540,7 +1517,7 @@ function productManager() {
 							'<div class="card">' +
 								'<div class="card-block">'+
 									'<center><h2>Product Manager</h2></center>' +
-									'<div id="manager-stats"><center><h3>Loading...</h3><i class="fa fa-spinner fa-spin fa-4"></i></center></div>' + 
+									'<div id="manager-stats" class="status"><center><h3>Loading...</h3><i class="fa fa-spinner fa-spin fa-4"></i></center></div>' + 
 								'</div>' +
 							'</div>'+ 
 							'<div class="card">' +
@@ -1556,6 +1533,7 @@ function productManager() {
     
 	var finalResult = [];
 	fetchAllLiveProducts(1, '0', finalResult, function(ts){
+		console.log("Processing Data...");
 		var cp2 = ' ' + 
 					'<div id="status"></div>' +
 					'<table id="quickEditor" class="sortable table table-striped"><thead><tr>'
@@ -1686,47 +1664,49 @@ function productManager() {
 /**************** Individual Product Page **********************/
 /***************************************************************/
 function individualProductPage(queryParams){
-	document.head.innerHTML = globalHeader;
-				
-	bodyHTML = '<body>' + 
-					'<div class="wrapper">' + 
+	pageContent = '<div class="container">' +						
 						'<div class="container">' +
-							'<div class="card">' +
-								'<div class="alert alert-success" id="status">' + 
-									'<strong> Loading ... </strong>' +
-								'</div>'+
-								'<div class="card-block" id="individualShirtSummary"></div>' +
-							'</div>'+
-							' <div class="card" id="salesPanel">' + 
-								'<div class="card-header">Sales/Cancellations</div>' + 
-								'<div class="card-block">' + 
-									'<center><canvas id="canvas1" height="450" width="800" ></canvas></center>' + 
-								'</div>' + 
+						'<div class="card">'+
+							'<div class="card-block">' +
+							'<center><h2>Individual Product</h2></center>' + 
+								'<div id="individualShirtSummary">' +
+									'<div class="status"><center><h3>Loading...</h3><i class="fa fa-spinner fa-spin fa-4"></i></center></div>'+ 
+								'</div>' +
 							'</div>' +
-							'<div class="card" id="revenuePanel">'+ 
-								'<div class="card-header">Revenue/Royalties</div>' + 
-								'<div class="card-block">' + 
-									'<center><canvas id="canvas2" height="450" width="800" ></canvas></center>' + 
-								'</div>' + 
-							'</div>' +
-							'<div class="card">' + 
-								'<div class="card-header">Sales History</div>' + 
-								'<div class="card-block" id="individualShirtSales"></div>' +
-							'</div>' +
-						'</div>' + 
-					'</div>' + 
-				'</body>';
-		
-    document.body.innerHTML = bodyHTML;
-		
-	var pageContent = document.querySelector(".wrapper");
-	pageContent.innerHTML += globalSidebar;
-	initSidebar();
-			
+							
+						'</div>' +
+						
+						' <div class="card" id="salesPanel">' + 
+							'<div class="card-header">Sales/Cancellations</div>' + 
+							'<div class="card-block">' + 
+								'<center><canvas id="canvas1" height="450" width="800" ></canvas></center>' + 
+							'</div>' + 
+						'</div>' +
+						'<div class="card" id="revenuePanel">'+ 
+							'<div class="card-header">Revenue/Royalties</div>' + 
+							'<div class="card-block">' + 
+								'<center><canvas id="canvas2" height="450" width="800" ></canvas></center>' + 
+							'</div>' + 
+						'</div>' +
+						'<div class="card">' + 
+							'<div class="card-header">Sales History</div>' + 
+							'<div class="card-block" id="individualShirtSales"></div>' +
+						'</div>' +
+					'</div>';
+
+	$(".wrapper").children().filter(":not(#sidebar)").remove();
+	$(".wrapper").append(pageContent);
+	
+	
 	renderIndividualProductSales(queryParams);
 }
 
 function renderIndividualProductSales(queryParams){
+	$('#sidebar li').removeClass("active")
+	$('#indvProduct').closest('li').addClass("active");
+	$('#indvProduct').closest('li').show();
+	
+	
 	var targetASIN = queryParams["ASIN"];
 	
 	fetchIndividualProductSales(targetASIN, function(responseArray){	
@@ -1929,9 +1909,9 @@ function renderIndividualProductSales(queryParams){
 								'<dd>$' + lifetimeRoyalties + '</dd>' +
 							'</dl>';
 			
-			document.getElementById("status").innerHTML = '<strong>Individual Product Information</strong>';			
+			
 			//document.getElementById("individualShirtSummary").innerHTML += '<img src='+ imgURL +'/>'; //Not working ATM
-			document.getElementById("individualShirtSummary").innerHTML += shirtInfo;
+			document.getElementById("individualShirtSummary").innerHTML = shirtInfo;
 							
 		});
 	});	
@@ -1959,10 +1939,8 @@ function fetchIndividualProductSales(targetASIN, callback){
 /*********************** Settings Page *************************/
 /***************************************************************/
 function settingsPage (e) {
-	(e || window.event).preventDefault();
 
     document.title = "Settings  - Merch Advanced Analytics";
-
 	
 	$(".wrapper").children().filter(":not(#sidebar)").remove();
 	
@@ -1976,6 +1954,8 @@ function settingsPage (e) {
             if ([200, 201, 202, 203, 204, 205, 206, 207, 226].indexOf(xhr.status) === -1) {
 
             } else {
+				
+				console.log('generating page');
 				var response = xhr.responseText;
 				$(".wrapper").append(response);	
 				
