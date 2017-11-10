@@ -1052,8 +1052,10 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 
 				if(viewType == "month"){
 					var pageTitle = "Monthly Statistics";
+					var periodTitle = "month";
 				} else {
 					var pageTitle = "Daily Statistics";
+					var periodTitle = "day";
 				}
 				
 				
@@ -1154,7 +1156,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 										'</div>'+
 									'</div>'+
 									'<div class="col-">'+
-										'<p class="text-muted text-uppercase small">Average Sales / Day</p>'+
+										'<p class="text-muted text-uppercase small">Average Sales / '+ periodTitle +'</p>'+
 									'</div>'+ 
 								'</div>'+
 							'</div>'+
@@ -1169,7 +1171,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 										'</div>'+
 									'</div>'+
 									'<div class="col-">'+
-										'<p class="text-muted text-uppercase small">Average Royalties / Day</p>'+
+										'<p class="text-muted text-uppercase small">Average Royalties / '+ periodTitle +'</p>'+
 									'</div>'+ 
 								'</div>'+
 							'</div>'+
