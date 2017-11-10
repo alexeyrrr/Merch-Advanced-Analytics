@@ -40,10 +40,10 @@ chrome.runtime.onInstalled.addListener(function(details){
 		//UPDATE MESSAGE
 		chrome.notifications.create(undefined, {
 			type: 'basic',
-			title: 'Merch Advanced Analytics Updated',
+			title: 'Blast From The Past Update',
 			isClickable: true,
 			iconUrl: '/img/logo-square.png',
-			message: "Faster loading speeds & improved loading notices. For other suggestions: alex@venmarkstudio.com"
+			message: "We added the ability to see sales numbers beyond 90 days into the past. For other suggestions: alex@venmarkstudio.com"
 		});	
 		
 	} else {
@@ -59,7 +59,6 @@ chrome.runtime.onInstalled.addListener(function(details){
 	//For disabling a few things on first install / update
 	firstInstall = true;
 });
-
 
 
 var checkforsales = function() {
