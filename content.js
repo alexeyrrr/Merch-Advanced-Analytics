@@ -236,7 +236,7 @@ function globalInit(){
 		$("#monthlySales").click(function(){
 			//Calculate Unix Timestamps
 			var fromDate6Mo = moment().subtract(6, 'months').unix() * 1000;
-			var toDate = moment().endOf('month').unix() * 1000;
+			var toDate = moment().unix() * 1000;
 						
 			dailySalesPage(fromDate6Mo, toDate, "month");
 		});
@@ -367,8 +367,6 @@ if (cmd.indexOf("IndividualProductPage") !== -1 && parsedParams) {
 /***************************************************************/	
 function fetchSalesDataCSV(endDate, toDate, result, callback){
 	//Not the most elegant way, but by far the simplest
-	
-	
 	if((toDate - endDate) <= (24*60*60000*90 + 12*60*60000)){ //Period under 90 days (with grace period)
         var sls = 'https://merch.amazon.com/product-purchases-report?fromDate=' + endDate + '&toDate=' + toDate ;
         var reqs = new XMLHttpRequest();
@@ -380,14 +378,14 @@ function fetchSalesDataCSV(endDate, toDate, result, callback){
 				} else {
                     if (reqs.responseText.indexOf('AuthenticationPortal') != -1) {
                         generateLoginModal();
-                    }
-					
-					setstatus("Processing Data...");
-					
-                    responseList = csvToJSON(reqs.responseText);
-                    Array.prototype.push.apply(result,responseList);     
-                    
-                    callback(result);
+                    } else {
+						setstatus("Processing Data...");
+						
+						responseList = csvToJSON(reqs.responseText);
+						Array.prototype.push.apply(result,responseList);     
+						
+						callback(result);
+					}
                 };
 			};
         };
@@ -405,17 +403,17 @@ function fetchSalesDataCSV(endDate, toDate, result, callback){
 				} else {
 					if (reqs.responseText.indexOf('AuthenticationPortal') != -1) {
 						generateLoginModal();
+					} else {
+						setstatus("Gathering Data...");
+					
+						responseList = csvToJSON(reqs.responseText);
+						Array.prototype.push.apply(result,responseList); 	
+						
+						
+						//Shift Last Call Date Down
+						toDate -= 24*60*60000*90;
+						fetchSalesDataCSV(endDate, toDate, result, callback);
 					}
-				
-					setstatus("Gathering Data...");
-				
-					responseList = csvToJSON(reqs.responseText);
-					Array.prototype.push.apply(result,responseList); 	
-					
-					
-					//Shift Last Call Date Down
-					toDate -= 24*60*60000*90;
-					fetchSalesDataCSV(endDate, toDate, result, callback);
 				};
 
 			};

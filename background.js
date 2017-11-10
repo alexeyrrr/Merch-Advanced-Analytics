@@ -40,10 +40,10 @@ chrome.runtime.onInstalled.addListener(function(details){
 		//UPDATE MESSAGE
 		chrome.notifications.create(undefined, {
 			type: 'basic',
-			title: 'Blast From The Past Update',
+			title: '"Blast From The Past" Update',
 			isClickable: true,
 			iconUrl: '/img/logo-square.png',
-			message: "We added the ability to see sales numbers beyond 90 days into the past. For other suggestions: alex@venmarkstudio.com"
+			message: "We added the ability to see sales numbers beyond 90 days into the past. Happy exploring! For other suggestions: alex@venmarkstudio.com"
 		});	
 		
 	} else {
