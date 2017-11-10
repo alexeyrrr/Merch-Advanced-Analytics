@@ -210,23 +210,27 @@ function globalInit(){
 	document.head.innerHTML = globalHeader;
 	document.body.innerHTML = globalBody;
 	document.body.style.backgroundColor = "#ecf1f2";  
-	initSidebar();
-}
-
-function initSidebar(){	
+	
+	//Initialize Sidebar
 	$(function(){		
 		$("#dailySales, #logo").click(function(){
 			//Calculate Unix Timestamps
 			var today = new Date(new Date().getTime() + OPTION_TIMEZONE_OFFSET);	
 			var fromDate14 = today.adjustDate(-14).getTime();
-			var fromDate1 = today.adjustDate(0).getTime();
 			var toDate = today.getTime();
 			
 			dailySalesPage(fromDate14, toDate);
 		});
 		
 		$("#monthlySales").click(function(){
-			merchmonthsall(6);	
+			// merchmonthsall(6);	//Old Way
+			
+			//Calculate Unix Timestamps
+			var today = new Date(new Date().getTime() + OPTION_TIMEZONE_OFFSET);	
+			var fromDate6Mo = today.adjustDate(-180).getTime();
+			var toDate = today.getTime();
+			
+			dailySalesPage(fromDate6Mo, toDate, "month");
 		});
 		
 		$("#productManager").click(function(){
@@ -245,7 +249,7 @@ function initSidebar(){
 								
 	})
 }
-		
+	
 var globalLineChartOptions = {
 						responsive: false,
 						animation: {
@@ -262,7 +266,6 @@ var globalLineChartOptions = {
 							display: false
 						}
 					};
-				
 				
 				
 /***************************************************************/
@@ -491,7 +494,7 @@ function setstatus(message, type="loading"){
 /***************************************************************/
 /********************** Daily Sales Page ***********************/
 /***************************************************************/	
-function dailySalesPage(fromDate, toDate){	
+function dailySalesPage(fromDate, toDate, viewType = 'daily'){	
 	document.title = "Daily View - Merch Advanced Analytics";
 	var pageContent = '<div class="container">' +
 					'<div class="card"></center>'+
@@ -571,10 +574,10 @@ function dailySalesPage(fromDate, toDate){
 	$(".wrapper").children().filter(":not(#sidebar)").remove();
 	$(".wrapper").append(pageContent);
 		
-	renderDailyView(fromDate, toDate);
+	renderDailyView(fromDate, toDate, viewType);
 }
 
-function renderDailyView(unixFromDate, unixToDate, callback){	
+function renderDailyView(unixFromDate, unixToDate, viewType){	
 	var finalResponse = [];
 	fetchSalesDataCSV(unixFromDate, unixToDate, finalResponse, function(responseArray){		
 		//Generate Axis Labels
@@ -584,31 +587,28 @@ function renderDailyView(unixFromDate, unixToDate, callback){
 		var localUnixFromDate = unixFromDate;	
 		var localUnixToDate = unixToDate;
 		
-		while (localUnixFromDate <= localUnixToDate) {
-			var date = new Date(localUnixFromDate);
-			var dd = date.getDate();
-			var mm = date.getMonth()+1;
-
-			var yyyy = date.getFullYear();
-			if(dd<10){
-				dd='0'+dd;
-			} 
-			if(mm<10){
-				mm='0'+mm;
-			} 
-			var stringifiedDate = mm+'-'+dd+'-'+yyyy;
-			axisLabels.push(stringifiedDate);
+		if(viewType == "month"){ //Monthly Labels
+			while (localUnixFromDate <= localUnixToDate) {	
+				var stringifiedDate = moment(localUnixFromDate).format("MMM YYYY");
+				axisLabels.push(stringifiedDate);
+				
+				var daysThisMonth = moment(localUnixFromDate).daysInMonth();
+				
+				localUnixFromDate = localUnixFromDate + (daysThisMonth*24*60*60000);
+			}
 			
-			localUnixFromDate = localUnixFromDate + 24*60*60000;
+		} else { //daily Labels
+			while (localUnixFromDate <= localUnixToDate) {			
+				var stringifiedDate = moment(localUnixFromDate).format("MM-DD-YYYY");
+				axisLabels.push(stringifiedDate);
+				
+				localUnixFromDate = localUnixFromDate + 24*60*60000;
+			}
+			
 		}
 		
 		
-		//Extract Dates of Sales
-		var datesArray = [];
-		for ( i =0; i < responseArray.length; i++){
-			datesArray.push(responseArray[i]["Date"]);
-		}
-			
+		
 		var salesData = new Array(axisLabels.length).fill(0);
 		var cancelData = new Array(axisLabels.length).fill(0);
 		var revenueData = new Array(axisLabels.length).fill(0);
@@ -634,7 +634,26 @@ function renderDailyView(unixFromDate, unixToDate, callback){
 				
 				for (i = 0; i < axisLabels.length; i++) {
 					for ( i2 = 0; i2 < responseArray.length; i2++){
-						if(axisLabels[i] == responseArray[i2]["Date"]){	
+						//Need to check here for weeks
+						
+						if(viewType == "month"){
+							var startDate   = moment(axisLabels[i], "MMM YYYY"); //This date month
+							var endDate     = moment(axisLabels[i], "MMM YYYY").add(1,'months'); //Previous month
+							var compareDate = moment(responseArray[i2]["Date"], "MM-DD-YYYY");
+								
+							var isWithinRange = compareDate.isBetween(startDate, endDate, 'months', '[)') // left inclusive
+							
+						} else { //Daily View
+							var startDate   = moment(axisLabels[i], "MM-DD-YYYY"); //This Date
+							var endDate     = moment(axisLabels[i], "MM-DD-YYYY").add(1,'days'); //Yesterday
+							var compareDate = moment(responseArray[i2]["Date"], "MM-DD-YYYY");
+								
+							var isWithinRange = compareDate.isBetween(startDate, endDate, 'days', '[)') // left inclusive
+						}
+						
+
+						
+						if(isWithinRange){ //See if inside range
 							//If niche tag matches, incremeent count
 							if (responseArray[i2]["ASIN"] in nichesLookupArray){ 
 								var shirtNiche = JSON.parse(nichesLookupArray[responseArray[i2]["ASIN"]])["niche"];
@@ -1086,7 +1105,6 @@ function renderDailyView(unixFromDate, unixToDate, callback){
 					}
 				);
 				
-				
 				function resubmitPage(picker){
 					//Calculate Unix Timestamps
 					var today = new Date().getTime();
@@ -1096,12 +1114,9 @@ function renderDailyView(unixFromDate, unixToDate, callback){
 					dailySalesPage(fromDate, toDate);
 				}
 				
-				
 				$('input[name="datefilter"]').on('apply.daterangepicker', function(ev, picker) {					
 					resubmitPage(picker);
 				});
-				
-				
 				
 				$('input[name="datefilter"], input[name="daterangepicker_start"],  input[name="daterangepicker_end"]').on("keyup", function(e) {
 					if (e.keyCode == 13) {
@@ -1116,7 +1131,6 @@ function renderDailyView(unixFromDate, unixToDate, callback){
 					}
 				});
 
-				
 				//********** Get Normalized Array ***************//
 				// (This is down here because it takes longer)
 				normalizedNicheArray = {};
@@ -1815,12 +1829,7 @@ function renderIndividualProductSales(queryParams){
 				firstPublishDate = firstPublishDate.adjustDate(1);
 			}
 						
-			//Extract Dates of Sales
-			var datesArray = [];
-			for ( i =0; i < responseArray.length; i++){
-				datesArray.push(responseArray[i]["Date"]);
-			}
-			
+						
 			var salesData = new Array(axisLabels.length).fill(0);
 			var cancelData = new Array(axisLabels.length).fill(0);
 			var revenueData = new Array(axisLabels.length).fill(0);
