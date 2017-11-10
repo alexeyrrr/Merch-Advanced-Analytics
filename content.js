@@ -339,7 +339,6 @@ parsedParams = parseQueryString(queryString);
 //End Parsing Query Params
 
 if (cmd.indexOf("MerchAnalytics") !== -1) {
-	
 	chrome.storage.sync.get("Settings", function(items) {
 		if(Object.values(items).length != 0){
 			parsedJson = JSON.parse(items["Settings"]);
@@ -588,6 +587,14 @@ function dailySalesPage(fromDate, toDate, viewType = 'daily'){
 			
 	$(".wrapper").children().filter(":not(#sidebar)").remove();
 	$(".wrapper").append(pageContent);
+	
+	if(viewType == "month"){ //Set Sidebar Highlight
+		$("#sidebar li").removeClass("active");
+		$("#monthlySales").closest("li").addClass('active');
+	} else{
+		$("#sidebar li").removeClass("active");
+		$("#dailySales").closest("li").addClass('active');
+	}
 		
 	renderDailyView(fromDate, toDate, viewType);
 }
@@ -602,7 +609,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 		var localUnixFromDate = unixFromDate;	
 		var localUnixToDate = unixToDate;
 		
-		if(viewType == "month"){ //Monthly Labels
+		if(viewType == "month"){ //Monthly Labels		
 			while (localUnixFromDate <= localUnixToDate) {	
 				var stringifiedDate = moment(localUnixFromDate).format("MMM YYYY");
 				axisLabels.push(stringifiedDate);
@@ -730,12 +737,75 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 				//Extend Array Length
 				var shirtNicheColorsLUT = replicateArray(shirtNicheColorsSeed, 6);
 				
+				
+				
+				if(viewType == "month"){ //Monthly Labels
+					//Projections
+					/* Calculate Projections */
+					daysSinceStartOfMonth = new Date().getDate();
+					var projectionSalesArray = new Array(salesData.length).fill(null); //Array of Nulls for Projection
+					var projectionRevenueArray = new Array(salesData.length).fill(null); //Array of Nulls for Projection
+					var projectionRoyaltiesArray = new Array(salesData.length).fill(null); //Array of Nulls for Projection
+					
+
+					/* Projected Sales */
+					salesLastMonth = salesData[salesData.length - 2];
+					salesThisMonthSoFar = salesData[salesData.length - 1];
+					projectedSales = (salesThisMonthSoFar * 30 / daysSinceStartOfMonth).toFixed(2); //Calculate Projection
+					
+					//Set Limits
+					if (projectedSales >= salesLastMonth*3){
+						projectedSales = salesLastMonth*3;
+					} else if (projectedSales <= salesLastMonth*0.5){
+						projectedSales = salesLastMonth*0.5;
+					}
+					
+					projectionSalesArray[projectionSalesArray.length - 1] = projectedSales; 
+					
+					
+					/* Projected Revenue */
+					revenueLastMonth = revenueData[revenueData.length - 2];		
+					revenueThisMonthSoFar = revenueData[revenueData.length - 1];
+					projectedRevenue = (revenueThisMonthSoFar * 30 / daysSinceStartOfMonth).toFixed(2); //Calculate Projection
+					
+					//Set Limits
+					if (projectedRevenue >= revenueLastMonth*3){
+						projectedRevenue = revenueLastMonth*3;
+					} else if (projectedRevenue <= revenueLastMonth*0.5){
+						projectedRevenue = revenueLastMonth*0.5;
+					}
+					
+					projectionRevenueArray[projectionRevenueArray.length - 1] = projectedRevenue; 
+					
+					
+					/* Projected Profit */
+					royaltiesLastMonth = royaltyData[royaltyData.length - 2];
+					royaltiesThisMonthSoFar = royaltyData[royaltyData.length - 1];
+					projectedRoyalties = (royaltiesThisMonthSoFar * 30 / daysSinceStartOfMonth).toFixed(2); //Calculate Projection
+					
+					
+					//Set Limits
+					if (projectedRoyalties >= royaltiesLastMonth*3){
+						projectedRoyalties = royaltiesLastMonth*3;
+					} else if (projectedRoyalties <= royaltiesLastMonth*0.5){
+						projectedRoyalties = royaltiesLastMonth*0.5;
+					}
+					
+					projectionRoyaltiesArray[projectionRoyaltiesArray.length - 1] = projectedRoyalties; 
+				}
+								
 				//Assemble Chart Info																	
 				var lineChartData1 = {
 					type: 'line',
 					data: {
 						labels: axisLabels,
 						datasets: [{
+							label: 'Projected Sales',
+							data: projectionSalesArray,
+							backgroundColor: "rgba(200, 200, 200, 0.75)",
+							pointBorderColor: "#ddd",
+							borderColor: "#ddd"
+						}, {
 							label: 'Cancellations',
 							data: cancelData,
 							backgroundColor: "rgba(255, 61, 61, 0.75)",
@@ -768,6 +838,18 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 							backgroundColor: "rgba(246, 145, 30, 0.75)",
 							pointBorderColor: "rgba(246, 145, 30,1)",
 							borderColor: "rgba(246, 145, 30,1)"
+						}, {
+							label: 'Projected Royalties',
+							data: projectionRoyaltiesArray,
+							backgroundColor: "rgba(210, 210, 210, 0.75)",
+							pointBorderColor: "#ccc",
+							borderColor: "#ccc"
+						}, {
+							label: 'Projected Revenue',
+							data: projectionRevenueArray,
+							backgroundColor: "rgba(200, 200, 200, 0.75)",
+							pointBorderColor: "#ddd",
+							borderColor: "#ddd"
 						}]
 					},
 					options: globalLineChartOptions,
