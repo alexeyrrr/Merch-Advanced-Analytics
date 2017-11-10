@@ -211,7 +211,9 @@ var globalSidebar = '<nav id="sidebar">' +
 				'</nav>';
 var globalLoading = '<div class="container">' +
 						'<div class="card">'+
-							'<div class="card-block"><center><h3>Loading...</h3><i class="fa fa-spinner fa-spin fa-4"></i></center></div>'+ 
+							'<div class="card-block">' +
+								'<div class="status"><center><h3>Loading...</h3><i class="fa fa-spinner fa-spin fa-4"></i></center></div>' + 
+							'</div>'+ 
 						'</div>' +
 					'</div>';
 var globalBody = '<body><div class="wrapper">' + globalSidebar + globalLoading + '</div></body>';
@@ -225,21 +227,17 @@ function globalInit(){
 	$(function(){		
 		$("#dailySales, #logo").click(function(){
 			//Calculate Unix Timestamps
-			var today = new Date(new Date().getTime() + OPTION_TIMEZONE_OFFSET);	
-			var fromDate14 = today.adjustDate(-14).getTime();
-			var toDate = today.getTime();
+			var fromDate14 = moment().subtract(14, 'days').unix() * 1000;
+			var toDate = moment().unix() * 1000;
 			
 			dailySalesPage(fromDate14, toDate);
 		});
 		
 		$("#monthlySales").click(function(){
-			// merchmonthsall(6);	//Old Way
-			
 			//Calculate Unix Timestamps
-			var today = new Date(new Date().getTime() + OPTION_TIMEZONE_OFFSET);	
-			var fromDate6Mo = today.adjustDate(-180).getTime();
-			var toDate = today.getTime();
-			
+			var fromDate6Mo = moment().subtract(6, 'months').unix() * 1000;
+			var toDate = moment().endOf('month').unix() * 1000;
+						
 			dailySalesPage(fromDate6Mo, toDate, "month");
 		});
 		
@@ -352,10 +350,8 @@ if (cmd.indexOf("MerchAnalytics") !== -1) {
 			}
 		}
 		
-		var today = new Date(new Date().getTime() + OPTION_TIMEZONE_OFFSET);	
-		var fromDate14 = today.adjustDate(-14).getTime();
-		var fromDate1 = today.adjustDate(0).getTime();
-		var toDate = today.getTime();
+		var fromDate14 = moment().subtract(14, 'days').unix() * 1000;
+		var toDate = moment().unix() * 1000;
 		
 		dailySalesPage(fromDate14, toDate);
 	});
@@ -372,6 +368,8 @@ if (cmd.indexOf("IndividualProductPage") !== -1 && parsedParams) {
 /***************************************************************/	
 function fetchSalesDataCSV(endDate, toDate, result, callback){
 	//Not the most elegant way, but by far the simplest
+	
+	
 	if((toDate - endDate) <= (24*60*60000*90 + 12*60*60000)){ //Period under 90 days (with grace period)
         var sls = 'https://merch.amazon.com/product-purchases-report?fromDate=' + endDate + '&toDate=' + toDate ;
         var reqs = new XMLHttpRequest();
@@ -384,7 +382,9 @@ function fetchSalesDataCSV(endDate, toDate, result, callback){
                     if (reqs.responseText.indexOf('AuthenticationPortal') != -1) {
                         generateLoginModal();
                     }
-
+					
+					setstatus("Rendering Data...");
+					
                     responseList = csvToJSON(reqs.responseText);
                     Array.prototype.push.apply(result,responseList);     
                     
@@ -407,6 +407,8 @@ function fetchSalesDataCSV(endDate, toDate, result, callback){
 					if (reqs.responseText.indexOf('AuthenticationPortal') != -1) {
 						generateLoginModal();
 					}
+				
+					setstatus("Gathering Data...");
 				
 					responseList = csvToJSON(reqs.responseText);
 					Array.prototype.push.apply(result,responseList); 	
@@ -508,7 +510,10 @@ function dailySalesPage(fromDate, toDate, viewType = 'daily'){
 	document.title = "Daily View - Merch Advanced Analytics";
 	var pageContent = '<div class="container">' +
 					'<div class="card"></center>'+
-						'<div class="card-block" id="dailystats"><center><h3>Loading...</h3><i class="fa fa-spinner fa-spin fa-4"></i></center></div>'+ 
+						'<div class="card-block">'+ 
+							//'<center><h2>Daily Page</h2></center>' +
+							'<div id="dailystats" class="status"><center><h3>Loading...</h3><i class="fa fa-spinner fa-spin fa-4"></i></center></div>' + 
+						'</div>' +
 					'</div>' +
 					'<div class="card" id="salesPanel">' +
 						'<div class="card-header">' + 
@@ -616,9 +621,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 			}
 			
 		}
-		
-		
-		
+				
 		var salesData = new Array(axisLabels.length).fill(0);
 		var cancelData = new Array(axisLabels.length).fill(0);
 		var revenueData = new Array(axisLabels.length).fill(0);
@@ -967,10 +970,16 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 				var duration = moment.duration(now.diff(end));
 				var daysDuration = Math.round(duration.asDays());
 
+				if(viewType == "month"){
+					var pageTitle = "Monthly Statistics";
+				} else {
+					var pageTitle = "Daily Statistics";
+				}
+				
 				
 				stats = '<div class="container row no-pading-top">'+
 							'<div class="col-sm-6 col-xs-6">' +
-								'<h3>Daily Statistics</h3>' +
+								'<h3>' + pageTitle + '</h3>' +
 								'<h4 class="subheading">' + daysDuration +' Day Range</h4>' +
 							'</div>' +
 							'<div class="col-sm-6 col-xs-6">' +
@@ -1117,11 +1126,17 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 				
 				function resubmitPage(picker){
 					//Calculate Unix Timestamps
-					var today = new Date().getTime();
 					var fromDate = picker.startDate.unix()*1000;
 					var toDate = picker.endDate.unix()*1000;
+					
+					var extraFlag = 'daily';
+					
+					if((toDate - fromDate) > 91*24*60*60000){
+						extraFlag = 'month';
+					}
 				
-					dailySalesPage(fromDate, toDate);
+			
+					dailySalesPage(fromDate, toDate, extraFlag);
 				}
 				
 				$('input[name="datefilter"]').on('apply.daterangepicker', function(ev, picker) {					
@@ -1313,280 +1328,6 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 }
 
 /***************************************************************/
-/********************* Monthly Sales Page **********************/
-/***************************************************************/	
-function merchmonths(count, m, salesData, cancelData, returnData, rev, roy, chlabel, ts) {
-    if (count >= 0) {
-        var today = new Date(new Date().getTime() + OPTION_TIMEZONE_OFFSET);
-		
-        var thatMonth = today.adjustMonth(-count);
-        startDate = thatMonth.getFirstDateOfMonth();
-        endDate = thatMonth.getLastDayOfMonth();
-
-        var sls = 'https://merch.amazon.com/product-purchases-records?fromDate=' + startDate.getTime() + '&toDate=' + endDate.getTime();
-        var reqs = new XMLHttpRequest();
-        reqs.open("GET", sls, true);
-        reqs.onreadystatechange = function() {
-            if (reqs.readyState == 4) {
-                if ([200, 201, 202, 203, 204, 205, 206, 207, 226].indexOf(reqs.status) === -1) {
-                    alert("Amazon Server Response Error");
-
-                } else {
-					if (reqs.responseText.indexOf('AuthenticationPortal') != -1) {
-						generateLoginModal();
-					}
-					
-                    var tots = 0;
-                    var totr = 0;
-                    var totc = 0;
-                    var totrev = 0;
-                    var totroy = 0;
-                    var ts = JSON.parse(reqs.responseText);
-
-					for (var item in ts){
-						var firstKey = Object.keys(ts[item])[0];
-						var innerData = ts[item][firstKey];
-						
-						tots += parseInt(innerData[0].unitsSold);
-						totr += parseInt(innerData[0].unitsReturned);
-						totc += parseInt(innerData[0].unitsCancelled);
-						totrev += parseFloat(parseFloat(innerData[0].revenueValue)
-							.toFixed(2));
-						totroy += parseFloat(parseFloat(innerData[0].royaltyValue)
-							.toFixed(2));
-                        
-                    };
-
-                    salesData.push(tots);
-                    cancelData.push(totc);
-                    returnData.push(totr);
-                    chlabel.push(['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][today.adjustMonth(-count)
-                        .getMonth()
-                    ]);
-                    rev.push(parseFloat(totrev.toFixed(2)));
-                    roy.push(parseFloat(totroy.toFixed(2)));
-                    document.getElementById("twoweeksstats")
-                        .innerHTML = "<center><h3>Loading Month [" + (m - count) + "/" + m + "]</h3></center>";
-                    merchmonths(count - 1, m, salesData, cancelData, returnData, rev, roy, chlabel, ts);
-                };
-
-            };
-        };
-
-        reqs.send();
-
-    } else {
-
-        xx = 0;
-        cxx = 0;
-        rr = 0;
-        rrev = 0;
-		
-        for (i = 0; i < salesData.length; i++) {
-            xx += salesData[i];
-            rr += roy[i];
-            rrev += rev[i];
-            cxx += cancelData[i];
-        }
-		
-		
-		/* Calculate Projections */
-		daysSinceStartOfMonth = new Date().getDate();
-		var projectionSalesArray = new Array(salesData.length).fill(null); //Array of Nulls for Projection
-		var projectionRevenueArray = new Array(salesData.length).fill(null); //Array of Nulls for Projection
-		var projectionRoyaltiesArray = new Array(salesData.length).fill(null); //Array of Nulls for Projection
-		
-
-		/* Projected Sales */
-		salesLastMonth = salesData[salesData.length - 2];
-		salesThisMonthSoFar = salesData[salesData.length - 1];
-		projectedSales = (salesThisMonthSoFar * 30 / daysSinceStartOfMonth).toFixed(2); //Calculate Projection
-		
-		//Set Limits
-		if (projectedSales >= salesLastMonth*3){
-			projectedSales = salesLastMonth*3;
-		} else if (projectedSales <= salesLastMonth*0.5){
-			projectedSales = salesLastMonth*0.5;
-		}
-		
-		projectionSalesArray[projectionSalesArray.length - 1] = projectedSales; 
-		
-		
-		/* Projected Revenue */
-		revenueLastMonth = rev[rev.length - 2];		
-		revenueThisMonthSoFar = rev[rev.length - 1];
-		projectedRevenue = (revenueThisMonthSoFar * 30 / daysSinceStartOfMonth).toFixed(2); //Calculate Projection
-		
-		//Set Limits
-		if (projectedRevenue >= revenueLastMonth*3){
-			projectedRevenue = revenueLastMonth*3;
-		} else if (projectedRevenue <= revenueLastMonth*0.5){
-			projectedRevenue = revenueLastMonth*0.5;
-		}
-		
-		projectionRevenueArray[projectionRevenueArray.length - 1] = projectedRevenue; 
-		
-		
-		/* Projected Profit */
-		royaltiesLastMonth = roy[roy.length - 2];
-		royaltiesThisMonthSoFar = roy[roy.length - 1];
-		projectedRoyalties = (royaltiesThisMonthSoFar * 30 / daysSinceStartOfMonth).toFixed(2); //Calculate Projection
-		
-		
-		//Set Limits
-		if (projectedRoyalties >= royaltiesLastMonth*3){
-			projectedRoyalties = royaltiesLastMonth*3;
-		} else if (projectedRoyalties <= royaltiesLastMonth*0.5){
-			projectedRoyalties = royaltiesLastMonth*0.5;
-		}
-		
-		
-		projectionRoyaltiesArray[projectionRoyaltiesArray.length - 1] = projectedRoyalties; 
-
-		
-		/*Generate Charts */
-		
-		var lineChartData1 = {
-			type: 'line',
-			data: {
-				labels: chlabel,
-				datasets: [{
-					label: 'Projected Sales',
-					data: projectionSalesArray,
-					backgroundColor: "rgba(200, 200, 200, 0.75)",
-					pointBorderColor: "#ddd",
-					borderColor: "#ddd"
-				}, {
-					label: 'Cancellations',
-					data: cancelData,
-					backgroundColor: "rgba(255, 61, 61, 0.75)",
-					pointBorderColor: "rgba(255, 61, 61,1)",
-					borderColor: "rgba(255, 61, 61,1)"
-				} , {
-					label: 'Sales',
-					data: salesData,
-					backgroundColor: "rgba(91, 185, 70, 1)",
-					pointBorderColor: "rgba(91, 185, 70,1)",
-					borderColor: "rgba(91, 185, 70,1)"
-				}]
-			},
-			options: globalLineChartOptions,
-		};
-				
-		var lineChartData2 = {
-			type: 'line',
-			data: {
-				labels: chlabel,
-				datasets: [{
-					label: 'Royalties',
-					data: roy,
-					backgroundColor: "rgba(215, 45, 255, 0.5)",
-					pointBorderColor: "rgba(215, 45, 255, 1)",
-					borderColor: "rgba(215, 45, 255, 1)"
-				},  {
-					label: 'Revenue',
-					data: rev,
-					backgroundColor: "rgba(246, 145, 30, 1)",
-					pointBorderColor: "rgba(246, 145, 30, 1)",
-					borderColor: "rgba(246, 145, 30, 1)"
-				}, {
-					label: 'Projected Royalties',
-					data: projectionRoyaltiesArray,
-					backgroundColor: "rgba(210, 210, 210, 0.75)",
-					pointBorderColor: "#ccc",
-					borderColor: "#ccc"
-				}, {
-					label: 'Projected Revenue',
-					data: projectionRevenueArray,
-					backgroundColor: "rgba(200, 200, 200, 0.75)",
-					pointBorderColor: "#ddd",
-					borderColor: "#ddd"
-				}]
-			},
-			options: globalLineChartOptions,
-		};
-
-		var ctxSales = document.getElementById("canvas1").getContext("2d");	
-		var myChart = new Chart(ctxSales, lineChartData1);
-		
-		var ctxSales = document.getElementById("canvas2").getContext("2d");	
-		var myChart = new Chart(ctxSales, lineChartData2);
-		
-
-        document.getElementById("twoweeksstats")
-            .innerHTML = '<center><h3>Statistics For The Past ' + m + ' Months</h3></center><br>'+ 
-			'<table class="table table-striped">' +
-			'<thead><tr><th class="text-center">Shirts Sold</th><th class="text-center">Shirts Cancelled</th><th class="text-center">Revenue</th><th class="text-center">Royalties</th></tr></thead>'+
-			'<tbody>' +
-				'<tr class="success text-center">'+
-					'<td><b>' + xx + '</b></td>'+
-					'<td><b>' + cxx + '</b></td>'+
-					'<td><b>' + rrev.toFixed(2) + '</b></td>'+
-					'<td><b>' + rr.toFixed(2) + '</b></td>'+
-				'</tr>'+
-			'</tbody></table>' +
-			
-			'<div class="number-of-days-wrapper">' +
-				'<span>Adjust date range for the past </span>' +
-			 	'<input type="text" name="numberOfDaysInput" />' + 'months' +
-			'</div>' +
-			'<input type="submit" value="Update & Refresh" class="btn btn-primary" id="save-number-months"/>';
-				
-				
-		//Make Number Selector Work
-		$('#save-number-months').on('click', function(e) {
-			numberOfDaysInput = parseInt($(this).closest("div").find('[name="numberOfDaysInput"]').val());
-			var maxDateRange = monthDiff( //Calculate available data since merch inception
-				new Date(2015, 6, 1),
-				new Date()
-			);
-			if (numberOfDaysInput === parseInt(numberOfDaysInput, 10)){ //Check if integer
-				if(numberOfDaysInput <= 0){
-					alert('Enter a number greater than 0');
-				} else if (numberOfDaysInput > maxDateRange){
-					alert('Cannot get info for more than ' + maxDateRange + ' months');
-					
-				} else{
-					merchmonthsall(numberOfDaysInput);
-				}
-				
-			} else{
-				alert("Please complete field with a number");
-			}
-		})
-
-
-		
-    };
-}
-
-function merchmonthsall(numberOfMonths) {
-    var d = new Date();
-    n = d.toString();
-	
-    var pageContent = '<div class="container"><div class="card"></center><div class="card-block" id="twoweeksstats"><center><h3>Loading..</h3></center></div></div>' +
-						' <div class="card">    <div class="card-header">Sales/Cancellations</div>    <div class="card-block"><center><canvas id="canvas1" height="450" width="800" ></canvas></center></div> </div>' +
-						' <div class="card">    <div class="card-header">Revenue/Royalties</div>    <div class="card-block"><center><canvas id="canvas2" height="450" width="800" ></canvas></center></div> </div>' +
-						'<br>' + 
-					'</div>';
-		
-		
-	$(".wrapper").children().filter(":not(#sidebar)").remove();
-	$(".wrapper").append(pageContent);	
-    document.title = "Monthly View - Merch Analytics";
-    
-    salesData = [];
-    cancelData = [];
-    returnData = [];
-    rev = [];
-    roy = [];
-    chlabel = [];
-
-	iio = numberOfMonths;
-    merchmonths(iio, iio, salesData, cancelData, returnData, rev, roy, chlabel);
-};
-
-/***************************************************************/
 /******************* Product Manager Page **********************/
 /***************************************************************/
 function productManager() {
@@ -1595,7 +1336,6 @@ function productManager() {
 	var pageContent = '<div class="container">' + 
 							'<div class="card">' +
 								'<div class="card-block">'+
-									'<center><h2>Product Manager</h2></center>' +
 									'<div id="manager-stats" class="status"><center><h3>Loading...</h3><i class="fa fa-spinner fa-spin fa-4"></i></center></div>' + 
 								'</div>' +
 							'</div>'+ 
@@ -1697,17 +1437,19 @@ function productManager() {
 		document.getElementById("shirtlist")
 			.innerHTML = cp2;
 						
-		managerStats = '<table class="table table-striped"><thead>' + 
-			'<tr>' +
-				'<th class="text-center">Shirts With Atleast One Lifetime Sale</th>'+
-				'<th class="text-center">Total Live Shirts</th>' + 
-				'<th class="text-center">% Of Designs that Have Ever Sold</th>' + 
-			'</tr></thead><tbody>' + 
-			'<tr class="success text-center">' + 
-				'<td><b>' + lifetimesSalesCounter + '</b></td>' + 
-				'<td><b>' + liveDesignsCounter + '</b></td>' + 
-				'<td><b>' + (lifetimesSalesCounter/liveDesignsCounter*100).toFixed(2)+'%'+'</b></td>' + 
-			'</tr></tbody></table>';
+		managerStats = '<center><h2>Product Manager</h2></center>' +
+			'<table class="table table-striped"><thead>' + 
+				'<tr>' +
+					'<th class="text-center">Shirts With Atleast One Lifetime Sale</th>'+
+					'<th class="text-center">Total Live Shirts</th>' + 
+					'<th class="text-center">% Of Designs that Have Ever Sold</th>' + 
+				'</tr></thead><tbody>' + 
+				'<tr class="success text-center">' + 
+					'<td><b>' + lifetimesSalesCounter + '</b></td>' + 
+					'<td><b>' + liveDesignsCounter + '</b></td>' + 
+					'<td><b>' + (lifetimesSalesCounter/liveDesignsCounter*100).toFixed(2)+'%'+'</b></td>' + 
+				'</tr></tbody>' +
+			'</table>';
 						
 			
 		document.getElementById("manager-stats")
@@ -1746,7 +1488,6 @@ function individualProductPage(queryParams){
 						'<div class="container">' +
 						'<div class="card">'+
 							'<div class="card-block">' +
-							'<center><h2>Individual Product</h2></center>' + 
 								'<div id="individualShirtSummary">' +
 									'<div class="status"><center><h3>Loading...</h3><i class="fa fa-spinner fa-spin fa-4"></i></center></div>'+ 
 								'</div>' +
@@ -1961,7 +1702,8 @@ function renderIndividualProductSales(queryParams){
 				.innerHTML = cp2;
 			
 			
-			var shirtInfo = '<dl>'+
+			var shirtInfo = '<center><h2>Individual Product Info</h2></center>' + 
+							'<dl>'+
 								'<dt>Shirt Name:&nbsp;</dt>' +
 								'<dd>' + shirtName + '</dd>' +
 							'</dl><dl>' +
