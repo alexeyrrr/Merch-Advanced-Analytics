@@ -196,8 +196,8 @@ var n = this,
 /***************************************************************/
 
 var logoURL = chrome.extension.getURL("/img/logo.png");
-var globalHeader = '<head><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"><link rel="shortcut icon" href="chrome-extension://__MSG_@@extension_id__/img/favicon.ico" type="image/x-icon">' +
-					'<link rel="icon" href="chrome-extension://__MSG_@@extension_id__/img/favicon.ico" type="image/x-icon"></head>';
+var globalHeader = '<head><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"><link rel="shortcut icon" href="'+  chrome.extension.getURL('img/favicon.ico') + '" type="image/x-icon">' +
+					'<link rel="icon" href="'+  chrome.extension.getURL('img/favicon.ico') + '" type="image/x-icon"></head>';
 var globalSidebar = '<nav id="sidebar">' +
 						'<div id="logo" class="sidebar-header">' +
 							'<img class="img-fluid" src="'+ logoURL +'"></img>' +
