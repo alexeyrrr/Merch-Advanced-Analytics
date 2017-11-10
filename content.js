@@ -383,7 +383,7 @@ function fetchSalesDataCSV(endDate, toDate, result, callback){
                         generateLoginModal();
                     }
 					
-					setstatus("Rendering Data...");
+					setstatus("Processing Data...");
 					
                     responseList = csvToJSON(reqs.responseText);
                     Array.prototype.push.apply(result,responseList);     
