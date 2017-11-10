@@ -404,6 +404,7 @@ input[type="text"]{
 .range_inputs{
 	display: none;
 }
+
 .down-arrow{
 	float:right;
 	color: #222;

@@ -371,16 +371,13 @@ function fetchSalesDataCSV(endDate, toDate, result, callback){
                     if (reqs.responseText.indexOf('AuthenticationPortal') != -1) {
                         generateLoginModal();
                     }
-                
+
                     responseList = csvToJSON(reqs.responseText);
                     Array.prototype.push.apply(result,responseList);     
                     
-                    
                     callback(result);
                 };
-
-	
-	            };
+			};
         };
         reqs.send();
     } else { //Period over 90 days (with grace period)
@@ -1070,7 +1067,10 @@ function renderDailyView(unixFromDate, unixToDate, callback){
 					{  
 						showDropdowns: true,
 						opens: 'left',
+						linkedCalendars: false,
+						showCustomRangeLabel: false,
 						autoApply: true,
+						autoUpdateInput: true,
 						alwaysShowCalendars: true,
 						maxDate: new Date,
 						minDate: new Date(2015, 9, 1),
@@ -1086,15 +1086,34 @@ function renderDailyView(unixFromDate, unixToDate, callback){
 					}
 				);
 				
-				$('input[name="datefilter"]').on('apply.daterangepicker', function(ev, picker) {
-					//$(this).val(picker.startDate.format('MM/DD/YYYY') + ' - ' + picker.endDate.format('MM/DD/YYYY'));
-					
+				
+				function resubmitPage(picker){
 					//Calculate Unix Timestamps
 					var today = new Date().getTime();
 					var fromDate = picker.startDate.unix()*1000;
 					var toDate = picker.endDate.unix()*1000;
 				
 					dailySalesPage(fromDate, toDate);
+				}
+				
+				
+				$('input[name="datefilter"]').on('apply.daterangepicker', function(ev, picker) {					
+					resubmitPage(picker);
+				});
+				
+				
+				
+				$('input[name="datefilter"], input[name="daterangepicker_start"],  input[name="daterangepicker_end"]').on("keyup", function(e) {
+					if (e.keyCode == 13) {
+						console.log('Enter');
+						
+						var picker = {};
+						
+						picker.startDate = $('input[name="datefilter"]').data('daterangepicker').startDate;
+						picker.endDate = $('input[name="datefilter"]').data('daterangepicker').endDate;
+						
+						resubmitPage(picker);
+					}
 				});
 
 				
