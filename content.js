@@ -180,7 +180,17 @@ Date.prototype.setUTC = function(reset) {
     return true === reset ? new Date(Date.UTC(this.getFullYear(), this.getMonth(), this.getDate())) :
         new Date(Date.UTC(this.getFullYear(), this.getMonth(), this.getDate(), this.getHours(), this.getMinutes(), this.getSeconds(), this.getMilliseconds()));
 };
-
+Number.prototype.formatMoney = function(c, d, t){
+var n = this, 
+    c = isNaN(c = Math.abs(c)) ? 2 : c, 
+    d = d == undefined ? "." : d, 
+    t = t == undefined ? "," : t, 
+    s = n < 0 ? "-" : "", 
+    i = String(parseInt(n = Math.abs(Number(n) || 0).toFixed(c))), 
+    j = (j = i.length) > 3 ? j % 3 : 0;
+   return s + (j ? i.substr(0, j) + t : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + t) + (c ? d + Math.abs(n - i).toFixed(c).slice(2) : "");
+ };
+ 
 /***************************************************************/
 /********************* Global HTML  / Options ******************/
 /***************************************************************/
@@ -1006,7 +1016,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 								'<div class="card-body">'+                                                                       
 									'<div class="row">'+
 										'<div class="col-lg-12 col-sm-12 col-xs-12">'+
-											'<h2 class="font-weight-lighter" style="color:#474C4F;"  >$'+ totals.revenue + '</h2>'+
+											'<h2 class="font-weight-lighter" style="color:#474C4F;"  >$'+ parseFloat(totals.revenue).formatMoney(2) + '</h2>'+
 										'</div>'+
 									'</div>'+
 									'<div class="col-">'+
@@ -1021,7 +1031,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 								'<div class="card-body">'+                                                                       
 									'<div class="row">'+
 										'<div class="col-lg-12 col-sm-12 col-xs-12">'+
-											'<h2 class="font-weight-lighter" style="color:#474C4F;"  >$'+ totals.royalty + '</h2>'+
+											'<h2 class="font-weight-lighter" style="color:#474C4F;"  >$'+ parseFloat(totals.royalty).formatMoney(2) + '</h2>'+
 										'</div>'+
 									'</div>'+
 									'<div class="col-">'+
@@ -1036,7 +1046,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 								'<div class="card-body">'+                                                                       
 									'<div class="row">'+
 										'<div class="col-lg-12 col-sm-12 col-xs-12">'+
-											'<h2 class="font-weight-lighter" style="color:#474C4F;"  >$'+ (totals.royalty /(totals.sales - totals.cancelled + 0.00001)).toFixed(2) + '</h2>'+
+											'<h2 class="font-weight-lighter" style="color:#474C4F;"  >$'+ (totals.royalty /(totals.sales - totals.cancelled + 0.00001)).formatMoney(2) + '</h2>'+
 										'</div>'+
 									'</div>'+
 									'<div class="col-">'+
@@ -1051,7 +1061,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 								'<div class="card-body">'+                                                                       
 									'<div class="row">'+
 										'<div class="col-lg-12 col-sm-12 col-xs-12">'+
-											'<h2 class="font-weight-lighter" style="color:#474C4F;"  >'+ (totals.sales /(numberofDaysInner+ 0.00001)).toFixed(2) + '</h2>'+
+											'<h2 class="font-weight-lighter" style="color:#474C4F;"  >'+ (totals.sales /(numberofDaysInner+ 0.00001)).formatMoney(2) + '</h2>'+
 										'</div>'+
 									'</div>'+
 									'<div class="col-">'+
