@@ -38,15 +38,14 @@ chrome.runtime.onInstalled.addListener(function(details){
 		let newVersion = chrome.runtime.getManifest().version;
 
 		//UPDATE MESSAGE
-		/*
 		chrome.notifications.create(undefined, {
 			type: 'basic',
 			title: 'Merch Advanced Analytics Updated',
 			isClickable: true,
 			iconUrl: '/img/logo-square.png',
-			message: "Manage Products page has improved loading for high tier members. For other suggestions: alex@venmarkstudio.com"
+			message: "Faster loading speeds & improved loading notices. For other suggestions: alex@venmarkstudio.com"
 		});	
-		*/
+		
 	} else {
 		chrome.notifications.create(undefined, {
 			type: 'basic',

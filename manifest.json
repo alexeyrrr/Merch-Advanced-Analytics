@@ -35,7 +35,7 @@
    "short_name": "Merch Analytics",
    "permissions": [ "tabs", "activeTab", "contextMenus", "notifications", "storage", "*://*.amazon.com/*" ],
    "update_url": "https://clients2.google.com/service/update2/crx",
-   "version": "0.0.0.10"
+   "version": "0.0.0.11"
 }
 
 

@@ -357,27 +357,61 @@ if (cmd.indexOf("IndividualProductPage") !== -1 && parsedParams) {
 /***************************************************************/
 /********* Global Fetch Function (Sales & Live List) ***********/
 /***************************************************************/	
-function fetchSalesDataCSV(fromDate, toDate, callback){
-	var sls = 'https://merch.amazon.com/product-purchases-report?fromDate=' + fromDate + '&toDate=' + toDate ;
-    var reqs = new XMLHttpRequest();
-    reqs.open("GET", sls, true);
-    reqs.onreadystatechange = function() {
-        if (reqs.readyState == 4) {
-			if ([200, 201, 202, 203, 204, 205, 206, 207, 226].indexOf(reqs.status) === -1) {
+function fetchSalesDataCSV(endDate, toDate, lastCallDate, result, callback){
+	
+	if((lastCallDate - endDate) <= (24*60*60000*90 + 12*60*60000)){ //Period under 90 days (with grace period)
+		
+		var sls = 'https://merch.amazon.com/product-purchases-report?fromDate=' + endDate + '&toDate=' + lastCallDate ;
+		var reqs = new XMLHttpRequest();
+		reqs.open("GET", sls, true);
+		reqs.onreadystatechange = function() {
+			if (reqs.readyState == 4) {
+				if ([200, 201, 202, 203, 204, 205, 206, 207, 226].indexOf(reqs.status) === -1) {
 
-			} else {
-				if (reqs.responseText.indexOf('AuthenticationPortal') != -1) {
-					generateLoginModal();
-				}
-			
-                var responseArray = csvToJSON(reqs.responseText);
-				//Run Callback
-				callback(responseArray);
-            };
+				} else {
+					if (reqs.responseText.indexOf('AuthenticationPortal') != -1) {
+						generateLoginModal();
+					}
+				
+					responseList = csvToJSON(reqs.responseText);
+					Array.prototype.push.apply(result,responseList); 	
+					
+					
+					callback(result);
+				};
 
-        };
-    };
-    reqs.send();
+			};
+		};
+		reqs.send();
+	} else { //Period over 90 days (with grace period)
+		
+		var newEndDate = lastCallDate - (24*60*60000*90);
+	
+		var sls = 'https://merch.amazon.com/product-purchases-report?fromDate=' + newEndDate + '&toDate=' + lastCallDate ;
+		var reqs = new XMLHttpRequest();
+		reqs.open("GET", sls, true);
+		reqs.onreadystatechange = function() {
+			if (reqs.readyState == 4) {
+				if ([200, 201, 202, 203, 204, 205, 206, 207, 226].indexOf(reqs.status) === -1) {
+
+				} else {
+					if (reqs.responseText.indexOf('AuthenticationPortal') != -1) {
+						generateLoginModal();
+					}
+				
+					responseList = csvToJSON(reqs.responseText);
+					Array.prototype.push.apply(result,responseList); 	
+					
+					
+					//Shift Last Call Date Down
+					lastCallDate -= 24*60*60000*90;
+					fetchSalesDataCSV(endDate, toDate, lastCallDate, result, callback);
+				};
+
+			};
+		};
+		reqs.send();
+	} 	
 }
 
 function fetchAllLiveProducts(page, cursor, result, callback){
@@ -393,10 +427,8 @@ function fetchAllLiveProducts(page, cursor, result, callback){
 		reqs.onreadystatechange = function() {
 			if (reqs.readyState == 4) {
 				if ([200, 201, 202, 203, 204, 205, 206, 207, 226].indexOf(reqs.status) === -1) {
-					console.log("Fetching response error");
-					
+					callback(result);
 				} else {
-					console.log("Successfully Recieved information");
 					if (reqs.responseText.indexOf('AuthenticationPortal') != -1) {
 						generateLoginModal();
 					} else {
@@ -411,12 +443,24 @@ function fetchAllLiveProducts(page, cursor, result, callback){
 						
 						//Calculate Display Message
 						var totalNumberMerch = parseInt(response.totalMerchandiseCount);
-						var totalPages = Math.ceil(totalNumberMerch / 250);
+						var maxPages = Math.ceil(totalNumberMerch / 250);
+						
+						//Set upper limit
+						if (maxPages > 40){
+							var totalPages = 40;
+						} else {
+							var totalPages = maxPages;
+						}
 						setstatus("Loading... [" + page + "/" + totalPages+"]");
 						
-						page++;
-						console.log("Recursively making next call");
-						fetchAllLiveProducts(page, myCursor, result, callback)
+						
+						if(page >= 40){ //End Condition
+							callback(result);
+						} else {
+							page++;
+							fetchAllLiveProducts(page, myCursor, result, callback);
+						}
+						
 					}
 				}
 			};
@@ -427,7 +471,7 @@ function fetchAllLiveProducts(page, cursor, result, callback){
 	}
 }
 	
-function setstatus(message,type="loading"){
+function setstatus(message, type="loading"){
 		newHTML = '<center><h3>' +
 					message + 
 					'</h3>' + 
@@ -525,7 +569,8 @@ function dailySalesPage(fromDate, toDate){
 }
 
 function renderDailyView(unixFromDate, unixToDate, callback){	
-	fetchSalesDataCSV(unixFromDate, unixToDate, function(responseArray){		
+	var finalResponse = [];
+	fetchSalesDataCSV(unixFromDate, unixToDate, unixToDate, finalResponse, function(responseArray){		
 		//Generate Axis Labels
 		var axisLabels = [];
 				
@@ -1019,7 +1064,7 @@ function renderDailyView(unixFromDate, unixToDate, callback){
 						autoApply: true,
 						alwaysShowCalendars: true,
 						maxDate: new Date,
-						minDate: new Date().adjustDate(-89),
+						minDate: new Date(2015, 9, 1),
 						ranges: {
 						   'Today': [moment(), moment()],
 						   'Last 7 Days': [moment().subtract(6, 'days'), moment()],
@@ -1039,16 +1084,8 @@ function renderDailyView(unixFromDate, unixToDate, callback){
 					var today = new Date().getTime();
 					var fromDate = picker.startDate.unix()*1000;
 					var toDate = picker.endDate.unix()*1000;
-					
-					var daysIntoThePast = today - fromDate;
-					
-					if (daysIntoThePast >= 90*24*60*60000){
-						alert('Cannot get info for more than 90 days. Please choose an earlier date range.');
-					} else if (daysIntoThePast <= 0){
-						alert('Cannot get info into the future. Please choose a later date range.');
-					}else{
-						dailySalesPage(fromDate, toDate);
-					}
+				
+					dailySalesPage(fromDate, toDate);
 				});
 
 				
@@ -1159,19 +1196,9 @@ function renderDailyView(unixFromDate, unixToDate, callback){
 						
 									'</div>';
 
-
-
-					
-					
-					
 					$("#niche").prepend(topNichesData);
 					
-					
-
-
-
-					
-					console.log();
+			
 					
 					
 					/*
@@ -1533,7 +1560,6 @@ function productManager() {
     
 	var finalResult = [];
 	fetchAllLiveProducts(1, '0', finalResult, function(ts){
-		console.log("Processing Data...");
 		var cp2 = ' ' + 
 					'<div id="status"></div>' +
 					'<table id="quickEditor" class="sortable table table-striped"><thead><tr>'
@@ -1705,7 +1731,6 @@ function renderIndividualProductSales(queryParams){
 	$('#sidebar li').removeClass("active")
 	$('#indvProduct').closest('li').addClass("active");
 	$('#indvProduct').closest('li').show();
-	
 	
 	var targetASIN = queryParams["ASIN"];
 	
@@ -1922,7 +1947,8 @@ function fetchIndividualProductSales(targetASIN, callback){
 	var fromDate = today.adjustDate(-90).getTime();
 	var toDate = today.getTime();
 	
-	fetchSalesDataCSV(fromDate, toDate, function(responseArray){
+	var finalResponse = [];
+	fetchSalesDataCSV(fromDate, toDate, toDate, finalResponse ,function(responseArray){
 		infoAboutTargetASIN = []
 		for (i=0; i < responseArray.length; i++){
 			if (responseArray[i]["ASIN"] == targetASIN){
@@ -1954,8 +1980,6 @@ function settingsPage (e) {
             if ([200, 201, 202, 203, 204, 205, 206, 207, 226].indexOf(xhr.status) === -1) {
 
             } else {
-				
-				console.log('generating page');
 				var response = xhr.responseText;
 				$(".wrapper").append(response);	
 				
