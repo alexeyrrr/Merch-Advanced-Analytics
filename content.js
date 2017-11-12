@@ -725,6 +725,10 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 							}
 						}
 					}
+				
+					if(viewType != "month" && axisLabels.length <= 15){
+						axisLabels[i] = moment(axisLabels[i], "MM-DD-YYYY").format('dddd');
+					}
 				}
 				
 				//Regroup all youth sizes to just Youth
