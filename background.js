@@ -125,9 +125,8 @@ var checkforsales = function() {
 						chrome.browserAction.setBadgeText({ text: " " });
 						chrome.browserAction.setBadgeBackgroundColor({color: '#FFD700' });
 					} else{
-						
 						var firstInstallInner = firstInstall; //Reset Scope
-						chrome.browserAction.setBadgeBackgroundColor({ color: '#008000' }); 
+						
 						if(currentsales != req.responseText) {
 							var sales = JSON.parse(req.responseText);
 							var xsales = JSON.parse(currentsales);
@@ -180,14 +179,17 @@ var checkforsales = function() {
 													} else {
 														
 														responseList = csvToJSON(reqs.responseText);
-														var shirtsale = responseList[responseList.length-1]["Name"];
 														
-														chrome.notifications.create(undefined, {
-															type: 'basic',
-															title: 'New Sales!',
-															iconUrl: '/img/sales.png',
-															message: chng + "Shirt Sold: ("+shirtsale +")."
-														});
+														for (i<0; chng; i++){
+															var shirtsale = responseList[responseList.length-1-i]["Name"];
+															
+															chrome.notifications.create(undefined, {
+																type: 'basic',
+																title: 'New Shirt Sale',
+																iconUrl: '/img/sales.png',
+																message: "Sold 1: " + shirtsale +")."
+															});
+														}
 													}
 												};
 											};
@@ -204,9 +206,8 @@ var checkforsales = function() {
 								currentsales = req.responseText;
 							}
 						   
-							chrome.browserAction.setBadgeText({ 
-								text: sales.productsSold
-							});
+							chrome.browserAction.setBadgeBackgroundColor({ color: '#008000' }); 
+							chrome.browserAction.setBadgeText({ text: sales.productsSold }); 
 							currentsales = req.responseText;
 							
 							firstInstall = false;

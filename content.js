@@ -781,11 +781,11 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 					var periodTitle = "month";
 					var periodDuration = Math.round(duration.asMonths()) + " Month Range";
 				
-				/*} else if(viewType == "week"){
+				} else if(viewType == "week"){
 					var pageTitle = "Weekly Statistics";
 					var periodTitle = "week";
-					var periodDuration = Math.round(duration.asMonths()) + " Week Range";
-				*/
+					//var periodDuration = Math.round(duration.asMonths()) + " Week Range";
+					var periodDuration = Math.round(duration.asDays()) + " Day Range"; //Keep as days
 				} else {
 					var pageTitle = "Daily Statistics";
 					var periodTitle = "day";
