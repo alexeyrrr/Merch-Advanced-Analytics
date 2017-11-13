@@ -290,7 +290,7 @@ var globalLineChartOptions = {
 						},
 						legend: {
 							display: false
-						}
+						}						
 					};
 				
 				
@@ -442,7 +442,7 @@ function fetchSalesDataCSV(endDate, toDate, result, callback){
 
 function fetchAllLiveProducts(page, cursor, result, specificASIN=null, callback){
 	if (cursor =='null'){ 
-		callback(result);
+		callback();
     } else {                   
 		var sls = 'https://merch.amazon.com/merchandise/list?pageSize=250&pageNumber=';
 		var url = sls + page;
@@ -452,7 +452,7 @@ function fetchAllLiveProducts(page, cursor, result, specificASIN=null, callback)
 		reqs.onreadystatechange = function() {
 			if (reqs.readyState == 4) {
 				if ([200, 201, 202, 203, 204, 205, 206, 207, 226].indexOf(reqs.status) === -1) {
-					callback(result);
+					callback();
 				} else {
 					if (reqs.responseText.indexOf('AuthenticationPortal') != -1) {
 						generateLoginModal();
@@ -484,14 +484,14 @@ function fetchAllLiveProducts(page, cursor, result, specificASIN=null, callback)
 							for(var i=0; i < result.length; i++){
 								if(result[i]["marketplaceAsinMap"]["US"] == specificASIN){
 									resultFound = true;
-									callback(result);
+									callback();
 									break;
 								}
 							}
 						}						
 						
 						if(page >= 40){ //End Condition
-							callback(result);
+							callback();
 						} else if(!resultFound){
 							page++;
 							fetchAllLiveProducts(page, myCursor, result, specificASIN, callback);
@@ -521,7 +521,7 @@ function setstatus(message, type="loading"){
 /***************************************************************/
 /********************** Daily Sales Page ***********************/
 /***************************************************************/	
-function dailySalesPage(fromDate, toDate, viewType = 'daily'){	
+function dailySalesPage(fromDate, toDate, viewType = 'day'){	
 	document.title = "Daily View - Merch Advanced Analytics";
 	var pageContent = '<div class="container">' +
 					'<div class="card"></center>'+
@@ -553,19 +553,19 @@ function dailySalesPage(fromDate, toDate, viewType = 'daily'){
 							'</div>' + 
 							'<div class="tab-pane" role="tabpanel"  id="advanced">' +
 								'<center class="inner-container">' +
-								'<div class="canvas-wrapper">' +
-									'<canvas id="canvas3" height="350" width="280" style="padding:10px"></canvas>' +
-									'<h5 class="canvas-title">Gender Distribution</h5>' +
-								'</div>' +
-								'<div class="canvas-wrapper">'+
-									'<canvas id="canvas4" height="350" width="280" style="padding:10px"></canvas>' +
-									'<h5 class="canvas-title">Size Distribution</h5>' +
-								'</div>'+
-								'<div class="canvas-wrapper">'+
-									'<canvas id="canvas5" height="350" width="280" style="padding:10px"></canvas>'+
-									'<h5 class="canvas-title">Color Distribution</h5>' +
-								'</div>' +
-							'</center>' +
+									'<div class="canvas-wrapper">' +
+										'<canvas id="canvas3" height="350" width="280" style="padding:10px"></canvas>' +
+										'<h5 class="canvas-title">Gender Distribution</h5>' +
+									'</div>' +
+									'<div class="canvas-wrapper">'+
+										'<canvas id="canvas4" height="350" width="280" style="padding:10px"></canvas>' +
+										'<h5 class="canvas-title">Size Distribution</h5>' +
+									'</div>'+
+									'<div class="canvas-wrapper">'+
+										'<canvas id="canvas5" height="350" width="280" style="padding:10px"></canvas>'+
+										'<h5 class="canvas-title">Color Distribution</h5>' +
+									'</div>' +
+								'</center>' +
 							'</div>' +
 							'<div class="tab-pane" role="tabpanel" id="niche">' +
 								'<div class="inner-container">' +
@@ -634,8 +634,14 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 				
 				localUnixFromDate = localUnixFromDate + (daysThisMonth*24*60*60000);
 			}
-			
-		} else { //daily Labels
+		} else if(viewType == "week"){	
+			while (localUnixFromDate <= localUnixToDate) {	
+				var stringifiedDate = moment(localUnixFromDate).format("ww YYYY");
+				axisLabels.push(stringifiedDate);
+								
+				localUnixFromDate = localUnixFromDate + (7*24*60*60000);
+			}
+		} else if(viewType == "day"){ //daily Labels
 			while (localUnixFromDate <= localUnixToDate) {			
 				var stringifiedDate = moment(localUnixFromDate).format("MM-DD-YYYY");
 				axisLabels.push(stringifiedDate);
@@ -669,25 +675,29 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 				var localUnixFromDate2 = unixFromDate;
 				
 				for (i = 0; i < axisLabels.length; i++) {
-					for ( i2 = 0; i2 < responseArray.length; i2++){
-						//Need to check here for weeks
-						
+					for ( i2 = 0; i2 < responseArray.length; i2++){						
 						if(viewType == "month"){
 							var startDate   = moment(axisLabels[i], "MMM YYYY"); //This date month
 							var endDate     = moment(axisLabels[i], "MMM YYYY").add(1,'months'); //Previous month
 							var compareDate = moment(responseArray[i2]["Date"], "MM-DD-YYYY");
 								
 							var isWithinRange = compareDate.isBetween(startDate, endDate, 'months', '[)') // left inclusive
+						
+						} else if(viewType == "week"){
+							var startDate   = moment(axisLabels[i], "ww YYYY"); //This date month
 							
-						} else { //Daily View
+							var endDate     = moment(axisLabels[i], "WW YYYY").add(7,'days'); //Previous month
+							var compareDate = moment(responseArray[i2]["Date"], "MM-DD-YYYY");
+							
+							var isWithinRange = compareDate.isBetween(startDate, endDate, 'weeks', '[)') // left inclusive
+						
+						} else if(viewType == "day"){ //Daily View
 							var startDate   = moment(axisLabels[i], "MM-DD-YYYY"); //This Date
 							var endDate     = moment(axisLabels[i], "MM-DD-YYYY").add(1,'days'); //Yesterday
 							var compareDate = moment(responseArray[i2]["Date"], "MM-DD-YYYY");
 								
 							var isWithinRange = compareDate.isBetween(startDate, endDate, 'days', '[)') // left inclusive
 						}
-						
-
 						
 						if(isWithinRange){ //See if inside range
 							//If niche tag matches, incremeent count
@@ -726,10 +736,168 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 						}
 					}
 				
-					if(viewType != "month" && axisLabels.length <= 15){
+					if(viewType == "day" && axisLabels.length <= 15){
 						axisLabels[i] = moment(axisLabels[i], "MM-DD-YYYY").format('dddd');
+					} else if (viewType == "week" && axisLabels.length <= 90){
+						var startweek = moment(axisLabels[i], "ww YYYY").format('MM/DD/YYYY');
+						var endweek = moment(axisLabels[i], "ww YYYY").add(7,"days").format('MM/DD/YYYY');
+						
+						axisLabels[i] = "Week" +startweek + " - " + endweek;
 					}
 				}
+				
+				
+				/******* Render Top Page Stats *****************/
+				var totals = {};				
+				totals.sales = salesData.reduce(function(a, b) { return a + b; }, 0);
+				totals.cancelled = cancelData.reduce(function(a, b) { return a + b; }, 0);
+				totals.revenue = revenueData.reduce(function(a, b) { return a + b; }, 0).toFixed(2);				
+				totals.royalty = royaltyData.reduce(function(a, b) { return a + b; }, 0).toFixed(2);
+				
+
+				fromDateString = moment.unix(localUnixFromDate2/1000).format("MM/DD/YYYY");
+				toDateString = moment.unix(localUnixToDate2/1000).format("MM/DD/YYYY");
+				
+				//Show User the date range they've selected
+				var now = moment(localUnixToDate2); 
+				var end = moment(localUnixFromDate2);
+				var duration = moment.duration(now.diff(end));
+				
+				if(viewType == "month"){
+					var pageTitle = "Monthly Statistics";
+					var periodTitle = "month";
+					var periodDuration = Math.round(duration.asMonths()) + " Month Range";
+				} else if(viewType == "Weekly"){
+					var pageTitle = "Weekly Statistics";
+					var periodTitle = "week";
+					var periodDuration = Math.round(duration.asMonths()) + " Week Range";
+				} else {
+					var pageTitle = "Daily Statistics";
+					var periodTitle = "day";
+					var periodDuration = Math.round(duration.asDays()) + " Day Range";
+				}
+				
+				stats = '<div class="container row no-pading-top">'+
+							'<div class="col-sm-6 col-xs-6">' +
+								'<h3>' + pageTitle + '</h3>' +
+								'<h4 class="subheading">' + periodDuration +'</h4>' +
+							'</div>' +
+							'<div class="col-sm-6 col-xs-6">' +
+								'<div class="dropdown">' +
+									'<input class="date-selector" type="text" name="datefilter" class="form-control" value="' + fromDateString + " - " + toDateString + '" />' +
+									'<i class="fa fa-caret-down down-arrow" aria-hidden="true"></i>' +
+								'</div>' +
+							'</div>' +	
+						'</div>';	
+				stats += '<div class="container row no-gutters row-eq-height">' +
+						'<div class="col-lg-2 col-sm-3 col-xs-12 offset-md-0 offset-lg-2">'+
+							'<div class="card">'+
+								'<div class="card-body">'+                                                                       
+									'<div class="row">'+
+										'<div class="col-lg-12 col-sm-12 col-xs-12">'+
+											'<h2 class="font-weight-lighter" style="color:#474C4F;"  >'+ totals.sales + '</h2>'+
+										'</div>'+
+									'</div>'+
+									'<div class="col-">'+
+										'<p class="text-muted text-uppercase small">Shirts Sold</p>'+
+									'</div>'+ 
+								'</div>'+
+							'</div>'+
+						'</div>'+
+						
+						'<div class="col-lg-2 col-sm-3 col-xs-12 ">'+
+							'<div class="card">'+
+								'<div class="card-body">'+                                                                       
+									'<div class="row">'+
+										'<div class="col-lg-12 col-sm-12 col-xs-12">'+
+											'<h2 class="font-weight-lighter" style="color:#474C4F;"  >'+ totals.cancelled + '</h2>'+
+										'</div>'+
+									'</div>'+
+									'<div class="col-">'+
+										'<p class="text-muted text-uppercase small">Shirts Cancelled</p>'+
+									'</div>'+ 
+								'</div>'+
+							'</div>'+
+						'</div>'+
+						
+						'<div class="col-lg-2 col-sm-3 col-xs-12 ">'+
+							'<div class="card">'+
+								'<div class="card-body">'+                                                                       
+									'<div class="row">'+
+										'<div class="col-lg-12 col-sm-12 col-xs-12">'+
+											'<h2 class="font-weight-lighter" style="color:#474C4F;"  >$'+ parseFloat(totals.revenue).formatMoney(2) + '</h2>'+
+										'</div>'+
+									'</div>'+
+									'<div class="col-">'+
+										'<p class="text-muted text-uppercase small">Revenue</p>'+
+									'</div>'+ 
+								'</div>'+
+							'</div>'+
+						'</div>'+
+						
+						'<div class="col-lg-2 col-sm-3 col-xs-12 ">'+
+							'<div class="card">'+
+								'<div class="card-body">'+                                                                       
+									'<div class="row">'+
+										'<div class="col-lg-12 col-sm-12 col-xs-12">'+
+											'<h2 class="font-weight-lighter" style="color:#474C4F;"  >$'+ parseFloat(totals.royalty).formatMoney(2) + '</h2>'+
+										'</div>'+
+									'</div>'+
+									'<div class="col-">'+
+										'<p class="text-muted text-uppercase small">Royalties</p>'+
+									'</div>'+ 
+								'</div>'+
+							'</div>'+
+						'</div>'+
+						
+						'<div class="col-lg-2 col-sm-4 col-xs-12 offset-lg-3 offset-md-0 offset-lg-2 no-card-bottom">'+
+							'<div class="card">'+
+								'<div class="card-body">'+                                                                       
+									'<div class="row">'+
+										'<div class="col-lg-12 col-sm-12 col-xs-12">'+
+											'<h2 class="font-weight-lighter" style="color:#474C4F;"  >$'+ (totals.royalty /(totals.sales - totals.cancelled + 0.00001)).formatMoney(2) + '</h2>'+
+										'</div>'+
+									'</div>'+
+									'<div class="col-">'+
+										'<p class="text-muted text-uppercase small">Average Royalties / Shirt</p>'+
+									'</div>'+ 
+								'</div>'+
+							'</div>'+
+						'</div>'+
+						
+						'<div class="col-lg-2 col-sm-4 col-xs-12 no-card-bottom ">'+
+							'<div class="card">'+
+								'<div class="card-body">'+                                                                       
+									'<div class="row">'+
+										'<div class="col-lg-12 col-sm-12 col-xs-12">'+
+											'<h2 class="font-weight-lighter" style="color:#474C4F;"  >'+ (totals.sales /(numberofDaysInner+ 0.00001)).formatMoney(2) + '</h2>'+
+										'</div>'+
+									'</div>'+
+									'<div class="col-">'+
+										'<p class="text-muted text-uppercase small">Average Sales / '+ periodTitle +'</p>'+
+									'</div>'+ 
+								'</div>'+
+							'</div>'+
+						'</div>'+
+						
+						'<div class="col-lg-2 col-sm-4 col-xs-12 no-card-bottom ">'+
+							'<div class="card">'+
+								'<div class="card-body">'+                                                                       
+									'<div class="row">'+
+										'<div class="col-lg-12 col-sm-12 col-xs-12">'+
+											'<h2 class="font-weight-lighter" style="color:#474C4F;"  >$'+ (totals.royalty /(numberofDaysInner+ 0.00001)).toFixed(2) + '</h2>'+
+										'</div>'+
+									'</div>'+
+									'<div class="col-">'+
+										'<p class="text-muted text-uppercase small">Average Royalties / '+ periodTitle +'</p>'+
+									'</div>'+ 
+								'</div>'+
+							'</div>'+
+						'</div>';
+												
+				document.getElementById("dailystats").innerHTML = stats;
+				
+				
 				
 				//Regroup all youth sizes to just Youth
 				var adjustedSizesArray = {'Youth': 0, 'Small': 0, 'Medium': 0, 'Large': 0, 'XL': 0, '2XL': 0, '3XL': 0};
@@ -1053,157 +1221,6 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 						window.open(url, '_blank');
 					});
 				});
-				
-				
-				/******* Render Top Page Stats *****************/
-				var totals = {};				
-				totals.sales = salesData.reduce(function(a, b) { return a + b; }, 0);
-				totals.cancelled = cancelData.reduce(function(a, b) { return a + b; }, 0);
-				totals.revenue = revenueData.reduce(function(a, b) { return a + b; }, 0).toFixed(2);				
-				totals.royalty = royaltyData.reduce(function(a, b) { return a + b; }, 0).toFixed(2);
-				
-
-				fromDateString = moment.unix(localUnixFromDate2/1000).format("MM/DD/YYYY");
-				toDateString = moment.unix(localUnixToDate2/1000).format("MM/DD/YYYY");
-				
-				//Show User the date range they've selected
-				var now = moment(localUnixToDate2); 
-				var end = moment(localUnixFromDate2);
-				var duration = moment.duration(now.diff(end));
-				
-				if(viewType == "month"){
-					var pageTitle = "Monthly Statistics";
-					var periodTitle = "month";
-					var periodDuration = Math.round(duration.asMonths()) + " Month Range";
-				} else {
-					var pageTitle = "Daily Statistics";
-					var periodTitle = "day";
-					var periodDuration = Math.round(duration.asDays()) + " Day Range";
-				}
-				
-				stats = '<div class="container row no-pading-top">'+
-							'<div class="col-sm-6 col-xs-6">' +
-								'<h3>' + pageTitle + '</h3>' +
-								'<h4 class="subheading">' + periodDuration +'</h4>' +
-							'</div>' +
-							'<div class="col-sm-6 col-xs-6">' +
-								'<div class="dropdown">' +
-									'<input class="date-selector" type="text" name="datefilter" class="form-control" value="' + fromDateString + " - " + toDateString + '" />' +
-									'<i class="fa fa-caret-down down-arrow" aria-hidden="true"></i>' +
-								'</div>' +
-							'</div>' +	
-						'</div>';	
-				stats += '<div class="container row no-gutters row-eq-height">' +
-						'<div class="col-lg-2 col-sm-3 col-xs-12 offset-md-0 offset-lg-2">'+
-							'<div class="card">'+
-								'<div class="card-body">'+                                                                       
-									'<div class="row">'+
-										'<div class="col-lg-12 col-sm-12 col-xs-12">'+
-											'<h2 class="font-weight-lighter" style="color:#474C4F;"  >'+ totals.sales + '</h2>'+
-										'</div>'+
-									'</div>'+
-									'<div class="col-">'+
-										'<p class="text-muted text-uppercase small">Shirts Sold</p>'+
-									'</div>'+ 
-								'</div>'+
-							'</div>'+
-						'</div>'+
-						
-						'<div class="col-lg-2 col-sm-3 col-xs-12 ">'+
-							'<div class="card">'+
-								'<div class="card-body">'+                                                                       
-									'<div class="row">'+
-										'<div class="col-lg-12 col-sm-12 col-xs-12">'+
-											'<h2 class="font-weight-lighter" style="color:#474C4F;"  >'+ totals.cancelled + '</h2>'+
-										'</div>'+
-									'</div>'+
-									'<div class="col-">'+
-										'<p class="text-muted text-uppercase small">Shirts Cancelled</p>'+
-									'</div>'+ 
-								'</div>'+
-							'</div>'+
-						'</div>'+
-						
-						'<div class="col-lg-2 col-sm-3 col-xs-12 ">'+
-							'<div class="card">'+
-								'<div class="card-body">'+                                                                       
-									'<div class="row">'+
-										'<div class="col-lg-12 col-sm-12 col-xs-12">'+
-											'<h2 class="font-weight-lighter" style="color:#474C4F;"  >$'+ parseFloat(totals.revenue).formatMoney(2) + '</h2>'+
-										'</div>'+
-									'</div>'+
-									'<div class="col-">'+
-										'<p class="text-muted text-uppercase small">Revenue</p>'+
-									'</div>'+ 
-								'</div>'+
-							'</div>'+
-						'</div>'+
-						
-						'<div class="col-lg-2 col-sm-3 col-xs-12 ">'+
-							'<div class="card">'+
-								'<div class="card-body">'+                                                                       
-									'<div class="row">'+
-										'<div class="col-lg-12 col-sm-12 col-xs-12">'+
-											'<h2 class="font-weight-lighter" style="color:#474C4F;"  >$'+ parseFloat(totals.royalty).formatMoney(2) + '</h2>'+
-										'</div>'+
-									'</div>'+
-									'<div class="col-">'+
-										'<p class="text-muted text-uppercase small">Royalties</p>'+
-									'</div>'+ 
-								'</div>'+
-							'</div>'+
-						'</div>'+
-						
-						'<div class="col-lg-2 col-sm-4 col-xs-12 offset-lg-3 offset-md-0 offset-lg-2 no-card-bottom">'+
-							'<div class="card">'+
-								'<div class="card-body">'+                                                                       
-									'<div class="row">'+
-										'<div class="col-lg-12 col-sm-12 col-xs-12">'+
-											'<h2 class="font-weight-lighter" style="color:#474C4F;"  >$'+ (totals.royalty /(totals.sales - totals.cancelled + 0.00001)).formatMoney(2) + '</h2>'+
-										'</div>'+
-									'</div>'+
-									'<div class="col-">'+
-										'<p class="text-muted text-uppercase small">Average Royalties / Shirt</p>'+
-									'</div>'+ 
-								'</div>'+
-							'</div>'+
-						'</div>'+
-						
-						'<div class="col-lg-2 col-sm-4 col-xs-12 no-card-bottom ">'+
-							'<div class="card">'+
-								'<div class="card-body">'+                                                                       
-									'<div class="row">'+
-										'<div class="col-lg-12 col-sm-12 col-xs-12">'+
-											'<h2 class="font-weight-lighter" style="color:#474C4F;"  >'+ (totals.sales /(numberofDaysInner+ 0.00001)).formatMoney(2) + '</h2>'+
-										'</div>'+
-									'</div>'+
-									'<div class="col-">'+
-										'<p class="text-muted text-uppercase small">Average Sales / '+ periodTitle +'</p>'+
-									'</div>'+ 
-								'</div>'+
-							'</div>'+
-						'</div>'+
-						
-						'<div class="col-lg-2 col-sm-4 col-xs-12 no-card-bottom ">'+
-							'<div class="card">'+
-								'<div class="card-body">'+                                                                       
-									'<div class="row">'+
-										'<div class="col-lg-12 col-sm-12 col-xs-12">'+
-											'<h2 class="font-weight-lighter" style="color:#474C4F;"  >$'+ (totals.royalty /(numberofDaysInner+ 0.00001)).toFixed(2) + '</h2>'+
-										'</div>'+
-									'</div>'+
-									'<div class="col-">'+
-										'<p class="text-muted text-uppercase small">Average Royalties / '+ periodTitle +'</p>'+
-									'</div>'+ 
-								'</div>'+
-							'</div>'+
-						'</div>';
-												
-						
-						
-				document.getElementById("dailystats")
-					.innerHTML = stats;
-				
 
 				$('input[name="datefilter"]').daterangepicker(
 					{  
@@ -1233,12 +1250,20 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 					var fromDate = picker.startDate.unix()*1000;
 					var toDate = picker.endDate.unix()*1000;
 					
-					var extraFlag = 'daily';
 					
-					if((toDate - fromDate) > 91*24*60*60000){
-						extraFlag = 'month';
+					if(15*24*60*60000 < (toDate - fromDate) <= 91*24*60*60000){
+						var extraFlag = 'week';
+						fromDate = moment(picker.startDate.unix()*1000).startOf('week').unix() *1000;
+						toDate = moment(picker.endDate.unix()*1000).add(6,'days').startOf('week').unix() *1000;
+						
+						
+					} else if ((toDate - fromDate) > 91*24*60*60000){
+						var extraFlag = 'month';
+					} else {
+						var extraFlag = 'daily';
+						
 					}
-				
+					
 			
 					dailySalesPage(fromDate, toDate, extraFlag);
 				}
@@ -1249,8 +1274,6 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 				
 				$('input[name="datefilter"], input[name="daterangepicker_start"],  input[name="daterangepicker_end"]').on("keyup", function(e) {
 					if (e.keyCode == 13) {
-						console.log('Enter');
-						
 						var picker = {};
 						
 						picker.startDate = $('input[name="datefilter"]').data('daterangepicker').startDate;
@@ -1454,20 +1477,19 @@ function productManager() {
 	$(".wrapper").children().filter(":not(#sidebar)").remove();
 	$(".wrapper").append(pageContent);	
     
-	var finalResult = [];
-	fetchAllLiveProducts(1, '0', finalResult, null, function(ts){
-		var cp2 = ' ' + 
-					'<div id="status"></div>' +
-					'<table id="quickEditor" class="sortable table table-striped"><thead><tr>'
-					+ '<th class="text-center">Design</th>'
-					+ '<th>Title</th>'
-					+ '<th>Niche</th>'
-					+ '<th class="text-center">Creation Date</th>'
-					+ '<th class="text-center">Days Until Deletion</th>'
-					+ '<th class="text-center">Product Details</th>'
-					+ '<th class="text-center">Price</th>' 
-					+ '<th class="text-center">Edit</th>'
-					+ '</tr></thead><tbody>';
+	fetchAllLiveProducts(1, '0', ts = [], null, function(){
+		var cp2 = 	'<div id="status"></div>' +
+			'<table id="quickEditor" class="sortable table table-striped"><thead><tr>'
+			'<th class="text-center">Design</th>' +
+			'<th>Title</th>' +
+			'<th>Niche</th>' +
+			'<th class="text-center">Creation Date</th>' +
+			'<th class="text-center">Days Until Deletion</th>' +
+			'<th class="text-center">Product Details</th>' +
+			'<th class="text-center">Price</th>' +
+			'<th class="text-center">Edit</th>' +
+			'</tr></thead>' +
+		'<tbody>';
 		k = 0;
 		
 		//Setup counter variables
@@ -1588,40 +1610,76 @@ function productManager() {
 /**************** Individual Product Page **********************/
 /***************************************************************/
 function individualProductPage(queryParams){
-	pageContent = '<div class="container">' +						
-						'<div class="container">' +
-						'<div class="card">'+
-							'<div class="card-block">' +
-								'<div id="individualShirtSummary">' +
-									'<div class="status"><center><h3>Loading...</h3><i class="fa fa-spinner fa-spin fa-4"></i></center></div>'+ 
+	if (queryParams["ASIN"]){
+		pageContent = '<div class="container">' +
+							'<div class="card"></center>'+
+								'<div class="card-block">'+ 
+									'<div id="individualShirtSummary" class="status"><center><h3>Loading...</h3><i class="fa fa-spinner fa-spin fa-4"></i></center></div>' + 
 								'</div>' +
 							'</div>' +
 							
-						'</div>' +
-						
-						' <div class="card" id="salesPanel">' + 
-							'<div class="card-header">Sales/Cancellations</div>' + 
-							'<div class="card-block">' + 
-								'<center><canvas id="canvas1" height="450" width="800" ></canvas></center>' + 
-							'</div>' + 
-						'</div>' +
-						'<div class="card" id="revenuePanel">'+ 
-							'<div class="card-header">Revenue/Royalties</div>' + 
-							'<div class="card-block">' + 
-								'<center><canvas id="canvas2" height="450" width="800" ></canvas></center>' + 
-							'</div>' + 
-						'</div>' +
-						'<div class="card">' + 
-							'<div class="card-header">Sales History</div>' + 
-							'<div class="card-block" id="individualShirtSales"></div>' +
+							'<div class="card" id="">' +
+								'<div class="card-header">' + 
+									'<ul class="nav nav-pills card-header-pills" role="tablist">' +
+										'<li class="nav-item"><a class="nav-link active" href="#sales" role="tab" data-toggle="tab">Sales/Cancellations</a></li>' +
+										'<li class="nav-item"><a class="nav-link" href="#revenue" role="tab" data-toggle="tab">Revenue/Royalties</a></li>' +
+										'<li class="nav-item"><a class="nav-link" href="#advanced" role="tab" data-toggle="tab">Advanced Analytics</a></li>' +
+									'</ul>' +
+								'</div>' +
+								
+								'<div class="card-block tab-content">' +
+									'<div class="tab-pane active" role="tabpanel" id="sales">' +
+										'<center class="inner-container"><canvas id="canvas1" height="450" width="800" ></canvas></center>' + 
+									'</div>' +
+									
+									'<div class="tab-pane" role="tabpanel" id="revenue">' +
+										'<center class="inner-container"><canvas id="canvas2" height="450" width="800" ></canvas></center>' +
+									'</div>' + 
+									
+									
+									'<div class="tab-pane" role="tabpanel"  id="advanced">' +
+										'<center class="inner-container">' +
+											'<div class="canvas-wrapper">' +
+												'<canvas id="canvas3" height="350" width="280" style="padding:10px"></canvas>' +
+												'<h5 class="canvas-title">Gender Distribution</h5>' +
+											'</div>' +
+											'<div class="canvas-wrapper">'+
+												'<canvas id="canvas4" height="350" width="280" style="padding:10px"></canvas>' +
+												'<h5 class="canvas-title">Size Distribution</h5>' +
+											'</div>'+
+											'<div class="canvas-wrapper">'+
+												'<canvas id="canvas5" height="350" width="280" style="padding:10px"></canvas>'+
+												'<h5 class="canvas-title">Color Distribution</h5>' +
+											'</div>' +
+										'</center>' +
+									'</div>' +
+								
+								'</div>' +
+							'</div>' +
+								
+
+							'<div class="card">' + 
+								'<div class="card-header">Sales History</div>' + 
+								'<div class="card-block" id="individualShirtSales"></div>' +
+							'</div>' +
+						'</div>';
+
+		$(".wrapper").children().filter(":not(#sidebar)").remove();
+		$(".wrapper").append(pageContent);
+		
+		renderIndividualProductSales(queryParams);
+	} else {
+		pageContent = '<div class="container">' +
+						'<div class="card"></center>'+
+							'<div class="card-block">'+ 
+								'<div id="individualShirtSummary" class="status">test</div>' + 
+							'</div>' +
 						'</div>' +
 					'</div>';
-
-	$(".wrapper").children().filter(":not(#sidebar)").remove();
-	$(".wrapper").append(pageContent);
-	
-	
-	renderIndividualProductSales(queryParams);
+		
+		$(".wrapper").children().filter(":not(#sidebar)").remove();
+		$(".wrapper").append(pageContent);
+	}
 }
 
 function renderIndividualProductSales(queryParams){
@@ -1635,24 +1693,18 @@ function renderIndividualProductSales(queryParams){
 		// Assemble Data for Graphs 
 		
 		// Need To get First Publication Date
-		var finalResult = [];
-		fetchAllLiveProducts(1, '0', finalResult, targetASIN, function(liveProductsArray){
+		
+		fetchAllLiveProducts(1, '0', liveProductsArray = [], targetASIN, function(){
 			var firstPublishDate = "";
 			var today = new Date(new Date().getTime() + OPTION_TIMEZONE_OFFSET);
 						
 			for ( i =0; i < liveProductsArray.length; i++){
 				if(liveProductsArray[i]["marketplaceAsinMap"]["US"] == targetASIN){
-					if(liveProductsArray[i]["status"] == "LIVE"){
-						var firstPublishDate = new Date(parseInt(liveProductsArray[i]["firstPublishDate"]));
-						var imgURL = liveProductsArray[i]["imageURL"]; //Not working ATM
-						var firstPublishDateString = firstPublishDate.toDateString();
-						var shirtName = liveProductsArray[i]["name"];	
-						
-						break;
-					} else{
-						alert("Item has been deleted");
-						break;
-					}
+					var firstPublishDate = new Date(parseInt(liveProductsArray[i]["firstPublishDate"]));
+					var imgURL = liveProductsArray[i]["imageURL"]; //Not working ATM
+					var firstPublishDateString = firstPublishDate.toDateString();
+					var shirtName = liveProductsArray[i]["name"];	
+					break;
 				}
 			}
 			
@@ -1660,8 +1712,7 @@ function renderIndividualProductSales(queryParams){
 			if (!firstPublishDate){
 				alert("Item not found", "First Publish Date: ", firstPublishDate);
 			}
-									
-									
+
 			//Generate Axis Labels
 			var axisLabels = [];
 			
@@ -1705,6 +1756,30 @@ function renderIndividualProductSales(queryParams){
 			var lifetimeSales = salesData.reduce(function(a, b) { return a + b; }, 0) - cancelData.reduce(function(a, b) { return a + b; }, 0) ;
 			var lifetimeRevenue = revenueData.reduce(function(a, b) { return a + b; }, 0).toFixed(2);
 			var lifetimeRoyalties = royaltyData.reduce(function(a, b) { return a + b; }, 0).toFixed(2);
+			
+			var shirtInfo = '<center><h2>Individual Product Info</h2></center>' + 
+							'<dl>'+
+								'<dt>Shirt Name:&nbsp;</dt>' +
+								'<dd>' + shirtName + '</dd>' +
+							'</dl><dl>' +
+								'<dt>First Published Date:&nbsp;</dt>' +
+								'<dd>' + firstPublishDateString + '</dd>' +
+							'</dl><dl>' +
+								'<dt>ASIN:&nbsp; </dt>' +
+								'<dd>' + targetASIN + '</dd>' +
+							'</dl><dl>' +
+								'<dt>Lifetime Sales:&nbsp; </dt>' +
+								'<dd>' + lifetimeSales + '</dd>' +
+							'</dl><dl>' +
+								'<dt>Lifetime Revenue:&nbsp; </dt>' +
+								'<dd>$' + lifetimeRevenue + '</dd>' +
+							'</dl><dl>' +
+								'<dt>Lifetime Royalties:&nbsp; </dt>' +
+								'<dd>$' + lifetimeRoyalties + '</dd>' +
+							'</dl>';
+			
+			//document.getElementById("individualShirtSummary").innerHTML += '<img src='+ imgURL +'/>'; //Not working ATM
+			document.getElementById("individualShirtSummary").innerHTML = shirtInfo;	
 			
 				
 
@@ -1750,6 +1825,49 @@ function renderIndividualProductSales(queryParams){
 				},
 				options: globalLineChartOptions,
 			};
+			
+			//Genders Charts
+			/*
+			var lineChartData3 = {
+				type: 'doughnut',
+				data: {
+					labels: Object.keys(gendersArray),
+					datasets: [{							
+						data: Object.values(gendersArray),
+						backgroundColor: ["#3498db", "#e86dab", "#84cb74"],
+					}]
+				},
+				options: globalLineChartOptions,
+			};
+			
+			//Size Charts
+			var lineChartData4 = {
+				type: 'doughnut',
+				data: {
+					labels: Object.keys(adjustedSizesArray),
+					datasets: [{							
+						data: Object.values(adjustedSizesArray),
+						backgroundColor: ["#ffab91", "#ff8a65", "#ff7043", "#ff5722", "#e64a19", "#d84315", "#ffccbc"],
+					}]
+				},
+				options: globalLineChartOptions,
+			};
+			
+			//Colors Charts
+			var lineChartData5 = {
+				type: 'doughnut',
+				data: {
+					labels: Object.keys(shirtColorsArray),
+					datasets: [{							
+						data: Object.values(shirtColorsArray),
+						backgroundColor: finalShirtColorsLUT,
+					}]
+				},
+				options: globalLineChartOptions,
+			};
+			*/
+			
+			
 					
 			var ctxSales = document.getElementById("canvas1").getContext("2d");	
 			var myChart = new Chart(ctxSales, lineChartData1);
@@ -1804,33 +1922,6 @@ function renderIndividualProductSales(queryParams){
 			cp2 += '</tbody></table>';
 			document.getElementById("individualShirtSales")
 				.innerHTML = cp2;
-			
-			
-			var shirtInfo = '<center><h2>Individual Product Info</h2></center>' + 
-							'<dl>'+
-								'<dt>Shirt Name:&nbsp;</dt>' +
-								'<dd>' + shirtName + '</dd>' +
-							'</dl><dl>' +
-								'<dt>First Published Date:&nbsp;</dt>' +
-								'<dd>' + firstPublishDateString + '</dd>' +
-							'</dl><dl>' +
-								'<dt>ASIN:&nbsp; </dt>' +
-								'<dd>' + targetASIN + '</dd>' +
-							'</dl><dl>' +
-								'<dt>Lifetime Sales:&nbsp; </dt>' +
-								'<dd>' + lifetimeSales + '</dd>' +
-							'</dl><dl>' +
-								'<dt>Lifetime Revenue:&nbsp; </dt>' +
-								'<dd>$' + lifetimeRevenue + '</dd>' +
-							'</dl><dl>' +
-								'<dt>Lifetime Royalties:&nbsp; </dt>' +
-								'<dd>$' + lifetimeRoyalties + '</dd>' +
-							'</dl>';
-			
-			
-			//document.getElementById("individualShirtSummary").innerHTML += '<img src='+ imgURL +'/>'; //Not working ATM
-			document.getElementById("individualShirtSummary").innerHTML = shirtInfo;
-							
 		});
 	});	
 }
