@@ -1769,12 +1769,57 @@ function renderIndividualProductSales(queryParams){
 										'<dd>$' + (lifetimeRoyalties / lifespan).toFixed(2) + '</dd>' +
 									'</dl><dl>' +
 										'<dt>Niche: </dt>' +
-										'<dd>' + '</dd>' +
+										'<dd>'+
+											'<div class="form-group has-success">' +
+												'<input type="text" class="form-control niche-input">'  +
+											'</div>' +
+										'</dd>' +
 									'</dl>' +
 								'</div>' +
 							'</div>';
 			
 			document.getElementById("individualShirtSummary").innerHTML = shirtInfo;	
+			
+			getShirtNiche(targetASIN, function(determinedNiche){
+				if(determinedNiche != 'unknown niche'){
+					$(".niche-input").val(determinedNiche);
+					$(".niche-input").addClass("form-control-success");
+				}
+				
+				
+				//Remove success on focus 
+				$('.niche-input').focusin(function() {
+					$(this).removeClass("form-control-success");
+				});
+				
+				
+				//Unfocus auto saves
+				$('.niche-input').focusout(function() {
+					if ($(this).val().length > 1){
+						nicheName = $(this).val();
+						saveShirtNiche(nicheName, targetASIN);
+						
+						$(this).addClass("form-control-success");
+					}
+				});
+				
+				//Enter key goes to next field
+				$('.niche-input').keydown(function(e) {
+					if (e.which == 13 || e.which == 9) { //Enter Key
+						e.preventDefault();
+								
+						if ($(this).val().length > 1){
+							nicheName = $(this).val();
+							saveShirtNiche(nicheName, targetASIN);
+							
+							$(this).addClass("form-control-success");
+						}
+					}
+				});
+						
+						
+			})
+			
 			
 			
 			//Regroup all youth sizes to just Youth
