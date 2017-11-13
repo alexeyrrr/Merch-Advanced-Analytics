@@ -728,8 +728,6 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 					}
 				}
 				
-				console.log(priceObject);
-				
 				/******* Render Top Page Stats *****************/
 				var totals = {};				
 				totals.sales = salesData.reduce(function(a, b) { return a + b; }, 0);
@@ -905,6 +903,13 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 					finalShirtColorsLUT.push(shirtColorsColorsLUT[key]);
 				}
 				
+				sortedPriceObject = {};
+ 				
+				Object.keys(priceObject)
+					.sort().forEach(function(key) {
+					sortedPriceObject[key] = priceObject[key];
+				});;
+				
 				var shirtNicheColorsSeed = ["#e0f2f1", "#b2dfdb", "#80cbc4", "#4db6ac", "#26a69a", "#009688", "#00897b", "#00796b", "#00695c", "#004d40"];
 				//Extend Array Length
 				var shirtNicheColorsLUT = replicateArray(shirtNicheColorsSeed, 6);
@@ -1071,9 +1076,9 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 				var lineChartData6 = {
 					type: 'doughnut',
 					data: {
-						labels: Object.keys(priceObject),
+						labels: Object.keys(sortedPriceObject),
 						datasets: [{							
-							data: Object.values(priceObject),
+							data: Object.values(sortedPriceObject),
 							backgroundColor: shirtNicheColorsLUT,
 						}]
 					},
