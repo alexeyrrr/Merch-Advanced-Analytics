@@ -486,7 +486,7 @@ function fetchAllLiveProducts(page, cursor, result, specificASIN=null, callback)
 						} else {
 							var totalPages = maxPages;
 						}
-						setstatus("Loading... [" + page + "/" + totalPages+"]");
+						//setstatus("Loading... [" + page + "/" + totalPages+"]");
 						
 						
 						var resultFound = false;
@@ -546,6 +546,7 @@ function dailySalesPage(fromDate, toDate, viewType = 'day'){
 								'<li class="nav-item"><a class="nav-link active" href="#sales" role="tab" data-toggle="tab">Sales/Cancellations</a></li>' +
 								'<li class="nav-item"><a class="nav-link" href="#revenue" role="tab" data-toggle="tab">Revenue/Royalties</a></li>' +
 								'<li class="nav-item"><a class="nav-link" href="#advanced" role="tab" data-toggle="tab">Advanced Analytics</a></li>' +
+								'<li class="nav-item"><a class="nav-link" href="#pricing" role="tab" data-toggle="tab">Pricing Analytics</a></li>' +
 								'<li class="nav-item"><a class="nav-link" href="#niche" role="tab" data-toggle="tab">'+
 									'Niche Analysis' +
 									'<i class="fa fa-info-circle" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="Group together TShirt designs of similar niches or styles to help forecast future winners on a broader scale. Niche tags can be set on the Manage Products page"></i>'+
@@ -575,9 +576,21 @@ function dailySalesPage(fromDate, toDate, viewType = 'day'){
 										'<canvas id="canvas5" height="350" width="280" style="padding:10px"></canvas>'+
 										'<h5 class="canvas-title">Color Distribution</h5>' +
 									'</div>' +
+								'</center>' +
+							'</div>' +
+							
+							'<div class="tab-pane" role="tabpanel"  id="pricing">' +
+								'<center class="inner-container">' +
 									'<div class="canvas-wrapper">'+
 										'<canvas id="canvas6" height="350" width="280" style="padding:10px"></canvas>'+
 										'<h5 class="canvas-title">Pricing Distribution</h5>' +
+									'</div>' +
+									'<div class="canvas-wrapper">'+
+										'<canvas id="canvas7" height="350" width="280" style="padding:10px"></canvas>'+
+										'<div class="canvas-title">' +
+											'<h5>Normalized Pricing Distribution (%)</h5>' +
+											'<i class="fa fa-info-circle" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="A normalized distribution takes into account the number of shirts for each niche and factors out the relative availablilty of each niche. (i.e. think like comparing a country\'s GDP vs GDP Per Capita)"></i>'+
+										'</div>' +
 									'</div>' +
 								'</center>' +
 							'</div>' +
@@ -587,7 +600,7 @@ function dailySalesPage(fromDate, toDate, viewType = 'day'){
 										'<div class="col-xs-6 col-sm-6 float-left">' +
 											'<center>' +
 												'<div class="canvas-wrapper" style="width: 100%;">'+
-													'<canvas id="canvas7" height="350" width="280" style="padding:10px"></canvas>'+
+													'<canvas id="canvas8" height="350" width="280" style="padding:10px"></canvas>'+
 													'<h5 class="canvas-title">Niche Distribution (Number Sold)</h5>' +
 												'</div>' +
 											'</center>' +
@@ -595,7 +608,7 @@ function dailySalesPage(fromDate, toDate, viewType = 'day'){
 										'<div class="col-xs-6 col-sm-6 float-left">' +
 											'<center>' +
 												'<div class="canvas-wrapper" style="width: 100%;">'+
-													'<canvas id="canvas8" height="350" width="280" style="padding:10px"></canvas>'+
+													'<canvas id="canvas9" height="350" width="280" style="padding:10px"></canvas>'+
 													'<div class="canvas-title">' +
 														'<h5>Normalized Niche Distribution (%)</h5>' +
 														'<i class="fa fa-info-circle" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="A normalized distribution takes into account the number of shirts for each niche and factors out the relative availablilty of each niche. (i.e. think like comparing a country\'s GDP vs GDP Per Capita)"></i>'+
@@ -760,8 +773,6 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 									priceObject[unitPrice] = 1;
 								}
 							}
-							
-							
 						}
 					}
 					
@@ -777,8 +788,6 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 						axisLabels[i] = weekMonth + " Week " + nthOfMonth;
 					}
 				}
-				
-				console.log(priceObject);
 				
 				/******* Render Top Page Stats *****************/
 				var totals = {};				
@@ -944,7 +953,14 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 					}
 				}
 				
+				sortedPriceObject = {};
 				
+				Object.keys(priceObject)
+					.sort().forEach(function(key) {
+					sortedPriceObject[key] = priceObject[key];
+				});;
+				
+
 				//Make sure colors are in correct order												
 				var shirtColorsColorsLUT = {'Dark Heather': "#454b4b", 'Heather Grey': "#d5d9da", 'Heather Blue': "#696c9c", 'Black': "#222", 
 					'Navy': "#15232b", 'Silver': "#cfd1d1", 'Royal Blue': "#1c4086", 'Brown': "#31261d", 'Slate': "#818189", 'Red': "#b71111", 'Asphalt': "#3f3e3c", 
@@ -1121,9 +1137,9 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 				var lineChartData6 = {
 					type: 'doughnut',
 					data: {
-						labels: Object.keys(priceObject),
+						labels: Object.keys(sortedPriceObject),
 						datasets: [{							
-							data: Object.values(priceObject),
+							data: Object.values(sortedPriceObject),
 							backgroundColor: shirtNicheColorsLUT,
 						}]
 					},
@@ -1132,7 +1148,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 				
 
 				//Shirt Niches (Non-normalized) 
-				var lineChartData7 = {
+				var lineChartData8 = {
 					type: 'doughnut',
 					data: {
 						labels: Object.keys(nicheArray),
@@ -1162,8 +1178,8 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 				var ctxNiches = document.getElementById("canvas6").getContext("2d");	
 				var myChart = new Chart(ctxNiches, lineChartData6);
 				
-				var ctxNiches = document.getElementById("canvas7").getContext("2d");	
-				var myChart = new Chart(ctxNiches, lineChartData7);
+				var ctxNiches = document.getElementById("canvas8").getContext("2d");	
+				var myChart = new Chart(ctxNiches, lineChartData8);
 				
 				//Summing up all values
 				var allASINValues = [];
@@ -1334,10 +1350,12 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 
 				//********** Get Normalized Array ***************//
 				// (This is down here because it takes longer)
-				normalizedNicheArray = {};
-				normalizedPercentageArray = {};
 				
-				getNicheDistribution(function(totalTally){
+				
+				getNicheDistribution(function(totalTally){					
+					normalizedNicheArray = {};
+					normalizedPercentageArray = {};
+					
 					for(var key in nicheArray){
 						if (key in totalTally){
 							loopTotalTally = totalTally[key];
@@ -1362,7 +1380,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 						normalizedPercentageArray[key] = percertangeValue;
 					}
 					
-					var lineChartData8 = {
+					var lineChartData9 = {
 						type: 'doughnut',
 						data: {
 							labels: Object.keys(normalizedPercentageArray),
@@ -1374,9 +1392,8 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 						options: globalLineChartOptions,
 					};
 					
-					var ctxNormNiches = document.getElementById("canvas8").getContext("2d");	
-					var myChart = new Chart(ctxNormNiches, lineChartData8);
-					
+					var ctxNormNiches = document.getElementById("canvas9").getContext("2d");	
+					var myChart = new Chart(ctxNormNiches, lineChartData9);
 					
 					
 					//Compute Top Selling Niches
@@ -1494,6 +1511,64 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 					})
 				
 				
+				});
+				
+				// (This is down here because it takes longer)
+				
+				fetchAllLiveProducts(1, '', resultArray = [], '', function(){					
+					normalizedPriceArray = {};
+					normalizedPercentageArray = {};
+					
+					
+					allPriceKeys = [];
+					for(var i=0; i < resultArray.length; i++ ) {
+						allPriceKeys.push(resultArray[i]["listPrice"]);	
+					}
+					
+					var totalTally = {};
+					allPriceKeys.forEach(function(x) { totalTally[x] = (totalTally[x] || 0)+1; });
+		
+					console.log(totalTally);
+		
+					for(var key in sortedPriceObject){
+						if (key in totalTally){
+							loopTotalTally = totalTally[key];
+						} else {
+							loopTotalTally = 999; //Artifically Skew Unidentified shirts
+						}
+						
+						normalization = (sortedPriceObject[key] / loopTotalTally);
+						normalizedPriceArray[key] = normalization;
+					}
+					
+					var grandTotal = 0;
+					for(var key in normalizedPriceArray){ //Get Total of Normalized
+						numberToAdd = parseFloat(normalizedPriceArray[key]);
+						if (!isNaN(numberToAdd)){					
+							grandTotal += numberToAdd;
+						}
+					}
+					
+					for(var key in normalizedPriceArray){
+						percertangeValue = (normalizedPriceArray[key] / grandTotal * 100).toFixed(1);
+						normalizedPercentageArray[key] = percertangeValue;
+					}
+					
+					var lineChartData7 = {
+						type: 'doughnut',
+						data: {
+							labels: Object.keys(normalizedPercentageArray),
+							datasets: [{							
+								data: Object.values(normalizedPercentageArray),
+								backgroundColor: shirtNicheColorsLUT,
+							}]
+						},
+						options: globalLineChartOptions,
+					};
+					
+					var ctxNormNiches = document.getElementById("canvas7").getContext("2d");	
+					var myChart = new Chart(ctxNormNiches, lineChartData7);
+					
 				});
 				
 			}); //Callback 2 end
@@ -2151,13 +2226,11 @@ function getNicheDistribution(callback){
 		
 		parsedArray = [];
 		for(var i=0; i < allValues.length; i++ ) {
-			parsedArray.push(JSON.parse(allValues[i])['niche']);
-			
+			parsedArray.push(JSON.parse(allValues[i])['niche']);	
 		}
 		
 		var totalTally = {};
 		parsedArray.forEach(function(x) { totalTally[x] = (totalTally[x] || 0)+1; });
-		
 		
 		callback(totalTally);
 	});
