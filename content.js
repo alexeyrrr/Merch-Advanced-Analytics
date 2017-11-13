@@ -75,37 +75,10 @@ function assembleDynamicBlankArray(callback){
 }
 
 function replicateArray(array, n) {
-  // Create an array of size "n" with undefined values
-  var arrays = Array.apply(null, new Array(n)); 
-
-  // Replace each "undefined" with our array, resulting in an array of n copies of our array
-  arrays = arrays.map(function() { return array });
-
-  // Flatten our array of arrays
-  return [].concat.apply([], arrays);
+	var arrays = Array.apply(null, new Array(n)); 
+	arrays = arrays.map(function() { return array });
+	return [].concat.apply([], arrays);
 }
-/******** More Date Related Stuff ********/				
-function monthDiff(d1, d2) {
-    var months;
-    months = (d2.getFullYear() - d1.getFullYear()) * 12;
-    months -= d1.getMonth() + 1;
-    months += d2.getMonth();
-    return months <= 0 ? 0 : months;
-}
-
-function when(t) { //Converts Unix timestamp to human
-    var dateVal = "/Date(" + t.toString() + ")/";
-    var a = new Date(parseFloat(dateVal.substr(6)));
-    var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    var year = a.getFullYear();
-    var month = months[a.getMonth()];
-    var date = a.getDate();
-    var hour = a.getHours();
-    var min = a.getMinutes();
-    var sec = a.getSeconds();
-    var time = date + ' ' + month + ' ' + year + ' ' + hour + ':' + min + ':' + sec;
-    return time;
-};
 
 Date.prototype.adjustDate = function(days) {
     var date;
@@ -286,7 +259,6 @@ function generateLoginModal(){
 
 //Add header and sidebar
 globalInit();
-
 
 
 function getQueryParams() {	
@@ -512,20 +484,20 @@ function dailySalesPage(fromDate, toDate, viewType = 'day'){
 								'<center class="inner-container"><canvas id="canvas2" height="450" width="800" ></canvas></center>' +
 							'</div>' + 
 							'<div class="tab-pane" role="tabpanel"  id="advanced">' +
-								'<center class="inner-container">' +
-									'<div class="canvas-wrapper">' +
+								'<center class="row">' +
+									'<div class="col col-xs-3 col-sm-3">' +
 										'<canvas id="canvas3" height="350" width="280" style="padding:10px"></canvas>' +
 										'<h5 class="canvas-title">Gender Distribution</h5>' +
 									'</div>' +
-									'<div class="canvas-wrapper">'+
+									'<div class="col col-xs-3 col-sm-3">'+
 										'<canvas id="canvas4" height="350" width="280" style="padding:10px"></canvas>' +
 										'<h5 class="canvas-title">Size Distribution</h5>' +
 									'</div>'+
-									'<div class="canvas-wrapper">'+
+									'<div class="col col-xs-3 col-sm-3">'+
 										'<canvas id="canvas5" height="350" width="280" style="padding:10px"></canvas>'+
 										'<h5 class="canvas-title">Color Distribution</h5>' +
 									'</div>' +
-									'<div class="canvas-wrapper">'+
+									'<div class="col col-xs-3 col-sm-3">'+
 										'<canvas id="canvas6" height="350" width="280" style="padding:10px"></canvas>'+
 										'<h5 class="canvas-title">Pricing Distribution</h5>' +
 									'</div>' +
@@ -534,22 +506,19 @@ function dailySalesPage(fromDate, toDate, viewType = 'day'){
 							'<div class="tab-pane" role="tabpanel" id="niche">' +
 								'<div class="inner-container">' +
 									'<div class="container row">' +									
-										'<div class="col-xs-6 col-sm-6 float-left">' +
+										'<div class="col col-xs-6 col-sm-6">'+
 											'<center>' +
-												'<div class="canvas-wrapper" style="width: 100%;">'+
-													'<canvas id="canvas7" height="350" width="280" style="padding:10px"></canvas>'+
-													'<h5 class="canvas-title">Niche Distribution (Number Sold)</h5>' +
-												'</div>' +
+												'<canvas id="canvas7" height="350" width="280" style="padding:10px"></canvas>'+
+												'<h5 class="canvas-title">Niche Distribution (Number Sold)</h5>' +
 											'</center>' +
 										'</div>' +
-										'<div class="col-xs-6 col-sm-6 float-left">' +
+										
+										'<div class="col col-xs-6 col-sm-6">'+
 											'<center>' +
-												'<div class="canvas-wrapper" style="width: 100%;">'+
-													'<canvas id="canvas8" height="350" width="280" style="padding:10px"></canvas>'+
-													'<div class="canvas-title">' +
-														'<h5>Normalized Niche Distribution (%)</h5>' +
-														'<i class="fa fa-info-circle" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="A normalized distribution takes into account the number of shirts for each niche and factors out the relative availablilty of each niche. (i.e. think like comparing a country\'s GDP vs GDP Per Capita)"></i>'+
-													'</div>' +
+												'<canvas id="canvas8" height="350" width="280" style="padding:10px"></canvas>'+
+												'<div class="canvas-title">' +
+													'<h5>Normalized Niche Distribution (%)</h5>' +
+													'<i class="fa fa-info-circle" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="A normalized distribution takes into account the number of shirts for each niche and factors out the relative availablilty of each niche. (i.e. think like comparing a country\'s GDP vs GDP Per Capita)"></i>'+
 												'</div>' +
 											'</center>' +
 										'</div>' +
@@ -1643,15 +1612,15 @@ function individualProductPage(queryParams){
 									
 									'<div class="tab-pane" role="tabpanel"  id="advanced">' +
 										'<center class="inner-container">' +
-											'<div class="canvas-wrapper">' +
+											'<div class="col col-xs-4 col-sm-4">' +
 												'<canvas id="canvas3" height="350" width="280" style="padding:10px"></canvas>' +
 												'<h5 class="canvas-title">Gender Distribution</h5>' +
 											'</div>' +
-											'<div class="canvas-wrapper">'+
+											'<div class="col col-xs-4 col-sm-4">'+
 												'<canvas id="canvas4" height="350" width="280" style="padding:10px"></canvas>' +
 												'<h5 class="canvas-title">Size Distribution</h5>' +
 											'</div>'+
-											'<div class="canvas-wrapper">'+
+											'<div class="col col-xs-4 col-sm-4">'+
 												'<canvas id="canvas5" height="350" width="280" style="padding:10px"></canvas>'+
 												'<h5 class="canvas-title">Color Distribution</h5>' +
 											'</div>' +

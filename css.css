@@ -38,7 +38,6 @@ html, body{
     float: left;
 	max-width: none;
 }
-
 .inner-container{
 	width: 100%;
 	max-width: 1000px;
@@ -139,14 +138,6 @@ div.desc {
 	float:left;
 	margin-right:10px;
 }
-
-.canvas-wrapper{
-	position: relative;
-	width: 33%;
-	float: left;
-	margin-bottom: 15px;
-}
-
 .canvas-title{
 	width: 100%;
 	position: absolute;
