@@ -1768,7 +1768,7 @@ function renderIndividualProductSales(queryParams){
 										'<dt>Average Revenue / Month :&nbsp; </dt>' +
 										'<dd>$' + (lifetimeRoyalties / lifespan).toFixed(2) + '</dd>' +
 									'</dl><dl>' +
-										'<dt>Niche: </dt>' +
+										'<dt style="margin: 5px 5px 5px 0;">Niche: </dt>' +
 										'<dd>'+
 											'<div class="form-group has-success">' +
 												'<input type="text" class="form-control niche-input">'  +

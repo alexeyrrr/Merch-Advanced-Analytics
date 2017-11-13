@@ -484,3 +484,7 @@ table tr, table td{
 .submit-asin{
 	vertical-align: top;
 }
+
+#individualShirtSummary .form-group{
+	margin: 0;
+}
