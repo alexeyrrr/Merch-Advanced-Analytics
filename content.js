@@ -123,23 +123,10 @@ function globalInit(){
 	document.head.innerHTML = globalHeader;
 	document.body.innerHTML = globalBody;
 	document.body.style.backgroundColor = "#ecf1f2";  
-	
-	var _gaq = _gaq || [];
-	_gaq.push(['_setAccount', 'UA-31916890-6']);
-	_gaq.push(['_trackPageLoadTime']);
-	_gaq.push(['_trackPageview', '/dailySales']);
-	
-	
-	(function() {
-	  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-	  ga.src = 'https://ssl.google-analytics.com/ga.js';
-	  $('head').append(ga);
-	})();
-	
+		
 	//Initialize Sidebar
 	$(function(){		
 		$("#dailySales, #logo").click(function(){
-			_gaq.push(['_trackPageview', '/dailySales']);
 			//Calculate Unix Timestamps
 			var fromDate14 = moment().subtract(14, 'days').unix() * 1000;
 			var toDate = moment().unix() * 1000;
@@ -148,7 +135,6 @@ function globalInit(){
 		});
 		
 		$("#monthlySales").click(function(){
-			_gaq.push(['_trackPageview', '/monthlySales']);
 			//Calculate Unix Timestamps
 			var fromDate6Mo = moment().subtract(6, 'months').unix() * 1000;
 			var toDate = moment().unix() * 1000;
@@ -157,12 +143,10 @@ function globalInit(){
 		});
 		
 		$("#productManager").click(function(){
-			_gaq.push(['_trackPageview', '/productManager']);
 			productManager();	
 		});
 		
 		$("#settingsPage").click(function(){
-			_gaq.push(['_trackPageview', '/settingsPage']);
 			settingsPage();
 		})
 		
