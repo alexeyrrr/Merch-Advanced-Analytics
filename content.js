@@ -749,10 +749,13 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 					if(viewType == "day" && axisLabels.length <= 15){
 						axisLabels[i] = moment(axisLabels[i], "MM-DD-YYYY").format('dddd');
 					} else if (viewType == "week" && axisLabels.length <= 90){
-						var startweek = moment(axisLabels[i], "ww YYYY").format('MM/DD/YYYY');
-						var endweek = moment(axisLabels[i], "ww YYYY").add(7,"days").format('MM/DD/YYYY');
+						var weekMonth = moment(axisLabels[i], "ww YYYY").format('MMM');
 						
-						axisLabels[i] = "Week" +startweek + " - " + endweek;
+						var myDate = moment(axisLabels[i], "ww YYYY"); //saturday
+						var day = myDate.day(); //6 = saturday
+						var nthOfMonth = Math.ceil(myDate.date() / 7); //1
+
+						axisLabels[i] = weekMonth + " Week " + nthOfMonth;
 					}
 				}
 				
@@ -777,10 +780,12 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 					var pageTitle = "Monthly Statistics";
 					var periodTitle = "month";
 					var periodDuration = Math.round(duration.asMonths()) + " Month Range";
-				} else if(viewType == "Weekly"){
+				
+				/*} else if(viewType == "week"){
 					var pageTitle = "Weekly Statistics";
 					var periodTitle = "week";
 					var periodDuration = Math.round(duration.asMonths()) + " Week Range";
+				*/
 				} else {
 					var pageTitle = "Daily Statistics";
 					var periodTitle = "day";
@@ -1259,8 +1264,8 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 					//Calculate Unix Timestamps
 					var fromDate = picker.startDate.unix()*1000;
 					var toDate = picker.endDate.unix()*1000;
-					
-					if(15*24*60*60000 < (toDate - fromDate) <= 91*24*60*60000){
+										
+					if((toDate - fromDate) < (91*24*60*60000) && (toDate - fromDate) > (32*24*60*60000)){
 						var extraFlag = 'week';
 						//Get full weeks
 						fromDate = moment(picker.startDate.unix()*1000).startOf('week').unix() *1000;
@@ -1269,7 +1274,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 					} else if ((toDate - fromDate) > 91*24*60*60000){
 						var extraFlag = 'month';
 					} else {
-						var extraFlag = 'daily';
+						var extraFlag = 'day';
 					}
 					
 					dailySalesPage(fromDate, toDate, extraFlag);
