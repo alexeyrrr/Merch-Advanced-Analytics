@@ -476,3 +476,7 @@ table tr, table td{
 .img-thumbnail{
 	max-width: none;
 }
+
+.img-responsive{
+	width: 100%;
+}

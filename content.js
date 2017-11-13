@@ -80,29 +80,6 @@ function replicateArray(array, n) {
 	return [].concat.apply([], arrays);
 }
 
-Date.prototype.adjustDate = function(days) {
-    var date;
-
-    days = days || 0;
-
-    if (days === 0) {
-        date = new Date(this.getTime());
-    } else if (days > 0) {
-        date = new Date(this.getTime());
-        date.setDate(date.getDate() + days);
-    } else {
-        date = new Date(
-            this.getFullYear(),
-            this.getMonth(),
-            this.getDate() - Math.abs(days),
-            this.getHours(),
-            this.getMinutes(),
-            this.getSeconds(),
-            this.getMilliseconds()
-        );
-    }
-    return date;
-};
 Number.prototype.formatMoney = function(c, d, t){
 var n = this, 
     c = isNaN(c = Math.abs(c)) ? 2 : c, 
@@ -1611,7 +1588,7 @@ function individualProductPage(queryParams){
 									
 									
 									'<div class="tab-pane" role="tabpanel"  id="advanced">' +
-										'<center class="inner-container">' +
+										'<center class="inner-container row">' +
 											'<div class="col col-xs-4 col-sm-4">' +
 												'<canvas id="canvas3" height="350" width="280" style="padding:10px"></canvas>' +
 												'<h5 class="canvas-title">Gender Distribution</h5>' +
@@ -1663,19 +1640,14 @@ function renderIndividualProductSales(queryParams){
 	var targetASIN = queryParams["ASIN"];
 	
 	fetchIndividualProductSales(targetASIN, function(responseArray){	
-		// Assemble Data for Graphs 
-		
 		// Need To get First Publication Date
-		
 		fetchAllLiveProducts(1, '0', liveProductsArray = [], targetASIN, function(){
-			var firstPublishDate = "";
-			var today = new Date(new Date().getTime() + OPTION_TIMEZONE_OFFSET);
+			var firstPublishDate = {};
 						
 			for ( i =0; i < liveProductsArray.length; i++){
 				if(liveProductsArray[i]["marketplaceAsinMap"]["US"] == targetASIN){
-					var firstPublishDate = new Date(parseInt(liveProductsArray[i]["firstPublishDate"]));
-					var imgURL = liveProductsArray[i]["imageURL"]; //Not working ATM
-					var firstPublishDateString = firstPublishDate.toDateString();
+					var firstPublishDate = parseInt(liveProductsArray[i]["firstPublishDate"]) / 1000;
+					var imgURL = liveProductsArray[i]["imageURL"]; 
 					var shirtName = liveProductsArray[i]["name"];	
 					break;
 				}
@@ -1688,27 +1660,16 @@ function renderIndividualProductSales(queryParams){
 
 			//Generate Axis Labels
 			var axisLabels = [];
+			var today = moment();
 			
-			var todayTime = today.getTime();
-			todayTime += 1*60*60000;
-			
-			while (firstPublishDate < todayTime) {
-				var dd = firstPublishDate.getDate();
-				var mm = firstPublishDate.getMonth()+1;
-
-				var yyyy = firstPublishDate.getFullYear();
-				if(dd<10){
-					dd='0'+dd;
-				} 
-				if(mm<10){
-					mm='0'+mm;
-				} 
-				var stringifiedDate = mm+'-'+dd+'-'+yyyy;
+			var tempFirstPublishDate = firstPublishDate;
+			while (tempFirstPublishDate <= today.unix()) {			
+				var stringifiedDate = moment.unix(tempFirstPublishDate).format("MM-DD-YYYY");
 				axisLabels.push(stringifiedDate);
-				firstPublishDate = firstPublishDate.adjustDate(1);
+				
+				tempFirstPublishDate = tempFirstPublishDate + 24*60*60;
 			}
-						
-						
+			
 			var salesData = new Array(axisLabels.length).fill(0);
 			var cancelData = new Array(axisLabels.length).fill(0);
 			var revenueData = new Array(axisLabels.length).fill(0);
@@ -1730,31 +1691,51 @@ function renderIndividualProductSales(queryParams){
 			var lifetimeRevenue = revenueData.reduce(function(a, b) { return a + b; }, 0).toFixed(2);
 			var lifetimeRoyalties = royaltyData.reduce(function(a, b) { return a + b; }, 0).toFixed(2);
 			
-			var shirtInfo = '<center><h2>Individual Product Info</h2></center>' + 
-							'<dl>'+
-								'<dt>Shirt Name:&nbsp;</dt>' +
-								'<dd>' + shirtName + '</dd>' +
-							'</dl><dl>' +
-								'<dt>First Published Date:&nbsp;</dt>' +
-								'<dd>' + firstPublishDateString + '</dd>' +
-							'</dl><dl>' +
-								'<dt>ASIN:&nbsp; </dt>' +
-								'<dd>' + targetASIN + '</dd>' +
-							'</dl><dl>' +
-								'<dt>Lifetime Sales:&nbsp; </dt>' +
-								'<dd>' + lifetimeSales + '</dd>' +
-							'</dl><dl>' +
-								'<dt>Lifetime Revenue:&nbsp; </dt>' +
-								'<dd>$' + lifetimeRevenue + '</dd>' +
-							'</dl><dl>' +
-								'<dt>Lifetime Royalties:&nbsp; </dt>' +
-								'<dd>$' + lifetimeRoyalties + '</dd>' +
-							'</dl>';
+			var lifespan = today.diff(moment.unix(firstPublishDate), 'months', true)+1;	
+			if (lifespan == 0){ lifespan = 1}; //Minimum 1 month lifespan
 			
-			//document.getElementById("individualShirtSummary").innerHTML += '<img src='+ imgURL +'/>'; //Not working ATM
+			var shirtInfo = '<center>' +
+								'<h2>' + shirtName +  '</h2>' +
+								'<p class="text-muted text-uppercase ">Individual Product Info</p>'+
+							'</center>' + 
+							'<div class="row">' +	
+								'<div class="col col-xs-3 col-sm-2">' +	
+									'<a target="_blank" href="https://www.amazon.com/dp/' + targetASIN + '">' +
+										'<img class="img-responsive" src="' +  imgURL + '">' +
+									'</a>' +
+								'</div>' +
+								'<div class="col col-xs-9 col-sm-10">' +	
+									'<dl>' +
+										'<dt>First Published Date:&nbsp;</dt>' +
+										'<dd>' + moment.unix(firstPublishDate).format("MM-DD-YYYY") + '</dd>' +
+									'</dl><dl>' +
+										'<dt>ASIN:&nbsp; </dt>' +
+										'<dd>' + 
+											'<a target="_blank" href="https://www.amazon.com/dp/' + targetASIN + '">' +
+											targetASIN + 
+											'</a>' +
+										'</dd>' +
+									'</dl><dl>' +
+										'<dt>Lifetime Sales:&nbsp; </dt>' +
+										'<dd>' + lifetimeSales + '</dd>' +
+									'</dl><dl>' +
+										'<dt>Lifetime Revenue:&nbsp; </dt>' +
+										'<dd>$' + lifetimeRevenue + '</dd>' +
+									'</dl><dl>' +
+										'<dt>Lifetime Royalties:&nbsp; </dt>' +
+										'<dd>$' + lifetimeRoyalties + '</dd>' +
+									'</dl><dl>' +
+										'<dt>Average Revenue / Month :&nbsp; </dt>' +
+										'<dd>$' + (lifetimeRoyalties / lifespan).toFixed(2) + '</dd>' +
+									'</dl><dl>' +
+										'<dt>Niche: </dt>' +
+										'<dd>' + '</dd>' +
+									'</dl>' +
+								'</div>' +
+							'</div>';
+			
 			document.getElementById("individualShirtSummary").innerHTML = shirtInfo;	
 			
-				
 
 			var lineChartData1 = {
 				type: 'line',
@@ -1900,10 +1881,9 @@ function renderIndividualProductSales(queryParams){
 }
 
 function fetchIndividualProductSales(targetASIN, callback){
-	var today = new Date(new Date().getTime() + OPTION_TIMEZONE_OFFSET);
-	var fromDate = today.adjustDate(-90).getTime();
-	var toDate = today.getTime();
-	
+	var toDate = moment().valueOf();
+	var fromDate = moment().subtract(90, 'days').valueOf();
+
 	var finalResponse = [];
 	fetchSalesDataCSV(fromDate, toDate, finalResponse, function(responseArray){
 		infoAboutTargetASIN = []
@@ -1922,14 +1902,11 @@ function fetchIndividualProductSales(targetASIN, callback){
 /*********************** Settings Page *************************/
 /***************************************************************/
 function settingsPage (e) {
-
     document.title = "Settings  - Merch Advanced Analytics";
 	
 	$(".wrapper").children().filter(":not(#sidebar)").remove();
 	
-
 	var xhr = new XMLHttpRequest();
-
 	xhr.open("GET", chrome.extension.getURL('options.html'), true);
 	xhr.setRequestHeader('Content-type', 'text/html');
 	xhr.onreadystatechange = function (e) { 
@@ -2121,7 +2098,6 @@ function initSaveButtons(){ //Adds event listeners to all buttons
 			}
 		})
 		
-		
 		//Enter key goes to next field
 		$('#shirtlist input[type="text"]').keydown(function(e) {
 			if (e.which == 13 || e.which == 9) { //Enter Key
@@ -2133,17 +2109,7 @@ function initSaveButtons(){ //Adds event listeners to all buttons
 					saveShirtNiche(nicheName, parentASIN);
 					
 					$(this).addClass("form-control-success");
-					
 					$(this).closest("tr").next().find('input[type="text"]').focus(); //Focus on Next Field
-					
-					
-					/*
-					setTimeout(function() {
-						targetButton.text('Save');
-						targetButton.removeClass('btn-success');
-						targetButton.addClass('btn-primary');
-					}, 750);
-					*/
 				}
 			}
 			
@@ -2157,9 +2123,6 @@ function initSaveButtons(){ //Adds event listeners to all buttons
 				$(this).closest("tr").next().find('input[type="text"]').focus(); //Focus on Next Field
 			}
 		});
-		
-
-				
 		
 		readShirtNiche();		
 	})
