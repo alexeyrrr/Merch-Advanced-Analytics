@@ -575,6 +575,10 @@ function dailySalesPage(fromDate, toDate, viewType = 'day'){
 										'<canvas id="canvas5" height="350" width="280" style="padding:10px"></canvas>'+
 										'<h5 class="canvas-title">Color Distribution</h5>' +
 									'</div>' +
+									'<div class="canvas-wrapper">'+
+										'<canvas id="canvas6" height="350" width="280" style="padding:10px"></canvas>'+
+										'<h5 class="canvas-title">Pricing Distribution</h5>' +
+									'</div>' +
 								'</center>' +
 							'</div>' +
 							'<div class="tab-pane" role="tabpanel" id="niche">' +
@@ -583,7 +587,7 @@ function dailySalesPage(fromDate, toDate, viewType = 'day'){
 										'<div class="col-xs-6 col-sm-6 float-left">' +
 											'<center>' +
 												'<div class="canvas-wrapper" style="width: 100%;">'+
-													'<canvas id="canvas6" height="350" width="280" style="padding:10px"></canvas>'+
+													'<canvas id="canvas7" height="350" width="280" style="padding:10px"></canvas>'+
 													'<h5 class="canvas-title">Niche Distribution (Number Sold)</h5>' +
 												'</div>' +
 											'</center>' +
@@ -591,7 +595,7 @@ function dailySalesPage(fromDate, toDate, viewType = 'day'){
 										'<div class="col-xs-6 col-sm-6 float-left">' +
 											'<center>' +
 												'<div class="canvas-wrapper" style="width: 100%;">'+
-													'<canvas id="canvas7" height="350" width="280" style="padding:10px"></canvas>'+
+													'<canvas id="canvas8" height="350" width="280" style="padding:10px"></canvas>'+
 													'<div class="canvas-title">' +
 														'<h5>Normalized Niche Distribution (%)</h5>' +
 														'<i class="fa fa-info-circle" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="A normalized distribution takes into account the number of shirts for each niche and factors out the relative availablilty of each niche. (i.e. think like comparing a country\'s GDP vs GDP Per Capita)"></i>'+
@@ -666,10 +670,12 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 		var revenueData = new Array(axisLabels.length).fill(0);
 		var royaltyData = new Array(axisLabels.length).fill(0);
 		
+		
 		//Tally Numbers
 		var gendersArray = {'Men': 0, 'Women': 0, 'Youth': 0};
 		var sizesArray = {'Small': 0, 'Medium': 0, 'Large': 0, 'XL': 0, '2XL': 0, '3XL': 0, '4': 0, '6': 0, '8': 0, '10': 0, '12': 0};
 		var shirtColorsArray = {'Dark Heather': 0, 'Heather Grey': 0, 'Heather Blue': 0, 'Black': 0, 'Navy': 0, 'Silver': 0, 'Royal Blue': 0, 'Brown': 0, 'Slate': 0, 'Red': 0, 'Asphalt': 0, 'Grass': 0, 'Olive': 0, 'Kelly Green': 0, 'Baby Blue': 0, 'White': 0, 'Lemon': 0, 'Cranberry': 0, 'Pink': 0, 'Orange': 0, 'Purple': 0};
+		var priceObject = {};
 					
 		//Assemble Dynamic Blank Array For Niches
 		var nicheArray = {};
@@ -743,9 +749,22 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 									shirtColorsArray[key] += 1;
 								}
 							}
+							
+							//Determing Unit Price & Count it
+							var unitsSold = responseArray[i2]["Units"] - responseArray[i2]["Cancellations"];
+							if (unitsSold != 0){ //Disregding canceled units intentionally								
+								var unitPrice = "$"+(responseArray[i2]["Revenue"] / (unitsSold)).toFixed(2);	
+									if (unitPrice in priceObject){
+									priceObject[unitPrice] += 1;
+								} else {
+									priceObject[unitPrice] = 1;
+								}
+							}
+							
+							
 						}
 					}
-				
+					
 					if(viewType == "day" && axisLabels.length <= 15){
 						axisLabels[i] = moment(axisLabels[i], "MM-DD-YYYY").format('dddd');
 					} else if (viewType == "week" && axisLabels.length <= 90){
@@ -759,6 +778,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 					}
 				}
 				
+				console.log(priceObject);
 				
 				/******* Render Top Page Stats *****************/
 				var totals = {};				
@@ -784,7 +804,6 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 				} else if(viewType == "week"){
 					var pageTitle = "Weekly Statistics";
 					var periodTitle = "week";
-					//var periodDuration = Math.round(duration.asMonths()) + " Week Range";
 					var periodDuration = Math.round(duration.asDays()) + " Day Range"; //Keep as days
 				} else {
 					var pageTitle = "Daily Statistics";
@@ -1096,9 +1115,24 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 					},
 					options: globalLineChartOptions,
 				};
+				
+				
+				//Pricing Charts
+				var lineChartData6 = {
+					type: 'doughnut',
+					data: {
+						labels: Object.keys(priceObject),
+						datasets: [{							
+							data: Object.values(priceObject),
+							backgroundColor: shirtNicheColorsLUT,
+						}]
+					},
+					options: globalLineChartOptions,
+				};
+				
 
 				//Shirt Niches (Non-normalized) 
-				var lineChartData6 = {
+				var lineChartData7 = {
 					type: 'doughnut',
 					data: {
 						labels: Object.keys(nicheArray),
@@ -1127,6 +1161,9 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 				
 				var ctxNiches = document.getElementById("canvas6").getContext("2d");	
 				var myChart = new Chart(ctxNiches, lineChartData6);
+				
+				var ctxNiches = document.getElementById("canvas7").getContext("2d");	
+				var myChart = new Chart(ctxNiches, lineChartData7);
 				
 				//Summing up all values
 				var allASINValues = [];
@@ -1169,12 +1206,12 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 					'<table class="table table-striped sortable" id="itemizedList"><thead><tr><th>#</th>' +
 					'<th>Shirt Name</th>' +
 					'<th class="">Niche Category</th>' +
+					'<th class="text-center">Product Details</th>' +
 					'<th class="text-center">Units Sold</th>' +
 					'<th class="text-center">Units Cancelled</th>' +
 					'<th class="text-center">Revenue</th>' +
 					'<th class="text-center">Royalties</th>' +
 					'<th class="text-center">Avg Royalties / Shirt </th>' +
-					'<th class="text-center">Product Details</th>' +
 					'</tr></thead><tbody>';
 
 				for (i=0; i < resultSumSales.length; i++){
@@ -1195,6 +1232,10 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 						'<td class="niche-tag">'+
 							'<i class="fa fa-tag" aria-hidden="true"></i> '+ specificNiche +
 						'</td>' +
+						
+						'<td class="text-center btn-inside">' +						
+							'<a target="_blank" href="' + '/IndividualProductPage/?ASIN=' + resultSumSales[i]["ASIN"]  + '" class="btn btn-primary">Analyze</a>' +
+						'</td>' +
 										
 						'<td class="text-center">' +
 							resultSumSales[i]["Units"]  +
@@ -1214,10 +1255,6 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 						
 						'<td class="text-center">' +
 							(resultSumSales[i]["Royalty"].toFixed(2) / (resultSumSales[i]["Units"] - resultSumSales[i]["Cancellations"] + 0.00001)).toFixed(2)  +
-						'</td>' +
-						
-						'<td class="text-center btn-inside">' +						
-							'<a target="_blank" href="' + '/IndividualProductPage/?ASIN=' + resultSumSales[i]["ASIN"]  + '" class="btn btn-primary">Details</a>' +
 						'</td>' 
 				}
 							
@@ -1325,7 +1362,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 						normalizedPercentageArray[key] = percertangeValue;
 					}
 					
-					var lineChartData7 = {
+					var lineChartData8 = {
 						type: 'doughnut',
 						data: {
 							labels: Object.keys(normalizedPercentageArray),
@@ -1337,8 +1374,8 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 						options: globalLineChartOptions,
 					};
 					
-					var ctxNormNiches = document.getElementById("canvas7").getContext("2d");	
-					var myChart = new Chart(ctxNormNiches, lineChartData7);
+					var ctxNormNiches = document.getElementById("canvas8").getContext("2d");	
+					var myChart = new Chart(ctxNormNiches, lineChartData8);
 					
 					
 					
