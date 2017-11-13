@@ -656,8 +656,6 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 									priceObject[unitPrice] = 1;
 								}
 							}
-							
-							
 						}
 					}
 					
@@ -837,7 +835,6 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 						adjustedSizesArray[item] += parseInt(sizesArray[item]);
 					}
 				}
-				
 				
 				//Make sure colors are in correct order												
 				var shirtColorsColorsLUT = {'Dark Heather': "#454b4b", 'Heather Grey': "#d5d9da", 'Heather Blue': "#696c9c", 'Black': "#222", 
@@ -1675,6 +1672,12 @@ function renderIndividualProductSales(queryParams){
 			var revenueData = new Array(axisLabels.length).fill(0);
 			var royaltyData = new Array(axisLabels.length).fill(0);
 			
+			//Tally Numbers
+			var gendersArray = {'Men': 0, 'Women': 0, 'Youth': 0};
+			var sizesArray = {'Small': 0, 'Medium': 0, 'Large': 0, 'XL': 0, '2XL': 0, '3XL': 0, '4': 0, '6': 0, '8': 0, '10': 0, '12': 0};
+			var shirtColorsArray = {'Dark Heather': 0, 'Heather Grey': 0, 'Heather Blue': 0, 'Black': 0, 'Navy': 0, 'Silver': 0, 'Royal Blue': 0, 'Brown': 0, 'Slate': 0, 'Red': 0, 'Asphalt': 0, 'Grass': 0, 'Olive': 0, 'Kelly Green': 0, 'Baby Blue': 0, 'White': 0, 'Lemon': 0, 'Cranberry': 0, 'Pink': 0, 'Orange': 0, 'Purple': 0};
+			var priceObject = {};
+			
 			//Sales Data (Not Very Efficient)
 			for (i = 0; i < axisLabels.length; i++) {
 				for ( i2 = 0; i2 < responseArray.length; i2++){
@@ -1683,6 +1686,27 @@ function renderIndividualProductSales(queryParams){
 						cancelData[i] += parseInt(responseArray[i2]["Cancellations"]);
 						revenueData[i] += parseFloat(responseArray[i2]["Revenue"]);
 						royaltyData[i] += parseFloat(responseArray[i2]["Royalty"]);
+						
+						//Determine Gender And Count it 
+						for (var key in gendersArray){
+							if (key.toString() == responseArray[i2]["Category 1"]){
+								gendersArray[key] += 1;
+							}
+						}
+						
+						//Determine Size And Count it 
+						for (var key in sizesArray){
+							if (key.toString() == responseArray[i2]["Category 2"]){
+								sizesArray[key] += 1;
+							}
+						}
+						
+						//Determine Color And Count it 
+						for (var key in shirtColorsArray){
+							if (key.toString() == responseArray[i2]["Category 3"]){
+								shirtColorsArray[key] += 1;
+							}
+						}
 					} 
 				}
 			}
@@ -1736,6 +1760,39 @@ function renderIndividualProductSales(queryParams){
 			
 			document.getElementById("individualShirtSummary").innerHTML = shirtInfo;	
 			
+			
+			//Regroup all youth sizes to just Youth
+			var adjustedSizesArray = {'Youth': 0, 'Small': 0, 'Medium': 0, 'Large': 0, 'XL': 0, '2XL': 0, '3XL': 0};
+			for(var item in sizesArray){
+				if (item == "4" || item == "6" || item == "8" || item == "10" || item == "12") {
+					adjustedSizesArray['Youth'] += parseInt(sizesArray[item]);
+				}
+				else {
+					adjustedSizesArray[item] += parseInt(sizesArray[item]);
+				}
+			}
+				
+			//Make sure colors are in correct order												
+			var shirtColorsColorsLUT = {'Dark Heather': "#454b4b", 'Heather Grey': "#d5d9da", 'Heather Blue': "#696c9c", 'Black': "#222", 
+				'Navy': "#15232b", 'Silver': "#cfd1d1", 'Royal Blue': "#1c4086", 'Brown': "#31261d", 'Slate': "#818189", 'Red': "#b71111", 'Asphalt': "#3f3e3c", 
+				'Grass': "#5e9444", 'Olive': "#4a4f26", 'Kelly Green': "#006136", 'Baby Blue': "#8fb8db", 'White': "#eeeeee", 'Lemon': "#f0e87b", 'Cranberry': "#6e0a25",
+				'Pink': "#f8a3bc", 'Orange': "#ff5c39", 'Purple': "#514689"};
+			var finalShirtColorsLUT = [];
+			for (var key in shirtColorsArray){
+				finalShirtColorsLUT.push(shirtColorsColorsLUT[key]);
+			}
+			
+			sortedPriceObject = {};
+			
+			Object.keys(priceObject)
+				.sort().forEach(function(key) {
+				sortedPriceObject[key] = priceObject[key];
+			});;
+			
+			var shirtNicheColorsSeed = ["#e0f2f1", "#b2dfdb", "#80cbc4", "#4db6ac", "#26a69a", "#009688", "#00897b", "#00796b", "#00695c", "#004d40"];
+			//Extend Array Length
+			var shirtNicheColorsLUT = replicateArray(shirtNicheColorsSeed, 6);
+			
 
 			var lineChartData1 = {
 				type: 'line',
@@ -1781,7 +1838,6 @@ function renderIndividualProductSales(queryParams){
 			};
 			
 			//Genders Charts
-			/*
 			var lineChartData3 = {
 				type: 'doughnut',
 				data: {
@@ -1819,8 +1875,6 @@ function renderIndividualProductSales(queryParams){
 				},
 				options: globalLineChartOptions,
 			};
-			*/
-			
 			
 					
 			var ctxSales = document.getElementById("canvas1").getContext("2d");	
@@ -1828,6 +1882,16 @@ function renderIndividualProductSales(queryParams){
 			
 			var ctxRoyalties = document.getElementById("canvas2").getContext("2d");	
 			var myChart = new Chart(ctxRoyalties, lineChartData2);
+			
+			var ctxGenders = document.getElementById("canvas3").getContext("2d");	
+			var myChart = new Chart(ctxGenders, lineChartData3);
+			
+			var ctxSizes = document.getElementById("canvas4").getContext("2d");	
+			var myChart = new Chart(ctxSizes, lineChartData4);
+			
+			var ctxColors = document.getElementById("canvas5").getContext("2d");	
+			var myChart = new Chart(ctxColors, lineChartData5);
+				
 					
 			/*Assemble Sales History Table */
 			var cp2 = '<div id="status"></div>' +
