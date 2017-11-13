@@ -271,8 +271,9 @@ function globalInit(){
 			$(this).addClass("active");
 			$('#indvProduct').closest("li").hide();
 		});
-								
 	})
+	
+	
 }
 
 
@@ -336,16 +337,15 @@ function generateLoginModal(){
 //Add header and sidebar
 globalInit();
 
-//Get Base Path
-var cmd = window.location.href.split('?')[0];
 
-// Get Query Params
-var queryString = window.location.search.substring(1);
 
-var parseQueryString = function( funcQueryString ) {
+function getQueryParams() {	
+	// Get Query Params
+	var queryString = window.location.search.substring(1);
+	
     var params = {}, queries, temp, i, l;
     // Split into key/value pairs
-    queries = funcQueryString.split("&");
+    queries = queryString.split("&");
     // Convert the array of strings into an object
     for ( i = 0, l = queries.length; i < l; i++ ) {
         temp = queries[i].split('=');
@@ -353,8 +353,18 @@ var parseQueryString = function( funcQueryString ) {
     }
     return params;
 };
-parsedParams = parseQueryString(queryString);
-//End Parsing Query Params
+
+function router(queryParams){
+	
+	if (queryParams["page"] == "test"){
+		//This works
+	}
+}
+
+router(getQueryParams());
+
+//Get Base Path
+var cmd = window.location.href.split('?')[0];
 
 if (cmd.indexOf("MerchAnalytics") !== -1) {
 	chrome.storage.sync.get("Settings", function(items) {
@@ -376,8 +386,8 @@ if (cmd.indexOf("MerchAnalytics") !== -1) {
 
 };
 
-if (cmd.indexOf("IndividualProductPage") !== -1 && parsedParams) {	
-	individualProductPage(parsedParams);
+if (cmd.indexOf("IndividualProductPage") !== -1) {	
+	individualProductPage(getQueryParams());
 };
 		
 /***************************************************************/
@@ -1250,21 +1260,18 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 					var fromDate = picker.startDate.unix()*1000;
 					var toDate = picker.endDate.unix()*1000;
 					
-					
 					if(15*24*60*60000 < (toDate - fromDate) <= 91*24*60*60000){
 						var extraFlag = 'week';
+						//Get full weeks
 						fromDate = moment(picker.startDate.unix()*1000).startOf('week').unix() *1000;
 						toDate = moment(picker.endDate.unix()*1000).add(6,'days').startOf('week').unix() *1000;
-						
 						
 					} else if ((toDate - fromDate) > 91*24*60*60000){
 						var extraFlag = 'month';
 					} else {
 						var extraFlag = 'daily';
-						
 					}
 					
-			
 					dailySalesPage(fromDate, toDate, extraFlag);
 				}
 				
