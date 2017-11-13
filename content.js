@@ -130,56 +130,6 @@ Date.prototype.adjustDate = function(days) {
     }
     return date;
 };
-Date.prototype.adjustMonth = function(months) {
-    var date;
-
-    months = months || 0;
-
-    if (months === 0) {
-        date = new Date(this.getTime());
-    } else if (months > 0) {
-        date = new Date(this.getTime());
-        date.setMonth(date.getMonth() + months);
-    } else {
-        date = new Date(
-            this.getFullYear(),
-            this.getMonth() - Math.abs(months),
-            this.getDate(),
-            this.getHours(),
-            this.getMinutes(),
-            this.getSeconds(),
-            this.getMilliseconds()
-        );
-    }
-    return date;
-};
-Date.prototype.getFirstDateOfMonth = function() {
-    var date = new Date(this.getTime());
-    date.setDate(1);
-    return new Date(date.getTime());
-};
-Date.prototype.getLastDayOfMonth = function() {
-    var nextMonthDate = new Date(this.getTime());
-    nextMonthDate.setMonth(this.getMonth() + 1);
-    nextMonthDate.setDate(1);
-    var date = new Date(nextMonthDate.getTime());
-    date.setDate(nextMonthDate.getDate() - 1);
-    return date;
-};
-Date.prototype.setTimeZone = function(zone) {
-    zone = zone || "America/Los_Angeles";
-    return new Date(this.toLocaleString("en-US", {
-        timeZone: zone
-    }));
-};
-Date.prototype.getUTC = function(reset) {
-    return true === reset ? new Date(Date.UTC(this.getFullYear(), this.getMonth(), this.getDate())) :
-        new Date(Date.UTC(this.getFullYear(), this.getMonth(), this.getDate(), this.getHours(), this.getMinutes(), this.getSeconds(), this.getMilliseconds()));
-};
-Date.prototype.setUTC = function(reset) {
-    return true === reset ? new Date(Date.UTC(this.getFullYear(), this.getMonth(), this.getDate())) :
-        new Date(Date.UTC(this.getFullYear(), this.getMonth(), this.getDate(), this.getHours(), this.getMinutes(), this.getSeconds(), this.getMilliseconds()));
-};
 Number.prototype.formatMoney = function(c, d, t){
 var n = this, 
     c = isNaN(c = Math.abs(c)) ? 2 : c, 
