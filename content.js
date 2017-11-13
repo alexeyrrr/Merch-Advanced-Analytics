@@ -1498,7 +1498,7 @@ function productManager() {
 					'</td>' +
 					
 					'<td class="text-center btn-inside">' +
-						'<a target="_blank" href="\/IndividualProductPage\/?ASIN=' + ts[i].marketplaceAsinMap.US  + '" class="btn btn-primary">Detail</a>' +
+						'<a target="_blank" href="\/IndividualProductPage\/?ASIN=' + ts[i].marketplaceAsinMap.US  + '" class="btn btn-primary">Analyze</a>' +
 					'</td>' +
 					
 					'<td class="text-center">' + ts[i].listPrice + '</td>' +
@@ -1619,13 +1619,29 @@ function individualProductPage(queryParams){
 		pageContent = '<div class="container">' +
 						'<div class="card"></center>'+
 							'<div class="card-block">'+ 
-								'<div id="individualShirtSummary" class="status">test</div>' + 
+								'<div id="individualShirtSummary" class="status text-center">' +
+									'<h2>Enter Your Product ASIN</h2>' +
+									'<div class="form-group">' +
+										'<input type="text">' +
+										'<button class="btn btn-primary submit-asin">Go</button>' +
+									'</div>' + 
+									'<p>Or select a product from the Product Manager page and click "Product Details"</p>' +
+								'</div>' + 
 							'</div>' +
 						'</div>' +
 					'</div>';
 		
 		$(".wrapper").children().filter(":not(#sidebar)").remove();
 		$(".wrapper").append(pageContent);
+		
+		$(".submit-asin").click(function(){
+			var asin = $(this).closest('.form-group').find("input").val();
+			if (asin.length != 10){
+				alert("Please enter a valid ASIN");
+			} else {
+				window.location.replace("/IndividualProductPage/?ASIN=" + asin);
+			}
+		})
 	}
 }
 

@@ -480,3 +480,7 @@ table tr, table td{
 .img-responsive{
 	width: 100%;
 }
+
+.submit-asin{
+	vertical-align: top;
+}
