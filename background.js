@@ -147,16 +147,12 @@ var checkforsales = function() {
 								chrome.browserAction.setBadgeText({ text: sales.productsSold }); 
 								chrome.browserAction.setBadgeBackgroundColor({ color: '#cc0000' });
 								currentsales = req.responseText;
-							}
-							
-							if (chng >= 1) {
+							} else if (chng >= 1 && chng <= 3) {
 								if(!firstInstallInner){
 									if(option.playSound) { 
 										SaleSound.play();    
 									}
 									if(option.showNotif) {  
-										
-
 										var toDate = new Date();
 										toDate = toDate.getTime();
 										
@@ -175,18 +171,19 @@ var checkforsales = function() {
 													if (reqs.responseText.indexOf('AuthenticationPortal') != -1) {
 														generateLoginModal();
 													} else {
-														
 														responseList = csvToJSON(reqs.responseText);
-														
-														for (i<0; chng; i++){
+															
+														for (var i<0; i < chng; i++){
 															var shirtsale = responseList[responseList.length-1-i]["Name"];
 															
 															chrome.notifications.create(undefined, {
 																type: 'basic',
 																title: 'New Shirt Sale',
 																iconUrl: '/img/sales.png',
-																message: "Sold 1: " + shirtsale +")."
+																message: "Sold 1: " + shirtsale +""
 															});
+															
+															console.log(shirtsale);
 														}
 													}
 												};
@@ -202,6 +199,28 @@ var checkforsales = function() {
 									color: '#008000' 
 								});
 								currentsales = req.responseText;
+							} else if (chng > 3){
+								if(!firstInstallInner){
+									if(option.playSound) { 
+										SaleSound.play();    
+									}
+									if(option.showNotif) {  
+										chrome.notifications.create(undefined, {
+											type: 'basic',
+											title: 'New Sales!',
+											iconUrl: '/img/sales.png',
+											message: "Good Job! "+chng +" new sales."
+										});
+									}
+									
+									chrome.browserAction.setBadgeText({ 
+										text: sales.productsSold
+									}); 
+									chrome.browserAction.setBadgeBackgroundColor({ 
+										color: '#008000' 
+									});
+									currentsales = req.responseText;
+								}
 							}
 						   
 							chrome.browserAction.setBadgeBackgroundColor({ color: '#008000' }); 
