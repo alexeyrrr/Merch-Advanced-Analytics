@@ -38,15 +38,13 @@ chrome.runtime.onInstalled.addListener(function(details){
 		let newVersion = chrome.runtime.getManifest().version;
 
 		//UPDATE MESSAGE
-		/*
 		chrome.notifications.create(undefined, {
 			type: 'basic',
-			title: '"Blast From The Past" Update',
+			title: 'Updated: New Pricing Analytics ',
 			isClickable: true,
 			iconUrl: '/img/logo-square.png',
-			message: "We added the ability to see sales numbers beyond 90 days into the past. Happy exploring! For other suggestions: alex@venmarkstudio.com"
+			message: "We added pricing analytics to the daily and monthly pages. Individual Product Detail pages have also been improved. For other suggestions: alex@venmarkstudio.com"
 		});	
-		*/
 		
 	} else {
 		chrome.notifications.create(undefined, {
