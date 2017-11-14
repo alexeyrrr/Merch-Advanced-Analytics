@@ -1657,14 +1657,16 @@ function renderIndividualProductSales(queryParams){
 
 			//Generate Axis Labels
 			var axisLabels = [];
-			var today = moment();
+			var today = moment().endOf('day');
 			
-			var tempFirstPublishDate = firstPublishDate;
-			while (tempFirstPublishDate <= today.unix()) {			
-				var stringifiedDate = moment.unix(tempFirstPublishDate).format("MM-DD-YYYY");
-				axisLabels.push(stringifiedDate);
+			var tempFirstPublishDate = moment.unix(firstPublishDate);
+			
+			while (tempFirstPublishDate.unix() <= today.unix()) {			
+				axisLabels.push(tempFirstPublishDate.format("MM-DD-YYYY"));
 				
-				tempFirstPublishDate = tempFirstPublishDate + 24*60*60;
+				tempFirstPublishDate.add(1, 'days');
+				
+				console.log(axisLabels);
 			}
 			
 			var salesData = new Array(axisLabels.length).fill(0);

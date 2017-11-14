@@ -124,11 +124,16 @@ var checkforsales = function() {
 						chrome.browserAction.setBadgeBackgroundColor({color: '#FFD700' });
 					} else{
 						var firstInstallInner = firstInstall; //Reset Scope
+						chrome.browserAction.setBadgeBackgroundColor({ color: '#008000' }); 
+						chrome.browserAction.setBadgeText({ text: " " });
 						
+						var sales = JSON.parse(req.responseText);
+						chrome.browserAction.setBadgeText({ text: sales.productsSold }); 
+							
 						if(currentsales != req.responseText) {
-							var sales = JSON.parse(req.responseText);
 							var xsales = JSON.parse(currentsales);
 							chng = parseInt(sales.productsSold) - parseInt(xsales.productsSold);
+							console.log(chng);
 							
 							if (chng < 0 ){
 								if(!firstInstallInner){								
@@ -144,9 +149,8 @@ var checkforsales = function() {
 										});
 									}
 								}
-								chrome.browserAction.setBadgeText({ text: sales.productsSold }); 
 								chrome.browserAction.setBadgeBackgroundColor({ color: '#cc0000' });
-								currentsales = req.responseText;
+
 							} else if (chng >= 1 && chng <= 3) {
 								if(!firstInstallInner){
 									if(option.playSound) { 
@@ -173,8 +177,9 @@ var checkforsales = function() {
 													} else {
 														responseList = csvToJSON(reqs.responseText);
 															
-														for (var i<0; i < chng; i++){
-															var shirtsale = responseList[responseList.length-1-i]["Name"];
+														for(var i=0; i < chng; i++ ) {
+															var newIndex = i-1;
+															var shirtsale = responseList[responseList.length-newIndex]["Name"];
 															
 															chrome.notifications.create(undefined, {
 																type: 'basic',
@@ -192,13 +197,8 @@ var checkforsales = function() {
 										reqs.send();
 									}
 								}
-								chrome.browserAction.setBadgeText({ 
-									text: sales.productsSold
-								}); 
-								chrome.browserAction.setBadgeBackgroundColor({ 
-									color: '#008000' 
-								});
-								currentsales = req.responseText;
+								chrome.browserAction.setBadgeBackgroundColor({ color: '#008000' });
+								
 							} else if (chng > 3){
 								if(!firstInstallInner){
 									if(option.playSound) { 
@@ -212,19 +212,12 @@ var checkforsales = function() {
 											message: "Good Job! "+chng +" new sales."
 										});
 									}
-									
-									chrome.browserAction.setBadgeText({ 
-										text: sales.productsSold
-									}); 
-									chrome.browserAction.setBadgeBackgroundColor({ 
-										color: '#008000' 
-									});
-									currentsales = req.responseText;
 								}
+								
+								chrome.browserAction.setBadgeBackgroundColor({ color: '#008000' });
 							}
 						   
-							chrome.browserAction.setBadgeBackgroundColor({ color: '#008000' }); 
-							chrome.browserAction.setBadgeText({ text: sales.productsSold }); 
+							
 							currentsales = req.responseText;
 							
 							firstInstall = false;
