@@ -664,17 +664,11 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 							'</div>' +	
 						'</div>';	
 				stats += '<div class="container row no-gutters row-eq-height">' +
-						'<div class="col-lg-2 col-sm-3 col-xs-12 offset-md-0 offset-lg-2">'+
+						'<div class="col-lg-2 col-sm-3 col-xs-12 offset-sm-0 offset-md-1 offset-lg-2">'+
 							'<div class="card">'+
 								'<div class="card-body">'+                                                                       
-									'<div class="row">'+
-										'<div class="col-lg-12 col-sm-12 col-xs-12">'+
-											'<h2 class="font-weight-lighter" style="color:#474C4F;"  >'+ totals.sales + '</h2>'+
-										'</div>'+
-									'</div>'+
-									'<div class="col-">'+
-										'<p class="text-muted text-uppercase small">Shirts Sold</p>'+
-									'</div>'+ 
+									'<h2 class="font-weight-lighter" style="color:#474C4F;"  >'+ totals.sales + '</h2>'+
+									'<p class="text-muted text-uppercase small">Shirts Sold</p>'+
 								'</div>'+
 							'</div>'+
 						'</div>'+
@@ -682,14 +676,8 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 						'<div class="col-lg-2 col-sm-3 col-xs-12 ">'+
 							'<div class="card">'+
 								'<div class="card-body">'+                                                                       
-									'<div class="row">'+
-										'<div class="col-lg-12 col-sm-12 col-xs-12">'+
-											'<h2 class="font-weight-lighter" style="color:#474C4F;"  >'+ totals.cancelled + '</h2>'+
-										'</div>'+
-									'</div>'+
-									'<div class="col-">'+
-										'<p class="text-muted text-uppercase small">Shirts Cancelled</p>'+
-									'</div>'+ 
+									'<h2 class="font-weight-lighter" style="color:#474C4F;"  >'+ totals.cancelled + '</h2>'+
+									'<p class="text-muted text-uppercase small">Shirts Cancelled</p>'+
 								'</div>'+
 							'</div>'+
 						'</div>'+
@@ -697,14 +685,8 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 						'<div class="col-lg-2 col-sm-3 col-xs-12 ">'+
 							'<div class="card">'+
 								'<div class="card-body">'+                                                                       
-									'<div class="row">'+
-										'<div class="col-lg-12 col-sm-12 col-xs-12">'+
-											'<h2 class="font-weight-lighter" style="color:#474C4F;"  >$'+ parseFloat(totals.revenue).formatMoney(2) + '</h2>'+
-										'</div>'+
-									'</div>'+
-									'<div class="col-">'+
-										'<p class="text-muted text-uppercase small">Revenue</p>'+
-									'</div>'+ 
+									'<h2 class="font-weight-lighter" style="color:#474C4F;"  >$'+ parseFloat(totals.revenue).formatMoney(2) + '</h2>'+
+									'<p class="text-muted text-uppercase small">Revenue</p>'+
 								'</div>'+
 							'</div>'+
 						'</div>'+
@@ -712,29 +694,17 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 						'<div class="col-lg-2 col-sm-3 col-xs-12 ">'+
 							'<div class="card">'+
 								'<div class="card-body">'+                                                                       
-									'<div class="row">'+
-										'<div class="col-lg-12 col-sm-12 col-xs-12">'+
-											'<h2 class="font-weight-lighter" style="color:#474C4F;"  >$'+ parseFloat(totals.royalty).formatMoney(2) + '</h2>'+
-										'</div>'+
-									'</div>'+
-									'<div class="col-">'+
-										'<p class="text-muted text-uppercase small">Royalties</p>'+
-									'</div>'+ 
+									'<h2 class="font-weight-lighter" style="color:#474C4F;"  >$'+ parseFloat(totals.royalty).formatMoney(2) + '</h2>'+
+									'<p class="text-muted text-uppercase small">Royalties</p>'+
 								'</div>'+
 							'</div>'+
 						'</div>'+
 						
-						'<div class="col-lg-2 col-sm-4 col-xs-12 offset-lg-3 offset-md-0 offset-lg-2 no-card-bottom">'+
+						'<div class="col-lg-2 col-sm-4 col-xs-12 offset-md-3 offset-lg-3 no-card-bottom">'+
 							'<div class="card">'+
 								'<div class="card-body">'+                                                                       
-									'<div class="row">'+
-										'<div class="col-lg-12 col-sm-12 col-xs-12">'+
-											'<h2 class="font-weight-lighter" style="color:#474C4F;"  >$'+ (totals.royalty /(totals.sales - totals.cancelled + 0.00001)).formatMoney(2) + '</h2>'+
-										'</div>'+
-									'</div>'+
-									'<div class="col-">'+
-										'<p class="text-muted text-uppercase small">Average Royalties / Shirt</p>'+
-									'</div>'+ 
+									'<h2 class="font-weight-lighter" style="color:#474C4F;"  >$'+ (totals.royalty /(totals.sales - totals.cancelled + 0.00001)).formatMoney(2) + '</h2>'+
+									'<p class="text-muted text-uppercase small">Average Royalties / Shirt</p>'+
 								'</div>'+
 							'</div>'+
 						'</div>'+
@@ -742,14 +712,8 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 						'<div class="col-lg-2 col-sm-4 col-xs-12 no-card-bottom ">'+
 							'<div class="card">'+
 								'<div class="card-body">'+                                                                       
-									'<div class="row">'+
-										'<div class="col-lg-12 col-sm-12 col-xs-12">'+
-											'<h2 class="font-weight-lighter" style="color:#474C4F;"  >'+ (totals.sales /(numberofDaysInner+ 0.00001)).formatMoney(2) + '</h2>'+
-										'</div>'+
-									'</div>'+
-									'<div class="col-">'+
-										'<p class="text-muted text-uppercase small">Average Sales / '+ periodTitle +'</p>'+
-									'</div>'+ 
+									'<h2 class="font-weight-lighter" style="color:#474C4F;"  >'+ (totals.sales /(numberofDaysInner+ 0.00001)).formatMoney(2) + '</h2>'+
+									'<p class="text-muted text-uppercase small">Average Sales / '+ periodTitle +'</p>'+
 								'</div>'+
 							'</div>'+
 						'</div>'+
@@ -757,21 +721,13 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 						'<div class="col-lg-2 col-sm-4 col-xs-12 no-card-bottom ">'+
 							'<div class="card">'+
 								'<div class="card-body">'+                                                                       
-									'<div class="row">'+
-										'<div class="col-lg-12 col-sm-12 col-xs-12">'+
-											'<h2 class="font-weight-lighter" style="color:#474C4F;"  >$'+ (totals.royalty /(numberofDaysInner+ 0.00001)).toFixed(2) + '</h2>'+
-										'</div>'+
-									'</div>'+
-									'<div class="col-">'+
-										'<p class="text-muted text-uppercase small">Average Royalties / '+ periodTitle +'</p>'+
-									'</div>'+ 
+									'<h2 class="font-weight-lighter" style="color:#474C4F;"  >$'+ (totals.royalty /(numberofDaysInner+ 0.00001)).toFixed(2) + '</h2>'+
+									'<p class="text-muted text-uppercase small">Average Royalties / '+ periodTitle +'</p>'+
 								'</div>'+
 							'</div>'+
 						'</div>';
 												
 				document.getElementById("dailystats").innerHTML = stats;
-				
-				
 				
 				//Regroup all youth sizes to just Youth
 				var adjustedSizesArray = {'Youth': 0, 'Small': 0, 'Medium': 0, 'Large': 0, 'XL': 0, '2XL': 0, '3XL': 0};
