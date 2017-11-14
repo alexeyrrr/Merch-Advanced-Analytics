@@ -1310,7 +1310,7 @@ function productManager() {
 	$(".wrapper").append(pageContent);	
     
 	fetchAllLiveProducts(1, '0', ts = [], null, function(){
-		var cp2 = '<table id="productManager" class="sortable table table-striped"><thead><tr>' +
+		var cp2 = '<table id="productManagerTable" class="sortable table table-striped"><thead><tr>' +
 			'<th class="text-center">Design</th>' +
 			'<th>Title</th>' +
 			'<th>Niche</th>' +
@@ -1404,11 +1404,11 @@ function productManager() {
 			$(this).hide();
 		});
 				
-		new Tablesort(document.getElementById('productManager'));
+		new Tablesort(document.getElementById('productManagerTable'));
 		
 		//Make Entire Row Clickable & Link to Individual Product Page				
 		$(function(){
-			$('#productManager tbody > tr[data-href!=""] td:not(.btn-inside)').click(function() {
+			$('#productManagerTable tbody > tr[data-href!=""] td:not(.btn-inside)').click(function() {
 				var url = $(this).closest("tr").data("href");
 				window.open(url, '_blank');
 			});
@@ -1683,10 +1683,7 @@ function renderIndividualProductSales(queryParams){
 						}
 					}
 				});
-						
-						
 			})
-			
 			
 			
 			//Regroup all youth sizes to just Youth
@@ -1804,7 +1801,6 @@ function renderIndividualProductSales(queryParams){
 				options: globalLineChartOptions,
 			};
 			
-					
 			var ctxSales = document.getElementById("canvas1").getContext("2d");	
 			var myChart = new Chart(ctxSales, lineChartData1);
 			
@@ -1820,18 +1816,16 @@ function renderIndividualProductSales(queryParams){
 			var ctxColors = document.getElementById("canvas5").getContext("2d");	
 			var myChart = new Chart(ctxColors, lineChartData5);
 				
-					
 			/*Assemble Sales History Table */
-			var cp2 = '<div id="status"></div>' +
-				'<table class="table table-striped"><thead><tr><th>#</th>'
-				+ '<th class="text-center">Date Sold</th>'
-				+ '<th class="text-center">Units</th>'
-				+ '<th class="text-center">Revenue</th>'
-				+ '<th class="text-center">Royalty</th>'
-				+ '<th class="text-center">Gender</th>' 
-				+ '<th class="text-center">Size</th>'
-				+ '<th class="text-center">Color</th>'
-				+ '</tr></thead><tbody>';
+			var cp2 = '<table id="indvTable" class="table table-striped sortable"><thead><tr><th>#</th>' +
+				'<th class="text-center">Date Sold</th>' +
+				'<th class="text-center">Units</th>' +
+				'<th class="text-center">Revenue</th>' +
+				'<th class="text-center">Royalty</th>' +
+				'<th class="text-center">Gender</th>' +
+				'<th class="text-center">Size</th>' +
+				'<th class="text-center">Color</th>' +
+				'</tr></thead><tbody>';
 
 			for (i=0; i < responseArray.length; i++){
 				cp2 += '<tr><th scope="row">' + (i + 1) + '</th>' + 
@@ -1863,10 +1857,11 @@ function renderIndividualProductSales(queryParams){
 						responseArray[i]["Category 3"]  +
 					'</td>';
 			}
-						
+
 			cp2 += '</tbody></table>';
-			document.getElementById("individualShirtSales")
-				.innerHTML = cp2;
+			document.getElementById("individualShirtSales").innerHTML = cp2;
+			
+			new Tablesort(document.getElementById('indvTable'));
 		});
 	});	
 }
