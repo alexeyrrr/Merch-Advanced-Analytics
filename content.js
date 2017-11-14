@@ -1004,17 +1004,20 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 				}
 									
 				// Assemble Sales History Table
-				var cp2 = 
-					'<table class="table table-striped sortable" id="itemizedList"><thead><tr><th>#</th>' +
-					'<th>Shirt Name</th>' +
-					'<th class="">Niche Category</th>' +
-					'<th class="text-center">Product Details</th>' +
-					'<th class="text-center">Units Sold</th>' +
-					'<th class="text-center">Units Cancelled</th>' +
-					'<th class="text-center">Revenue</th>' +
-					'<th class="text-center">Royalties</th>' +
-					'<th class="text-center">Avg Royalties / Shirt </th>' +
-					'</tr></thead><tbody>';
+				var cp2 = '<table class="table table-striped sortable" id="itemizedList">' +
+					'<thead>' + 
+						'<tr>' +
+							'<th>#</th>' +
+							'<th>Shirt Name</th>' +
+							'<th>Niche Category</th>' +
+							'<th class="text-center">Product Details</th>' +
+							'<th class="text-center">Units Sold</th>' +
+							'<th class="text-center">Units Cancelled</th>' +
+							'<th class="text-center">Revenue</th>' +
+							'<th class="text-center">Royalties</th>' +
+							'<th class="text-center">Avg Royalties / Shirt </th>' +
+						'</tr>'  +
+					'</thead><tbody>';
 
 				for (i=0; i < resultSumSales.length; i++){
 					//Assign Niche
@@ -1060,10 +1063,9 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 						'</td>' 
 				}
 							
-									
 				cp2 += '</tbody></table>';
-				document.getElementById("shirtlist")
-					.innerHTML = cp2;
+				
+				document.getElementById("shirtlist").innerHTML = cp2;
 					
 				//Init TableSort
 				new Tablesort(document.getElementById('itemizedList'));
@@ -1308,8 +1310,7 @@ function productManager() {
 	$(".wrapper").append(pageContent);	
     
 	fetchAllLiveProducts(1, '0', ts = [], null, function(){
-		var cp2 = 	'<div id="status"></div>' +
-			'<table id="quickEditor" class="sortable table table-striped"><thead><tr>'
+		var cp2 = '<table id="productManager" class="sortable table table-striped"><thead><tr>' +
 			'<th class="text-center">Design</th>' +
 			'<th>Title</th>' +
 			'<th>Niche</th>' +
@@ -1320,15 +1321,12 @@ function productManager() {
 			'<th class="text-center">Edit</th>' +
 			'</tr></thead>' +
 		'<tbody>';
-		k = 0;
 		
 		//Setup counter variables
 		var lifetimesSalesCounter = 0;
 		var liveDesignsCounter = 0;
 		
-		for (var i = 0; i < ts.length; i++) {
-			k++;
-			
+		for (var i = 0; i < ts.length; i++) {			
 			if (ts[i].marketplaceAsinMap.US !== undefined && ts[i].status == "LIVE"){
 				var hasLifetimeSales = false;
 				liveDesignsCounter++;
@@ -1343,41 +1341,41 @@ function productManager() {
 				var stringifiedCreateDate = moment.unix(parseInt(ts[i].createDate) / 1000).format("MM-DD-YYYY");
 				
 				cp2 += '<tr data-lifetime-sales="'+ hasLifetimeSales.toString() + '" data-href="https://www.amazon.com/dp/' + ts[i].marketplaceAsinMap.US + '">' +
-					'<td class="text-center">' +	
-						'<img class="img-thumbnail design-preview" src="' +   ts[i].imageURL + '">' +
-						'<img class="floated-preview img-thumbnail" style="display:none" src="' +   ts[i].imageURL + '">' +
-					'</td>' +
-					
-					'<td class="product-name"><span>' + ts[i].name + '</span></td>' + 
-						
-					'<td class="text-center btn-inside">' +
-						'<div class="form-group has-success">' +
-						  '<input type="text" name="nicheName" class="form-control niche-input"/>' +
-						  '<input type="hidden" name="parentASIN" value='+ ts[i].marketplaceAsinMap.US + '>' +
-						  //'<button class="btn btn-primary save"/>Save</button>' +
-						'</div>' +
-					'</td>' +
-					
-					'<td class="text-center">' +	
-						stringifiedCreateDate +
-					'</td>' +
-					
-					'<td class="text-center">' +
-						ts[i].daysUntilDeletion + 
-					'</td>' +
-					
-					'<td class="text-center btn-inside">' +
-						'<a target="_blank" href="\/IndividualProductPage\/?ASIN=' + ts[i].marketplaceAsinMap.US  + '" class="btn btn-primary">Analyze</a>' +
-					'</td>' +
-					
-					'<td class="text-center">' + ts[i].listPrice + '</td>' +
-					'<td class="text-center btn-inside">' + '<a target="_blank" href="http://merch.amazon.com/merch-tshirt/title-setup/' + ts[i].id + '/add_details" class="btn btn-primary">Edit</a>' + '</td></tr>';
+							'<td class="text-center">' +	
+								'<img class="img-thumbnail design-preview" src="' +   ts[i].imageURL + '">' +
+								'<img class="floated-preview img-thumbnail" style="display:none" src="' +   ts[i].imageURL + '">' +
+							'</td>' +
+							
+							'<td class="product-name"><span>' + ts[i].name + '</span></td>' + 
+								
+							'<td class="text-center btn-inside">' +
+								'<div class="form-group has-success">' +
+								  '<input type="text" name="nicheName" class="form-control niche-input"/>' +
+								  '<input type="hidden" name="parentASIN" value='+ ts[i].marketplaceAsinMap.US + '>' +
+								  //'<button class="btn btn-primary save"/>Save</button>' +
+								'</div>' +
+							'</td>' +
+							
+							'<td class="text-center">' +	
+								stringifiedCreateDate +
+							'</td>' +
+							
+							'<td class="text-center">' +
+								ts[i].daysUntilDeletion + 
+							'</td>' +
+							
+							'<td class="text-center btn-inside">' +
+								'<a target="_blank" href="\/IndividualProductPage\/?ASIN=' + ts[i].marketplaceAsinMap.US  + '" class="btn btn-primary">Analyze</a>' +
+							'</td>' +
+							
+							'<td class="text-center">' + ts[i].listPrice + '</td>' +
+							'<td class="text-center btn-inside">' + '<a target="_blank" href="http://merch.amazon.com/merch-tshirt/title-setup/' + ts[i].id + '/add_details" class="btn btn-primary">Edit</a>' + '</td>' +
+						'</tr>';
 			}
 		}
 			
 		cp2 += '</tbody></table>';
-		document.getElementById("shirtlist")
-			.innerHTML = cp2;
+		document.getElementById("shirtlist").innerHTML = cp2;
 						
 		managerStats = '<center><h2>Product Manager</h2></center>' +
 			'<table class="table table-striped"><thead>' + 
@@ -1406,11 +1404,11 @@ function productManager() {
 			$(this).hide();
 		});
 				
-		new Tablesort(document.getElementById('quickEditor'));
+		new Tablesort(document.getElementById('productManager'));
 		
 		//Make Entire Row Clickable & Link to Individual Product Page				
 		$(function(){
-			$('#quickEditor tbody > tr[data-href!=""] td:not(.btn-inside)').click(function() {
+			$('#productManager tbody > tr[data-href!=""] td:not(.btn-inside)').click(function() {
 				var url = $(this).closest("tr").data("href");
 				window.open(url, '_blank');
 			});
