@@ -664,7 +664,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 							'</div>' +	
 						'</div>';	
 				stats += '<div class="container row no-gutters row-eq-height">' +
-						'<div class="col-lg-2 col-sm-3 col-xs-12 offset-sm-0 offset-md-1 offset-lg-2">'+
+						'<div class="col-lg-2 col-sm-3 col-xs-12 offset-sm-0 offset-md-1 offset-lg-2 no-card-bottom">'+
 							'<div class="card">'+
 								'<div class="card-body">'+                                                                       
 									'<h2 class="font-weight-lighter" style="color:#474C4F;"  >'+ totals.sales + '</h2>'+
@@ -673,7 +673,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 							'</div>'+
 						'</div>'+
 						
-						'<div class="col-lg-2 col-sm-3 col-xs-12 ">'+
+						'<div class="col-lg-2 col-sm-3 col-xs-12 no-card-bottom">'+
 							'<div class="card">'+
 								'<div class="card-body">'+                                                                       
 									'<h2 class="font-weight-lighter" style="color:#474C4F;"  >'+ totals.cancelled + '</h2>'+
@@ -682,7 +682,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 							'</div>'+
 						'</div>'+
 						
-						'<div class="col-lg-2 col-sm-3 col-xs-12 ">'+
+						'<div class="col-lg-2 col-sm-3 col-xs-12 no-card-bottom">'+
 							'<div class="card">'+
 								'<div class="card-body">'+                                                                       
 									'<h2 class="font-weight-lighter" style="color:#474C4F;"  >$'+ parseFloat(totals.revenue).formatMoney(2) + '</h2>'+
@@ -691,7 +691,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 							'</div>'+
 						'</div>'+
 						
-						'<div class="col-lg-2 col-sm-3 col-xs-12 ">'+
+						'<div class="col-lg-2 col-sm-3 col-xs-12 no-card-bottom">'+
 							'<div class="card">'+
 								'<div class="card-body">'+                                                                       
 									'<h2 class="font-weight-lighter" style="color:#474C4F;"  >$'+ parseFloat(totals.royalty).formatMoney(2) + '</h2>'+
@@ -1194,14 +1194,8 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 										'<div class="col-lg-3 col-sm-4 col-xs-12 offset-md-0 offset-lg-2">'+
 											'<div class="card">'+
 												'<div class="card-body">'+                                                                       
-													'<div class="row">'+
-														'<div class="col-lg-12 col-sm-12 col-xs-12">'+
-															'<h2 class="font-weight-lighter" style="color:#474C4F;"  >'+ topSellingNiches[0] + '</h2>'+
-														'</div>'+
-													'</div>'+
-													'<div class="col-">'+
-														'<p class="text-muted text-uppercase small">#1 Top Selling Niche</p>'+
-													'</div>'+ 
+													'<h2 class="font-weight-lighter" style="color:#474C4F;"  >'+ topSellingNiches[0] + '</h2>'+
+													'<p class="text-muted text-uppercase small">#1 Top Selling Niche</p>'+
 												'</div>'+
 											'</div>'+
 										'</div>'+
@@ -1209,14 +1203,8 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 										'<div class="col-lg-3 col-sm-4 col-xs-12 ">'+
 											'<div class="card">'+
 												'<div class="card-body">'+                                                                       
-													'<div class="row">'+
-														'<div class="col-lg-12 col-sm-12 col-xs-12">'+
-															'<h2 class="font-weight-lighter" style="color:#474C4F;"  >'+ topSellingNiches[1] + '</h2>'+
-														'</div>'+
-													'</div>'+
-													'<div class="col-">'+
-														'<p class="text-muted text-uppercase small">#2 Top Selling Niche</p>'+
-													'</div>'+ 
+													'<h2 class="font-weight-lighter" style="color:#474C4F;"  >'+ topSellingNiches[1] + '</h2>'+
+													'<p class="text-muted text-uppercase small">#2 Top Selling Niche</p>'+
 												'</div>'+
 											'</div>'+
 										'</div>'+
@@ -1224,14 +1212,8 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 										'<div class="col-lg-3 col-sm-4 col-xs-12 ">'+
 											'<div class="card">'+
 												'<div class="card-body">'+                                                                       
-													'<div class="row">'+
-														'<div class="col-lg-12 col-sm-12 col-xs-12">'+
-															'<h2 class="font-weight-lighter" style="color:#474C4F;"  >'+ topSellingNiches[2] + '</h2>'+
-														'</div>'+
-													'</div>'+
-													'<div class="col-">'+
-														'<p class="text-muted text-uppercase small">#3 Top Selling Niche</p>'+
-													'</div>'+ 
+													'<h2 class="font-weight-lighter" style="color:#474C4F;"  >'+ topSellingNiches[2] + '</h2>'+
+													'<p class="text-muted text-uppercase small">#3 Top Selling Niche</p>'+
 												'</div>'+
 											'</div>'+
 										'</div>'+
