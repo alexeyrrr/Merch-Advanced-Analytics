@@ -94,7 +94,6 @@ var n = this,
 /***************************************************************/
 /********************* Global HTML  / Options ******************/
 /***************************************************************/
-
 var logoURL = chrome.extension.getURL("/img/logo.png");
 var globalHeader = '<head><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"><link rel="shortcut icon" href="'+  chrome.extension.getURL('img/favicon.ico') + '" type="image/x-icon">' +
 					'<link rel="icon" href="'+  chrome.extension.getURL('img/favicon.ico') + '" type="image/x-icon"></head>';
@@ -128,10 +127,10 @@ function globalInit(){
 	$(function(){		
 		$("#dailySales, #logo").click(function(){
 			//Calculate Unix Timestamps
-			var fromDate14 = moment().subtract(14, 'days').unix();
+			var fromDate7 = moment().subtract(7, 'days').unix();
 			var toDate = moment().unix();
 			
-			dailySalesPage(fromDate14, toDate);
+			dailySalesPage(fromDate7, toDate);
 		});
 		
 		$("#monthlySales").click(function(){
@@ -237,10 +236,10 @@ router(getQueryParams());
 var cmd = window.location.href.split('?')[0];
 
 if (cmd.indexOf("MerchAnalytics") !== -1) {
-	var fromDate14 = moment().subtract(14, 'days').unix();
+	var fromDate7 = moment().subtract(7, 'days').unix();
 	var toDate = moment().unix();
 	
-	dailySalesPage(fromDate14, toDate);
+	dailySalesPage(fromDate7, toDate);
 };
 
 if (cmd.indexOf("IndividualProductPage") !== -1) {	
@@ -492,9 +491,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 		//Reset Var Scope
 		var localUnixToDate = moment.unix(unixToDate);
 		var localUnixFromDate = moment.unix(unixFromDate);	
-		
-		console.log(viewType);
-		
+				
 		if(viewType == "month"){ //Monthly Labels		
 			while (localUnixFromDate <= localUnixToDate) {	
 				axisLabels.push(String(localUnixFromDate.format("MMM YYYY")));
@@ -518,7 +515,6 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 		var cancelData = new Array(axisLabels.length).fill(0);
 		var revenueData = new Array(axisLabels.length).fill(0);
 		var royaltyData = new Array(axisLabels.length).fill(0);
-		
 		
 		//Tally Numbers
 		var gendersArray = {'Men': 0, 'Women': 0, 'Youth': 0};
@@ -648,17 +644,17 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 				} else if(viewType == "week"){
 					var pageTitle = "Weekly Statistics";
 					var periodTitle = "week";
-					var periodDuration = Math.round(duration.asDays()) + " Day Range"; //Keep as days
+					var periodDuration = Math.floor(duration.asDays()) + " Day Range"; //Keep as days
 				} else {
 					var pageTitle = "Daily Statistics";
 					var periodTitle = "day";
-					var periodDuration = Math.round(duration.asDays()) + " Day Range";
+					var periodDuration = Math.floor(duration.asDays()) + " Day Range";
 				}
 				
 				stats = '<div class="container row no-pading-top">'+
 							'<div class="col-sm-6 col-xs-6">' +
 								'<h3>' + pageTitle + '</h3>' +
-								'<h4 class="subheading">' + periodDuration +'</h4>' +
+								'<h4 class="subheading" style="margin-bottom: 0;">' + periodDuration +'</h4>' +
 							'</div>' +
 							'<div class="col-sm-6 col-xs-6">' +
 								'<div class="dropdown">' +
@@ -1137,7 +1133,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 						minDate: new Date(2015, 9, 1),
 						ranges: {
 						   'Today': [moment(), moment()],
-						   'This Week': [moment().subtract(7, 'days'), moment()],
+						   'Last 7 Days': [moment().subtract(7, 'days').startOf('day'), moment().startOf('day')],
 						   'Last 14 Days': [moment().subtract(13, 'days'), moment()],
 						   'Last 30 Days': [moment().subtract(29, 'days'), moment()],
 						   'This Month': [moment().startOf('month'), moment().endOf('month')],

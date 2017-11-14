@@ -488,3 +488,7 @@ table tr, table td{
 #individualShirtSummary .form-group{
 	margin: 0;
 }
+
+h2.font-weight-lighter{
+	font-size: calc(12px + 0.83vw);
+}
