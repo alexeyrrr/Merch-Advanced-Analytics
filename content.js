@@ -160,7 +160,6 @@ function globalInit(){
 	
 }
 
-
 var globalLineChartOptions = {
 						responsive: false,
 						animation: {
@@ -177,21 +176,10 @@ var globalLineChartOptions = {
 							display: false
 						}						
 					};
-				
-				
+								
 /***************************************************************/
 /******* Login Functions / Timezone Global Options *************/
 /***************************************************************/
-var OPTION_TIMEZONE_OFFSET = -7*60*60000;
-var DAYLIGHT_SAVINGS = false;
-
-//Determine if Daylight Savings Now
-(function(){
-	var today = new Date();
-	var jan = new Date(today.getFullYear(),0,1);
-	var jul = new Date(today.getFullYear(),6,1);
-	DAYLIGHT_SAVINGS = Math.min(jan.getTimezoneOffset(),jul.getTimezoneOffset()) == today.getTimezoneOffset();  
-})();
 
 function generateLoginModal(){
 	loginerr = '<div id="myModal" class="modal fade" role="dialog">' +
@@ -221,7 +209,6 @@ function generateLoginModal(){
 //Add header and sidebar
 globalInit();
 
-
 function getQueryParams() {	
 	// Get Query Params
 	var queryString = window.location.search.substring(1);
@@ -250,23 +237,10 @@ router(getQueryParams());
 var cmd = window.location.href.split('?')[0];
 
 if (cmd.indexOf("MerchAnalytics") !== -1) {
-	chrome.storage.sync.get("Settings", function(items) {
-		if(Object.values(items).length != 0){
-			parsedJson = JSON.parse(items["Settings"]);
-			OPTION_TIMEZONE_OFFSET = parseInt(parsedJson["timezone"])*60*60000;
-			
-			if (DAYLIGHT_SAVINGS){
-				OPTION_TIMEZONE_OFFSET += 1*60*60000;
-			}
-		}
-		
-		var fromDate14 = moment().subtract(14, 'days').unix();
-		var toDate = moment().unix();
-		
-		dailySalesPage(fromDate14, toDate);
-	});
-								
-
+	var fromDate14 = moment().subtract(14, 'days').unix();
+	var toDate = moment().unix();
+	
+	dailySalesPage(fromDate14, toDate);
 };
 
 if (cmd.indexOf("IndividualProductPage") !== -1) {	
@@ -1959,7 +1933,6 @@ function renderIndividualProductSales(queryParams){
 					'</td>';
 			}
 						
-								
 			cp2 += '</tbody></table>';
 			document.getElementById("individualShirtSales")
 				.innerHTML = cp2;
@@ -1968,8 +1941,8 @@ function renderIndividualProductSales(queryParams){
 }
 
 function fetchIndividualProductSales(targetASIN, callback){
-	var toDate = moment().unix() * 1000;
-	var fromDate = moment().subtract(90, 'days').unix() * 1000;
+	var toDate = moment().unix();
+	var fromDate = moment().subtract(90, 'days').unix();
 
 	fetchSalesDataCSV(fromDate, toDate, responseArray = [], function(){
 		infoAboutTargetASIN = []
@@ -1978,7 +1951,6 @@ function fetchIndividualProductSales(targetASIN, callback){
 				infoAboutTargetASIN.push(responseArray[i]);
 			}
 		}
-			
 		callback(infoAboutTargetASIN);
 	});
 	
