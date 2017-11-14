@@ -493,6 +493,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 		var localUnixToDate = moment.unix(unixToDate);
 		var localUnixFromDate = moment.unix(unixFromDate);	
 		
+		console.log(viewType);
 		
 		if(viewType == "month"){ //Monthly Labels		
 			while (localUnixFromDate <= localUnixToDate) {	
@@ -1153,12 +1154,10 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 					
 					if((toDate - fromDate) < (91*24*60*60) && (toDate - fromDate) > (32*24*60*60)){
 						var extraFlag = 'week';
-						//Get full weeks						
-						fromDate = moment.unix(fromDate).startOf('week').unix();
-						toDate = moment.unix(toDate).add(6,'days').startOf('week').unix();
-						
+						fromDate = moment.unix(fromDate).startOf('week').unix(); //Get full weeks offset						
 					} else if ((toDate - fromDate) > 91*24*60*60){
 						var extraFlag = 'month';
+						fromDate = moment.unix(fromDate).startOf('month').unix(); //Get full months offset						
 					} else {
 						var extraFlag = 'day';
 					}
