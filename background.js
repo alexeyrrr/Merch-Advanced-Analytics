@@ -110,7 +110,6 @@ var checkforsales = function() {
 			option.showNotif = parsedJson["popup"];
 		}
 		
-		
 		var salesAnalytics = 'https://merch.amazon.com/product-purchases-summary'; //https://merch.amazon.com/salesAnalyticsSummary
 		var req = new XMLHttpRequest();
 		req.open("GET", salesAnalytics, true);
@@ -133,7 +132,6 @@ var checkforsales = function() {
 						if(currentsales != req.responseText) {
 							var xsales = JSON.parse(currentsales);
 							chng = parseInt(sales.productsSold) - parseInt(xsales.productsSold);
-							console.log(chng);
 							
 							if (chng < 0 ){
 								if(!firstInstallInner){								
@@ -178,17 +176,15 @@ var checkforsales = function() {
 														responseList = csvToJSON(reqs.responseText);
 															
 														for(var i=0; i < chng; i++ ) {
-															var newIndex = i-1;
-															var shirtsale = responseList[responseList.length-newIndex]["Name"];
+															var newIndex = responseList.length - i - 1;
+															var shirtsale = responseList[newIndex]["Name"];
 															
 															chrome.notifications.create(undefined, {
 																type: 'basic',
 																title: 'New Shirt Sale',
 																iconUrl: '/img/sales.png',
-																message: "Sold 1: " + shirtsale +""
+																message: "Sold: " + shirtsale +""
 															});
-															
-															console.log(shirtsale);
 														}
 													}
 												};
