@@ -136,10 +136,10 @@ function globalInit(){
 		
 		$("#monthlySales").click(function(){
 			//Calculate Unix Timestamps
-			var fromDate6Mo = moment().subtract(6, 'months').unix();
+			var fromDate6Mo = moment().subtract(6, 'months').startOf('month').unix();
 			var toDate = moment().unix();
 						
-			dailySalesPage(fromDate6Mo, toDate, "week");
+			dailySalesPage(fromDate6Mo, toDate, "month");
 		});
 		
 		$("#productManager").click(function(){
