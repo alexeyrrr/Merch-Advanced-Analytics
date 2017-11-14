@@ -128,18 +128,18 @@ function globalInit(){
 	$(function(){		
 		$("#dailySales, #logo").click(function(){
 			//Calculate Unix Timestamps
-			var fromDate14 = moment().subtract(14, 'days').unix() * 1000;
-			var toDate = moment().unix() * 1000;
+			var fromDate14 = moment().subtract(14, 'days').unix();
+			var toDate = moment().unix();
 			
 			dailySalesPage(fromDate14, toDate);
 		});
 		
 		$("#monthlySales").click(function(){
 			//Calculate Unix Timestamps
-			var fromDate6Mo = moment().subtract(6, 'months').unix() * 1000;
-			var toDate = moment().unix() * 1000;
+			var fromDate6Mo = moment().subtract(6, 'months').unix();
+			var toDate = moment().unix();
 						
-			dailySalesPage(fromDate6Mo, toDate, "month");
+			dailySalesPage(fromDate6Mo, toDate, "week");
 		});
 		
 		$("#productManager").click(function(){
@@ -260,8 +260,8 @@ if (cmd.indexOf("MerchAnalytics") !== -1) {
 			}
 		}
 		
-		var fromDate14 = moment().subtract(14, 'days').unix() * 1000;
-		var toDate = moment().unix() * 1000;
+		var fromDate14 = moment().subtract(14, 'days').unix();
+		var toDate = moment().unix();
 		
 		dailySalesPage(fromDate14, toDate);
 	});
@@ -278,8 +278,9 @@ if (cmd.indexOf("IndividualProductPage") !== -1) {
 /***************************************************************/	
 function fetchSalesDataCSV(endDate, toDate, result, callback){
 	//Not the most elegant way, but by far the simplest
-	if((toDate - endDate) <= (24*60*60000*90 + 12*60*60000)){ //Period under 90 days (with grace period)
-        var sls = 'https://merch.amazon.com/product-purchases-report?fromDate=' + endDate + '&toDate=' + toDate ;
+	//This Function Deals in Unix Milliseconds
+	if((toDate - endDate) <= (24*60*60*90 + 12*60*60)){ //Period under 90 days (with grace period)
+        var sls = 'https://merch.amazon.com/product-purchases-report?fromDate=' + endDate * 1000 + '&toDate=' + toDate * 1000;
         var reqs = new XMLHttpRequest();
         reqs.open("GET", sls, true);
         reqs.onreadystatechange = function() {
@@ -302,9 +303,9 @@ function fetchSalesDataCSV(endDate, toDate, result, callback){
         };
         reqs.send();
     } else { //Period over 90 days (with grace period)
-		var newEndDate = toDate - (24*60*60000*90);
+		var newEndDate = toDate - (24*60*60*90);
 	
-		var sls = 'https://merch.amazon.com/product-purchases-report?fromDate=' + newEndDate + '&toDate=' + toDate ;
+		var sls = 'https://merch.amazon.com/product-purchases-report?fromDate=' + newEndDate * 1000+ '&toDate=' + toDate * 1000;
 		var reqs = new XMLHttpRequest();
 		reqs.open("GET", sls, true);
 		reqs.onreadystatechange = function() {
@@ -322,7 +323,7 @@ function fetchSalesDataCSV(endDate, toDate, result, callback){
 						
 						
 						//Shift Last Call Date Down
-						toDate -= 24*60*60000*90;
+						toDate -= 24*60*60*90;
 						fetchSalesDataCSV(endDate, toDate, result, callback);
 					}
 				};
@@ -510,37 +511,30 @@ function dailySalesPage(fromDate, toDate, viewType = 'day'){
 }
 
 function renderDailyView(unixFromDate, unixToDate, viewType){	
-	var finalResponse = [];
-	fetchSalesDataCSV(unixFromDate, unixToDate, finalResponse, function(responseArray){		
+	fetchSalesDataCSV(unixFromDate, unixToDate, responseArray = [], function(){		
 		//Generate Axis Labels
 		var axisLabels = [];
 				
 		//Reset Var Scope
-		var localUnixFromDate = unixFromDate;	
-		var localUnixToDate = unixToDate;
+		var localUnixToDate = moment.unix(unixToDate);
+		var localUnixFromDate = moment.unix(unixFromDate);	
+		
 		
 		if(viewType == "month"){ //Monthly Labels		
 			while (localUnixFromDate <= localUnixToDate) {	
-				var stringifiedDate = moment(localUnixFromDate).format("MMM YYYY");
-				axisLabels.push(stringifiedDate);
-				
+				axisLabels.push(String(localUnixFromDate.format("MMM YYYY")));
 				var daysThisMonth = moment(localUnixFromDate).daysInMonth();
-				
-				localUnixFromDate = localUnixFromDate + (daysThisMonth*24*60*60000);
+				localUnixFromDate.add(daysThisMonth, 'days');
 			}
 		} else if(viewType == "week"){	
 			while (localUnixFromDate <= localUnixToDate) {	
-				var stringifiedDate = moment(localUnixFromDate).format("ww YYYY");
-				axisLabels.push(stringifiedDate);
-								
-				localUnixFromDate = localUnixFromDate + (7*24*60*60000);
+				axisLabels.push(String(localUnixFromDate.format("ww YYYY")));
+				localUnixFromDate.add(7, 'days');
 			}
 		} else if(viewType == "day"){ //daily Labels
 			while (localUnixFromDate <= localUnixToDate) {			
-				var stringifiedDate = moment(localUnixFromDate).format("MM-DD-YYYY");
-				axisLabels.push(stringifiedDate);
-				
-				localUnixFromDate = localUnixFromDate + 24*60*60000;
+				axisLabels.push(String(localUnixFromDate.format("MM-DD-YYYY")));
+				localUnixFromDate.add(1, 'days');
 			}
 			
 		}
@@ -559,6 +553,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 					
 		//Assemble Dynamic Blank Array For Niches
 		var nicheArray = {};
+				
 		assembleDynamicBlankArray(function(resultBlankArray){
 			nicheArray = resultBlankArray;
 		
@@ -567,8 +562,8 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 				var numberofDaysInner = axisLabels.length; //Janky Way to recover number of days with proper scope
 				
 				//Reset Scope Again
-				var localUnixToDate2 = unixToDate;
-				var localUnixFromDate2 = unixFromDate;
+				var localUnixToDate2 = moment.unix(unixToDate);
+				var localUnixFromDate2 = moment.unix(unixFromDate);
 				
 				for (i = 0; i < axisLabels.length; i++) {
 					for ( i2 = 0; i2 < responseArray.length; i2++){						
@@ -581,19 +576,19 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 						
 						} else if(viewType == "week"){
 							var startDate   = moment(axisLabels[i], "ww YYYY"); //This date month
-							
 							var endDate     = moment(axisLabels[i], "WW YYYY").add(7,'days'); //Previous month
 							var compareDate = moment(responseArray[i2]["Date"], "MM-DD-YYYY");
 							
 							var isWithinRange = compareDate.isBetween(startDate, endDate, 'weeks', '[)') // left inclusive
-						
+							
 						} else if(viewType == "day"){ //Daily View
 							var startDate   = moment(axisLabels[i], "MM-DD-YYYY"); //This Date
 							var endDate     = moment(axisLabels[i], "MM-DD-YYYY").add(1,'days'); //Yesterday
 							var compareDate = moment(responseArray[i2]["Date"], "MM-DD-YYYY");
-								
+							
 							var isWithinRange = compareDate.isBetween(startDate, endDate, 'days', '[)') // left inclusive
 						}
+						
 						
 						if(isWithinRange){ //See if inside range
 							//If niche tag matches, incremeent count
@@ -664,13 +659,11 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 				totals.royalty = royaltyData.reduce(function(a, b) { return a + b; }, 0).toFixed(2);
 				
 
-				fromDateString = moment.unix(localUnixFromDate2/1000).format("MM/DD/YYYY");
-				toDateString = moment.unix(localUnixToDate2/1000).format("MM/DD/YYYY");
+				fromDateString = localUnixFromDate2.format("MM/DD/YYYY");
+				toDateString = localUnixToDate2.format("MM/DD/YYYY");
 				
 				//Show User the date range they've selected
-				var now = moment(localUnixToDate2); 
-				var end = moment(localUnixFromDate2);
-				var duration = moment.duration(now.diff(end));
+				var duration = moment.duration(localUnixToDate2.diff(localUnixFromDate2));
 				
 				if(viewType == "month"){
 					var pageTitle = "Monthly Statistics";
@@ -1181,21 +1174,20 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 				
 				function resubmitPage(picker){
 					//Calculate Unix Timestamps
-					var fromDate = picker.startDate.unix()*1000;
-					var toDate = picker.endDate.unix()*1000;
-										
-					if((toDate - fromDate) < (91*24*60*60000) && (toDate - fromDate) > (32*24*60*60000)){
+					var fromDate = picker.startDate.unix();
+					var toDate = picker.endDate.unix();
+					
+					if((toDate - fromDate) < (91*24*60*60) && (toDate - fromDate) > (32*24*60*60)){
 						var extraFlag = 'week';
-						//Get full weeks
-						fromDate = moment(picker.startDate.unix()*1000).startOf('week').unix() *1000;
-						toDate = moment(picker.endDate.unix()*1000).add(6,'days').startOf('week').unix() *1000;
+						//Get full weeks						
+						fromDate = moment.unix(fromDate).startOf('week').unix();
+						toDate = moment.unix(toDate).add(6,'days').startOf('week').unix();
 						
-					} else if ((toDate - fromDate) > 91*24*60*60000){
+					} else if ((toDate - fromDate) > 91*24*60*60){
 						var extraFlag = 'month';
 					} else {
 						var extraFlag = 'day';
 					}
-					
 					dailySalesPage(fromDate, toDate, extraFlag);
 				}
 				
@@ -1440,22 +1432,8 @@ function productManager() {
 					lifetimesSalesCounter++;
 				}
 				
-				
 				//Parse Create Date
-				var rawCreateDate = new Date(parseInt(ts[i].createDate));
-				var dd = rawCreateDate.getDate();
-				var mm = rawCreateDate.getMonth()+1;
-
-				var yyyy = rawCreateDate.getFullYear();
-				if(dd<10){
-					dd='0'+dd;
-				} 
-				if(mm<10){
-					mm='0'+mm;
-				} 
-				var stringifiedCreateDate = mm+'-'+dd+'-'+yyyy;
-				
-				
+				var stringifiedCreateDate = moment.unix(parseInt(ts[i].createDate) / 1000).format("MM-DD-YYYY");
 				
 				cp2 += '<tr data-lifetime-sales="'+ hasLifetimeSales.toString() + '" data-href="https://www.amazon.com/dp/' + ts[i].marketplaceAsinMap.US + '">' +
 					'<td class="text-center">' +	
@@ -1665,8 +1643,6 @@ function renderIndividualProductSales(queryParams){
 				axisLabels.push(tempFirstPublishDate.format("MM-DD-YYYY"));
 				
 				tempFirstPublishDate.add(1, 'days');
-				
-				console.log(axisLabels);
 			}
 			
 			var salesData = new Array(axisLabels.length).fill(0);
@@ -1992,11 +1968,10 @@ function renderIndividualProductSales(queryParams){
 }
 
 function fetchIndividualProductSales(targetASIN, callback){
-	var toDate = moment().valueOf();
-	var fromDate = moment().subtract(90, 'days').valueOf();
+	var toDate = moment().unix() * 1000;
+	var fromDate = moment().subtract(90, 'days').unix() * 1000;
 
-	var finalResponse = [];
-	fetchSalesDataCSV(fromDate, toDate, finalResponse, function(responseArray){
+	fetchSalesDataCSV(fromDate, toDate, responseArray = [], function(){
 		infoAboutTargetASIN = []
 		for (i=0; i < responseArray.length; i++){
 			if (responseArray[i]["ASIN"] == targetASIN){
