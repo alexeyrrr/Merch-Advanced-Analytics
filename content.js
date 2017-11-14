@@ -1162,7 +1162,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 						minDate: new Date(2015, 9, 1),
 						ranges: {
 						   'Today': [moment(), moment()],
-						   'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+						   'This Week': [moment().subtract(7, 'days'), moment()],
 						   'Last 14 Days': [moment().subtract(13, 'days'), moment()],
 						   'Last 30 Days': [moment().subtract(29, 'days'), moment()],
 						   'This Month': [moment().startOf('month'), moment().endOf('month')],
