@@ -30,6 +30,8 @@ var losssound  = new Audio();
 var currentsales = '{"royaltySymbol":"$","revenueValue":"0","royaltyValue":"0","productsSold":"0","revenueSymbol":"$"}';
 var chng = 0 ;
 
+var shirtsSoldToday = [];
+
 //Disable sales notification first time
 var firstInstall = false;	
 	
@@ -155,13 +157,9 @@ var checkforsales = function() {
 										SaleSound.play();    
 									}
 									if(option.showNotif) {  
-										var toDate = new Date();
-										toDate = toDate.getTime();
-										
-										var endDate = new Date();
-										endDate.setDate(endDate.getDate()-2);
-										endDate = endDate.getTime();
-										
+										var toDate = moment();
+										var endDate = moment().startOf('day')
+
 										var sls = 'https://merch.amazon.com/product-purchases-report?fromDate=' + endDate + '&toDate=' + toDate ;
 										var reqs = new XMLHttpRequest();
 										reqs.open("GET", sls, true);
@@ -173,11 +171,12 @@ var checkforsales = function() {
 													if (reqs.responseText.indexOf('AuthenticationPortal') != -1) {
 														generateLoginModal();
 													} else {
-														responseList = csvToJSON(reqs.responseText);
+														newShirtsSold = csvToJSON(reqs.responseText);
 															
-														for(var i=0; i < chng; i++ ) {
-															var newIndex = responseList.length - i - 1;
-															var shirtsale = responseList[newIndex]["Name"];
+														var diff = $(newShirtsSold).not(shirtsSoldToday).get();
+														
+														for(var i=0; i < diff.length; i++ ) {
+															var shirtsale = diff[i]["Name"];
 															
 															chrome.notifications.create(undefined, {
 																type: 'basic',
