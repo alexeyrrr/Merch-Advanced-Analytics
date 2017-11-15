@@ -158,7 +158,7 @@ var checkforsales = function() {
 									}
 									if(option.showNotif) {  
 										var toDate = moment();
-										var endDate = moment().startOf('day')
+										var endDate = moment().startOf('day');
 
 										var sls = 'https://merch.amazon.com/product-purchases-report?fromDate=' + endDate + '&toDate=' + toDate ;
 										var reqs = new XMLHttpRequest();
