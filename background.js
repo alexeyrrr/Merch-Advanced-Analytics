@@ -15,7 +15,6 @@ chrome.notifications.onClicked.addListener(function(notificationId, byUser) {
 	openMerchAnalytics();
 });
 
-
 var option = {
 		playSound: true, //change to true 
 		showNotif: true
@@ -40,6 +39,7 @@ chrome.runtime.onInstalled.addListener(function(details){
 		let newVersion = chrome.runtime.getManifest().version;
 
 		//UPDATE MESSAGE
+		/*
 		chrome.notifications.create(undefined, {
 			type: 'basic',
 			title: 'Updated: New Pricing Analytics ',
@@ -47,6 +47,7 @@ chrome.runtime.onInstalled.addListener(function(details){
 			iconUrl: '/img/logo-square.png',
 			message: "We added pricing analytics to the daily and monthly pages. Individual Product Detail pages have also been improved. For other suggestions: alex@venmarkstudio.com"
 		});	
+		*/
 		
 	} else {
 		chrome.notifications.create(undefined, {
