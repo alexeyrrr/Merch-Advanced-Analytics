@@ -176,8 +176,12 @@ var checkforsales = function() {
 															
 														var diff = $(newShirtsSold).not(shirtsSoldToday).get();
 														
+														console.log("diff is ", diff);
+														
 														for(var i=0; i < diff.length; i++ ) {
 															var shirtsale = diff[i]["Name"];
+															
+															console.log("Notification", shirtsale);
 															
 															chrome.notifications.create(undefined, {
 																type: 'basic',
@@ -186,6 +190,9 @@ var checkforsales = function() {
 																message: "Sold: " + shirtsale +""
 															});
 														}
+														
+														shirtsSoldToday = newShirtsSold;
+														console.log("Reset new array to", shirtsSoldToday);
 													}
 												};
 											};
