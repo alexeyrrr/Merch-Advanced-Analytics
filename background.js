@@ -161,15 +161,13 @@ var checkforsales = function() {
 						});
 						
 						console.log("newShirtsSoldToday", newShirtsSoldToday);
+						
 							
-						if(sevenDaySaleCount != saleCount){ //Efficiency ;)
-							var onlyInA = shirtsSoldToday.filter(comparer(newShirtsSoldToday));
-							var onlyInB = newShirtsSoldToday.filter(comparer(shirtsSoldToday));
-
-							diff = onlyInA.concat(onlyInB);
-
-							var change = diff.length;
+						var change = sevenDaySaleCount - saleCount;
+						
+						console.log("change is ", change);
 							
+						if(change){ //Efficiency ;)
 							if (change < 0 ){
 								if(!firstInstallInner){								
 									if(option.playSound) {  
@@ -192,7 +190,12 @@ var checkforsales = function() {
 										SaleSound.play();    
 									}
 									if(option.showNotif) {  
-										var max = 3;
+										var onlyInA = shirtsSoldToday.filter(comparer(newShirtsSoldToday));
+										var onlyInB = newShirtsSoldToday.filter(comparer(shirtsSoldToday));
+
+										diff = onlyInA.concat(onlyInB);
+										
+										var max = 3; //Extra Precaution
 										for(var i=0; i < diff.length; i++ ) {
 											var shirtsale = diff[i]["Name"];
 											

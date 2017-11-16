@@ -712,8 +712,8 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 						'<div class="col-lg-2 col-sm-4 col-xs-12 no-card-bottom ">'+
 							'<div class="card">'+
 								'<div class="card-body">'+                                                                       
-									'<h2 class="font-weight-lighter" style="color:#474C4F;"  >'+ (totals.sales /(numberofDaysInner+ 0.00001)).formatMoney(2) + '</h2>'+
-									'<p class="text-muted text-uppercase small">Average Sales / '+ periodTitle +'</p>'+
+									'<h2 class="font-weight-lighter" style="color:#474C4F;"  >'+ ((totals.sales - totals.cancelled) /(numberofDaysInner+ 0.00001)).formatMoney(2) + '</h2>'+
+									'<p class="text-muted text-uppercase small">Average Net Sales / '+ periodTitle +'</p>'+
 								'</div>'+
 							'</div>'+
 						'</div>'+
