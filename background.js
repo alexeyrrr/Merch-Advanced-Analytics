@@ -26,9 +26,9 @@ var SaleSound = new Audio();
 var losssound  = new Audio(); 
     losssound.src = "/sound/loss.wav";
 
-var currentsales = '{"royaltySymbol":"$","revenueValue":"0","royaltyValue":"0","productsSold":"0","revenueSymbol":"$"}';
-var chng = 0 ;
 
+var change = 0;
+var saleCount = 0;
 var shirtsSoldToday = [];
 
 
@@ -64,6 +64,15 @@ chrome.runtime.onInstalled.addListener(function(details){
 	//For disabling a few things on first install / update
 	firstInstall = true;
 });
+
+
+function comparer(otherArray){
+  return function(current){
+    return otherArray.filter(function(other){
+      return other.value == current.value && other.display == current.display
+    }).length == 0;
+  }
+}
 
 function csvToJSON(csv) {
   var lines=csv.split("\n");
@@ -116,7 +125,7 @@ var checkforsales = function() {
 		}
 		
 		var toDate = moment();
-		var endDate = moment().startOf('day');
+		var endDate = moment().subtract(7,'days').startOf('day');
 
 		var sls = 'https://merch.amazon.com/product-purchases-report?fromDate=' + endDate + '&toDate=' + toDate ;
 		var reqs = new XMLHttpRequest();
@@ -134,76 +143,103 @@ var checkforsales = function() {
 						chrome.browserAction.setBadgeBackgroundColor({ color: '#008000' }); 
 						chrome.browserAction.setBadgeText({ text: " " });
 						
-						newShirtsSold = csvToJSON(reqs.responseText);
-						chrome.browserAction.setBadgeText({ text: newShirtsSold.length }); 
+						var sevenDaySales = csvToJSON(reqs.responseText);
 						
-						var diff = newShirtsSold.filter(function(x) { return shirtsSoldToday.indexOf(x) < 0 })
+						sevenDaySaleCount = sevenDaySales.length;
+						chrome.browserAction.setBadgeText({ text: String(sevenDaySaleCount) }); 
 						
-						
-						console.log("diff is ", diff);
-						
-						var change = diff.length;
-						
-						if (change < 0 ){
-							if(!firstInstallInner){								
-								if(option.playSound) {  
-									losssound.play();    
+						if(sevenDaySaleCount != saleCount){ //Efficiency ;)
+							var newShirtsSoldToday = [];
+							var todayFormated = toDate.format("MM-DD-YYYY");
+							
+							sevenDaySales.forEach(function(element) {
+								if (element["Date"] == todayFormated ){
+									newShirtsSoldToday.push(element);
 								}
-								if(option.showNotif) {  
-									chrome.notifications.create(undefined, {
-										type: 'basic',
-										title: 'Sales Decreased',
-										iconUrl: '/img/can.png',
-										message: "New day maybe? ("+chng +")."
-									});
-								}
-							}
-							chrome.browserAction.setBadgeBackgroundColor({ color: '#cc0000' });
+							});
+							
+							var onlyInA = shirtsSoldToday.filter(comparer(newShirtsSoldToday));
+							var onlyInB = newShirtsSoldToday.filter(comparer(shirtsSoldToday));
 
-						} else if (chng >= 1 && chng <= 3) {
-							if(!firstInstallInner){
-								if(option.playSound) { 
-									SaleSound.play();    
-								}
-								if(option.showNotif) {  
-									for(var i=0; i < diff.length; i++ ) {
-										var shirtsale = diff[i]["Name"];
-										
-										console.log("Notification", shirtsale);
-										
+							diff = onlyInA.concat(onlyInB);
+
+							var change = diff.length;
+							
+							
+							if (change < 0 ){
+								if(!firstInstallInner){								
+									if(option.playSound) {  
+										losssound.play();    
+									}
+									if(option.showNotif) {  
 										chrome.notifications.create(undefined, {
 											type: 'basic',
-											title: 'New Shirt Sale',
-											iconUrl: '/img/sales.png',
-											message: "Sold: " + shirtsale +""
+											title: 'Sales Decreased',
+											iconUrl: '/img/can.png',
+											message: "New day maybe? ("+change +")."
 										});
 									}
 								}
-							}
-							chrome.browserAction.setBadgeBackgroundColor({ color: '#008000' });
-							
-						} else if (chng > 3){
-							if(!firstInstallInner){
-								if(option.playSound) { 
-									SaleSound.play();    
+								chrome.browserAction.setBadgeBackgroundColor({ color: '#cc0000' });
+
+							} else if (change >= 1 && change <= 3) {
+								if(!firstInstallInner){
+									if(option.playSound) { 
+										SaleSound.play();    
+									}
+									if(option.showNotif) {  
+										var max = 3;
+										for(var i=0; i < diff.length; i++ ) {
+											var shirtsale = diff[i]["Name"];
+											
+											console.log("Notification", shirtsale);
+											
+											chrome.notifications.create(undefined, {
+												type: 'basic',
+												title: 'New Shirt Sale',
+												iconUrl: '/img/sales.png',
+												message: "Sold: " + shirtsale +""
+											});
+											
+											max--;
+											if(max==0){ //Get out early after 3.
+												break;
+											}
+										}
+									}
 								}
-								if(option.showNotif) {  
-									chrome.notifications.create(undefined, {
-										type: 'basic',
-										title: 'New Sales!',
-										iconUrl: '/img/sales.png',
-										message: "Good Job! "+chng +" new sales."
-									});
+								chrome.browserAction.setBadgeBackgroundColor({ color: '#008000' });
+								
+							} else if (change > 3){
+								if(!firstInstallInner){
+									if(option.playSound) { 
+										SaleSound.play();    
+									}
+									if(option.showNotif) {  
+										chrome.notifications.create(undefined, {
+											type: 'basic',
+											title: 'New Sales!',
+											iconUrl: '/img/sales.png',
+											message: "Good Job! "+change +" new sales."
+										});
+									}
 								}
+								
+								chrome.browserAction.setBadgeBackgroundColor({ color: '#008000' });
 							}
-							
-							chrome.browserAction.setBadgeBackgroundColor({ color: '#008000' });
 						}
 					   
-						shirtsSoldToday = newShirtsSold;
-						console.log("Reset new array to", shirtsSoldToday);
-						
+						console.log("saleCount", saleCount);
+						console.log("sevenDaySaleCount", sevenDaySaleCount);
+					   
+					   
+					   
+						saleCount = sevenDaySaleCount;
+						shirtsSoldToday = newShirtsSoldToday;
 						firstInstall = false;
+						
+						
+						console.log("Updated saleCount", saleCount);
 					}
 				};
 			};
