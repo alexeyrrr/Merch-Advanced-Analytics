@@ -148,23 +148,27 @@ var checkforsales = function() {
 						sevenDaySaleCount = sevenDaySales.length;
 						chrome.browserAction.setBadgeText({ text: String(sevenDaySaleCount) }); 
 						
+						console.log("shirtsSoldToday", shirtsSoldToday);
+						
+						
+						var newShirtsSoldToday = [];
+						var todayFormated = toDate.format("MM-DD-YYYY");
+						
+						sevenDaySales.forEach(function(element) {
+							if (element["Date"] == todayFormated ){
+								newShirtsSoldToday.push(element);
+							}
+						});
+						
+						console.log("newShirtsSoldToday", newShirtsSoldToday);
+							
 						if(sevenDaySaleCount != saleCount){ //Efficiency ;)
-							var newShirtsSoldToday = [];
-							var todayFormated = toDate.format("MM-DD-YYYY");
-							
-							sevenDaySales.forEach(function(element) {
-								if (element["Date"] == todayFormated ){
-									newShirtsSoldToday.push(element);
-								}
-							});
-							
 							var onlyInA = shirtsSoldToday.filter(comparer(newShirtsSoldToday));
 							var onlyInB = newShirtsSoldToday.filter(comparer(shirtsSoldToday));
 
 							diff = onlyInA.concat(onlyInB);
 
 							var change = diff.length;
-							
 							
 							if (change < 0 ){
 								if(!firstInstallInner){								
