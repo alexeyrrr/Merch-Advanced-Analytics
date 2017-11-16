@@ -31,6 +31,8 @@ var chng = 0 ;
 
 var shirtsSoldToday = [];
 
+
+
 //Disable sales notification first time
 var firstInstall = false;	
 	
@@ -113,124 +115,100 @@ var checkforsales = function() {
 			option.showNotif = parsedJson["popup"];
 		}
 		
-		var salesAnalytics = 'https://merch.amazon.com/product-purchases-summary'; //https://merch.amazon.com/salesAnalyticsSummary
-		var req = new XMLHttpRequest();
-		req.open("GET", salesAnalytics, true);
-		req.onreadystatechange = function() {
-			if (req.readyState == 4) { 
-				if ([200,201,202,203,204,205,206,207,226].indexOf(req.status) === -1) {          
-								
+		var toDate = moment();
+		var endDate = moment().startOf('day');
+
+		var sls = 'https://merch.amazon.com/product-purchases-report?fromDate=' + endDate + '&toDate=' + toDate ;
+		var reqs = new XMLHttpRequest();
+		reqs.open("GET", sls, true);
+		reqs.onreadystatechange = function() {
+			if (reqs.readyState == 4) {
+				if ([200, 201, 202, 203, 204, 205, 206, 207, 226].indexOf(reqs.status) === -1) {
+
 				} else {
-					if (req.responseText.indexOf('AuthenticationPortal') != -1) {
+					if (reqs.responseText.indexOf('AuthenticationPortal') != -1) {
 						chrome.browserAction.setBadgeText({ text: " " });
 						chrome.browserAction.setBadgeBackgroundColor({color: '#FFD700' });
-					} else{
+					} else {
 						var firstInstallInner = firstInstall; //Reset Scope
 						chrome.browserAction.setBadgeBackgroundColor({ color: '#008000' }); 
 						chrome.browserAction.setBadgeText({ text: " " });
 						
-						var sales = JSON.parse(req.responseText);
-						chrome.browserAction.setBadgeText({ text: sales.productsSold }); 
-							
-						if(currentsales != req.responseText) {
-							var xsales = JSON.parse(currentsales);
-							chng = parseInt(sales.productsSold) - parseInt(xsales.productsSold);
-							
-							if (chng < 0 ){
-								if(!firstInstallInner){								
-									if(option.playSound) {  
-										losssound.play();    
-									}
-									if(option.showNotif) {  
-										chrome.notifications.create(undefined, {
-											type: 'basic',
-											title: 'Sales Decreased',
-											iconUrl: '/img/can.png',
-											message: "New day maybe? ("+chng +")."
-										});
-									}
+						newShirtsSold = csvToJSON(reqs.responseText);
+						chrome.browserAction.setBadgeText({ text: newShirtsSold.length }); 
+						
+						var diff = newShirtsSold.filter(function(x) { return shirtsSoldToday.indexOf(x) < 0 })
+						
+						
+						console.log("diff is ", diff);
+						
+						var change = diff.length;
+						
+						if (change < 0 ){
+							if(!firstInstallInner){								
+								if(option.playSound) {  
+									losssound.play();    
 								}
-								chrome.browserAction.setBadgeBackgroundColor({ color: '#cc0000' });
-
-							} else if (chng >= 1 && chng <= 3) {
-								if(!firstInstallInner){
-									if(option.playSound) { 
-										SaleSound.play();    
-									}
-									if(option.showNotif) {  
-										var toDate = moment();
-										var endDate = moment().startOf('day');
-
-										var sls = 'https://merch.amazon.com/product-purchases-report?fromDate=' + endDate + '&toDate=' + toDate ;
-										var reqs = new XMLHttpRequest();
-										reqs.open("GET", sls, true);
-										reqs.onreadystatechange = function() {
-											if (reqs.readyState == 4) {
-												if ([200, 201, 202, 203, 204, 205, 206, 207, 226].indexOf(reqs.status) === -1) {
-
-												} else {
-													if (reqs.responseText.indexOf('AuthenticationPortal') != -1) {
-														generateLoginModal();
-													} else {
-														newShirtsSold = csvToJSON(reqs.responseText);
-															
-														var diff = $(newShirtsSold).not(shirtsSoldToday).get();
-														
-														console.log("diff is ", diff);
-														
-														for(var i=0; i < diff.length; i++ ) {
-															var shirtsale = diff[i]["Name"];
-															
-															console.log("Notification", shirtsale);
-															
-															chrome.notifications.create(undefined, {
-																type: 'basic',
-																title: 'New Shirt Sale',
-																iconUrl: '/img/sales.png',
-																message: "Sold: " + shirtsale +""
-															});
-														}
-														
-														shirtsSoldToday = newShirtsSold;
-														console.log("Reset new array to", shirtsSoldToday);
-													}
-												};
-											};
-										};
-										reqs.send();
-									}
+								if(option.showNotif) {  
+									chrome.notifications.create(undefined, {
+										type: 'basic',
+										title: 'Sales Decreased',
+										iconUrl: '/img/can.png',
+										message: "New day maybe? ("+chng +")."
+									});
 								}
-								chrome.browserAction.setBadgeBackgroundColor({ color: '#008000' });
-								
-							} else if (chng > 3){
-								if(!firstInstallInner){
-									if(option.playSound) { 
-										SaleSound.play();    
-									}
-									if(option.showNotif) {  
-										chrome.notifications.create(undefined, {
-											type: 'basic',
-											title: 'New Sales!',
-											iconUrl: '/img/sales.png',
-											message: "Good Job! "+chng +" new sales."
-										});
-									}
-								}
-								
-								chrome.browserAction.setBadgeBackgroundColor({ color: '#008000' });
 							}
-						   
+							chrome.browserAction.setBadgeBackgroundColor({ color: '#cc0000' });
+
+						} else if (chng >= 1 && chng <= 3) {
+							if(!firstInstallInner){
+								if(option.playSound) { 
+									SaleSound.play();    
+								}
+								if(option.showNotif) {  
+									for(var i=0; i < diff.length; i++ ) {
+										var shirtsale = diff[i]["Name"];
+										
+										console.log("Notification", shirtsale);
+										
+										chrome.notifications.create(undefined, {
+											type: 'basic',
+											title: 'New Shirt Sale',
+											iconUrl: '/img/sales.png',
+											message: "Sold: " + shirtsale +""
+										});
+									}
+								}
+							}
+							chrome.browserAction.setBadgeBackgroundColor({ color: '#008000' });
 							
-							currentsales = req.responseText;
+						} else if (chng > 3){
+							if(!firstInstallInner){
+								if(option.playSound) { 
+									SaleSound.play();    
+								}
+								if(option.showNotif) {  
+									chrome.notifications.create(undefined, {
+										type: 'basic',
+										title: 'New Sales!',
+										iconUrl: '/img/sales.png',
+										message: "Good Job! "+chng +" new sales."
+									});
+								}
+							}
 							
-							firstInstall = false;
+							chrome.browserAction.setBadgeBackgroundColor({ color: '#008000' });
 						}
+					   
+						shirtsSoldToday = newShirtsSold;
+						console.log("Reset new array to", shirtsSoldToday);
+						
+						firstInstall = false;
 					}
-				
-				}
-			}
+				};
+			};
 		};
-		req.send();
+		reqs.send();
 		
 	});
 };
