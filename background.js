@@ -124,8 +124,8 @@ var checkforsales = function() {
 			option.showNotif = parsedJson["popup"];
 		}
 		
-		var toDate = moment();
-		var endDate = moment().subtract(7,'days').startOf('day');
+		var toDate = moment().endOf('day');
+		var endDate = moment().subtract(7,'days');
 
 		var sls = 'https://merch.amazon.com/product-purchases-report?fromDate=' + endDate + '&toDate=' + toDate ;
 		var reqs = new XMLHttpRequest();
@@ -144,6 +144,8 @@ var checkforsales = function() {
 						chrome.browserAction.setBadgeText({ text: " " });
 						
 						var sevenDaySales = csvToJSON(reqs.responseText);
+						
+						console.log(sevenDaySales);
 						
 						sevenDaySaleCount = sevenDaySales.length;
 						chrome.browserAction.setBadgeText({ text: String(sevenDaySaleCount) }); 
@@ -167,7 +169,7 @@ var checkforsales = function() {
 						
 						console.log("change is ", change);
 							
-						if(change){ //Efficiency ;)
+						if(change != 0){ //Efficiency ;)
 							if (change < 0 ){
 								if(!firstInstallInner){								
 									if(option.playSound) {  
@@ -184,7 +186,7 @@ var checkforsales = function() {
 								}
 								chrome.browserAction.setBadgeBackgroundColor({ color: '#cc0000' });
 
-							} else if (change >= 1 && change <= 3) {
+							} else if (change >= 1 && change <= 30) {
 								if(!firstInstallInner){
 									if(option.playSound) { 
 										SaleSound.play();    
@@ -193,13 +195,15 @@ var checkforsales = function() {
 										var onlyInA = shirtsSoldToday.filter(comparer(newShirtsSoldToday));
 										var onlyInB = newShirtsSoldToday.filter(comparer(shirtsSoldToday));
 
-										diff = onlyInA.concat(onlyInB);
+										var diff = onlyInA.concat(onlyInB); //This is the issue right now
 										
-										var max = 3; //Extra Precaution
+										console.log("diff", diff);
+										console.log("diff.length", diff.length);
+										
 										for(var i=0; i < diff.length; i++ ) {
 											var shirtsale = diff[i]["Name"];
 											
-											console.log("Notification", shirtsale);
+											console.log("shirtsale", shirtsale);
 											
 											chrome.notifications.create(undefined, {
 												type: 'basic',
@@ -207,17 +211,12 @@ var checkforsales = function() {
 												iconUrl: '/img/sales.png',
 												message: "Sold: " + shirtsale +""
 											});
-											
-											max--;
-											if(max==0){ //Get out early after 3.
-												break;
-											}
 										}
 									}
 								}
 								chrome.browserAction.setBadgeBackgroundColor({ color: '#008000' });
 								
-							} else if (change > 3){
+							} else if (change > 30){
 								if(!firstInstallInner){
 									if(option.playSound) { 
 										SaleSound.play();    
