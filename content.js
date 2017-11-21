@@ -766,7 +766,13 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 				if(viewType == "month"){ //Monthly Labels
 					//Projections
 					/* Calculate Projections */
-					daysSinceStartOfMonth = moment().format('D');
+					startOfMonth = moment().startOf('month');
+					today = moment();
+					
+					
+					hoursSinceStartOfMonth = today.diff(startOfMonth, 'hours', true)
+					hoursInMonth = moment().daysInMonth() * 24;
+					
 					var projectionSalesArray = new Array(salesData.length).fill(null); //Array of Nulls for Projection
 					var projectionRevenueArray = new Array(salesData.length).fill(null); //Array of Nulls for Projection
 					var projectionRoyaltiesArray = new Array(salesData.length).fill(null); //Array of Nulls for Projection
@@ -775,7 +781,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 					/* Projected Sales */
 					salesLastMonth = salesData[salesData.length - 2];
 					salesThisMonthSoFar = salesData[salesData.length - 1];
-					projectedSales = (salesThisMonthSoFar * moment().daysInMonth() / daysSinceStartOfMonth).toFixed(2); //Calculate Projection
+					projectedSales = (salesThisMonthSoFar * hoursInMonth / hoursSinceStartOfMonth).toFixed(2); //Calculate Projection
 					
 					//Set Limits
 					if (projectedSales >= salesLastMonth*3){
@@ -790,7 +796,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 					/* Projected Revenue */
 					revenueLastMonth = revenueData[revenueData.length - 2];		
 					revenueThisMonthSoFar = revenueData[revenueData.length - 1];
-					projectedRevenue = (revenueThisMonthSoFar * moment().daysInMonth() / daysSinceStartOfMonth).toFixed(2); //Calculate Projection
+					projectedRevenue = (revenueThisMonthSoFar * hoursInMonth / hoursSinceStartOfMonth).toFixed(2); //Calculate Projection
 					
 					//Set Limits
 					if (projectedRevenue >= revenueLastMonth*3){
@@ -805,7 +811,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 					/* Projected Profit */
 					royaltiesLastMonth = royaltyData[royaltyData.length - 2];
 					royaltiesThisMonthSoFar = royaltyData[royaltyData.length - 1];
-					projectedRoyalties = (royaltiesThisMonthSoFar * moment().daysInMonth() / daysSinceStartOfMonth).toFixed(2); //Calculate Projection
+					projectedRoyalties = (royaltiesThisMonthSoFar * hoursInMonth / hoursSinceStartOfMonth).toFixed(2); //Calculate Projection
 					
 					
 					//Set Limits
