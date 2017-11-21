@@ -206,15 +206,15 @@ var checkforsales = function() {
 										console.log("diff.length", diff.length);
 										
 										for(var i=0; i < diff.length; i++ ) {
-											var shirtsale = diff[i]["Name"];
+											var shirtName = diff[i]["Name"];
 											
-											console.log("shirtsale", shirtsale);
+											console.log("shirtName", shirtName);
 											
 											chrome.notifications.create(undefined, {
 												type: 'basic',
 												title: 'New Shirt Sale',
 												iconUrl: '/img/sales.png',
-												message: "Sold: " + shirtsale +""
+												message: "Sold: " + shirtName +""
 											});
 										}
 									}
