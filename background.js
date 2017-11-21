@@ -124,9 +124,9 @@ var checkforsales = function() {
 			option.showNotif = parsedJson["popup"];
 		}
 		
-		var toDate = moment().endOf('day');
-		var endDate = moment().subtract(7,'days');
-
+		var toDate = moment();
+		var endDate = moment().subtract(7,'days').startOf('day');
+		
 		var sls = 'https://merch.amazon.com/product-purchases-report?fromDate=' + endDate + '&toDate=' + toDate ;
 		var reqs = new XMLHttpRequest();
 		reqs.open("GET", sls, true);
@@ -144,10 +144,12 @@ var checkforsales = function() {
 						chrome.browserAction.setBadgeText({ text: " " });
 						
 						var sevenDaySales = csvToJSON(reqs.responseText);
+
+						var sevenDaySaleCount = 0;
+						sevenDaySales.forEach(function(element) { //Tally up net units sold
+							sevenDaySaleCount += element["Units"] - element["Cancellations"];
+						});
 						
-						console.log(sevenDaySales);
-						
-						sevenDaySaleCount = sevenDaySales.length;
 						chrome.browserAction.setBadgeText({ text: String(sevenDaySaleCount) }); 
 						
 						console.log("shirtsSoldToday", shirtsSoldToday);
@@ -195,6 +197,9 @@ var checkforsales = function() {
 										var onlyInA = shirtsSoldToday.filter(comparer(newShirtsSoldToday));
 										var onlyInB = newShirtsSoldToday.filter(comparer(shirtsSoldToday));
 
+										console.log("onlyInA", onlyInA);
+										console.log("onlyInB", onlyInB);
+										
 										var diff = onlyInA.concat(onlyInB); //This is the issue right now
 										
 										console.log("diff", diff);

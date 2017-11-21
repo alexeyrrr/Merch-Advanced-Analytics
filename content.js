@@ -546,8 +546,8 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 							var isWithinRange = compareDate.isBetween(startDate, endDate, 'months', '[)') // left inclusive
 						
 						} else if(viewType == "week"){
-							var startDate   = moment(axisLabels[i], "ww YYYY"); //This date month
-							var endDate     = moment(axisLabels[i], "WW YYYY").add(7,'days'); //Previous month
+							var startDate   = moment(axisLabels[i], "ww YYYY"); //This date week
+							var endDate     = moment(axisLabels[i], "WW YYYY").add(7,'days'); //Previous week
 							var compareDate = moment(responseArray[i2]["Date"], "MM-DD-YYYY");
 							
 							var isWithinRange = compareDate.isBetween(startDate, endDate, 'weeks', '[)') // left inclusive
