@@ -822,7 +822,68 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 					}
 					
 					projectionRoyaltiesArray[projectionRoyaltiesArray.length - 1] = projectedRoyalties; 
+				} else if(viewType == "week"){ //Weekly Labels
+					//Projections
+					/* Calculate Projections */
+					startOfWeek = moment().startOf('week');
+					today = moment();
+					
+					
+					hoursSinceStartOfWeek = today.diff(startOfWeek, 'hours', true)
+					hoursInWeek = 7 * 24;
+					
+					var projectionSalesArray = new Array(salesData.length).fill(null); //Array of Nulls for Projection
+					var projectionRevenueArray = new Array(salesData.length).fill(null); //Array of Nulls for Projection
+					var projectionRoyaltiesArray = new Array(salesData.length).fill(null); //Array of Nulls for Projection
+					
+
+					/* Projected Sales */
+					salesLastMonth = salesData[salesData.length - 2];
+					salesThisMonthSoFar = salesData[salesData.length - 1];
+					projectedSales = (salesThisMonthSoFar * hoursInWeek / hoursSinceStartOfWeek).toFixed(2); //Calculate Projection
+					
+					//Set Limits
+					if (projectedSales >= salesLastMonth*3){
+						projectedSales = salesLastMonth*3;
+					} else if (projectedSales <= salesLastMonth*0.5){
+						projectedSales = salesLastMonth*0.5;
+					}
+					
+					projectionSalesArray[projectionSalesArray.length - 1] = projectedSales; 
+					
+					
+					/* Projected Revenue */
+					revenueLastMonth = revenueData[revenueData.length - 2];		
+					revenueThisMonthSoFar = revenueData[revenueData.length - 1];
+					projectedRevenue = (revenueThisMonthSoFar * hoursInWeek / hoursSinceStartOfWeek).toFixed(2); //Calculate Projection
+					
+					//Set Limits
+					if (projectedRevenue >= revenueLastMonth*3){
+						projectedRevenue = revenueLastMonth*3;
+					} else if (projectedRevenue <= revenueLastMonth*0.5){
+						projectedRevenue = revenueLastMonth*0.5;
+					}
+					
+					projectionRevenueArray[projectionRevenueArray.length - 1] = projectedRevenue; 
+					
+					
+					/* Projected Profit */
+					royaltiesLastMonth = royaltyData[royaltyData.length - 2];
+					royaltiesThisMonthSoFar = royaltyData[royaltyData.length - 1];
+					projectedRoyalties = (royaltiesThisMonthSoFar * hoursInWeek / hoursSinceStartOfWeek).toFixed(2); //Calculate Projection
+					
+					
+					//Set Limits
+					if (projectedRoyalties >= royaltiesLastMonth*3){
+						projectedRoyalties = royaltiesLastMonth*3;
+					} else if (projectedRoyalties <= royaltiesLastMonth*0.5){
+						projectedRoyalties = royaltiesLastMonth*0.5;
+					}
+					
+					projectionRoyaltiesArray[projectionRoyaltiesArray.length - 1] = projectedRoyalties; 
 				}
+				
+				
 								
 				//Assemble Chart Info																	
 				var lineChartData1 = {
