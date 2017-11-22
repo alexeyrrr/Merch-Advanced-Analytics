@@ -1411,8 +1411,6 @@ function productManager() {
 				var uriEncodedName = encodeURIComponent(ts[i].name); 
 				var deleteLink = 'https://merch.amazon.com/manage/products?pageNumber=1&pageSize=15&keywords=' + uriEncodedName + '&statusFilters=%5B%22DELETED%22%2C%22DRAFT%22%2C%22LIVE%22%2C%22NOT_DISCOVERABLE%22%2C%22PENDING%22%2C%22PROCESSING%22%2C%22STOPPED%22%2C%22UNDER_REVIEW%22%2C%22REJECTED%22%2C%22MANUALLY_REJECTED%22%5D';
 				
-
-
 				cp2 += '<tr data-lifetime-sales="'+ hasLifetimeSales.toString() + '" data-href="https://www.amazon.com/dp/' + ts[i].marketplaceAsinMap.US + '">' +
 							'<td class="text-center">' +	
 								'<img class="img-thumbnail design-preview" src="' +   ts[i].imageURL + '">' +
@@ -1444,7 +1442,6 @@ function productManager() {
 							'<td class="text-center">' + ts[i].listPrice + '</td>' +
 							'<td class="text-center btn-inside">' + '<a target="_blank" href="http://merch.amazon.com/merch-tshirt/title-setup/' + ts[i].id + '/add_details" class="btn btn-primary">Edit</a>' + '</td>' +
 							'<td class="text-center btn-inside">' + '<a target="_blank" href="' + deleteLink + '" class="btn btn-danger"><i class="fa fa-trash-o fa-lg"></i></a>' + '</td>' +
-							//
 						'</tr>';
 			}
 		}

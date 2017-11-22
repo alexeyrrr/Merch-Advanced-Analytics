@@ -41,15 +41,15 @@ chrome.runtime.onInstalled.addListener(function(details){
 		let newVersion = chrome.runtime.getManifest().version;
 
 		//UPDATE MESSAGE
-		/*
+		
 		chrome.notifications.create(undefined, {
 			type: 'basic',
-			title: 'Updated: New Pricing Analytics ',
+			title: 'Updated: Improved Sale Notifications',
 			isClickable: true,
 			iconUrl: '/img/logo-square.png',
-			message: "We added pricing analytics to the daily and monthly pages. Individual Product Detail pages have also been improved. For other suggestions: alex@venmarkstudio.com"
+			message: "We improved shirt sale notifications and added delete buttons in the Product Manager. For other suggestions: alex@venmarkstudio.com"
 		});	
-		*/
+		
 		
 	} else {
 		chrome.notifications.create(undefined, {
@@ -155,10 +155,6 @@ var checkforsales = function() {
 							}
 						});
 						
-						console.log("sevenDaySales", sevenDaySales);
-						
-						console.log("newShirtsSoldToday", newShirtsSoldToday);
-						
 						var change = sevenDaySaleCount - saleCount; //Needs to be seperate to account for loses
 						var diff = [];
 						
@@ -180,7 +176,6 @@ var checkforsales = function() {
 						console.log("diff", diff);
 						console.log("change", change);
 						
-						
 						if(change != 0){ //Efficiency ;)
 							if (change < 0 ){
 								if(!firstInstallInner){								
@@ -198,7 +193,7 @@ var checkforsales = function() {
 								}
 								chrome.browserAction.setBadgeBackgroundColor({ color: '#cc0000' });
 
-							} else if (change >= 1 && change <= 30) {
+							} else if (change >= 1 && change <= 5) {
 								if(!firstInstallInner){
 									if(option.playSound) { 
 										SaleSound.play();    
@@ -221,7 +216,7 @@ var checkforsales = function() {
 								}
 								chrome.browserAction.setBadgeBackgroundColor({ color: '#008000' });
 								
-							} else if (change > 30){
+							} else if (change > 5){
 								if(!firstInstallInner){
 									if(option.playSound) { 
 										SaleSound.play();    
