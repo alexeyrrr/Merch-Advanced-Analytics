@@ -130,7 +130,7 @@ var checkforsales = function() {
 						chrome.browserAction.setBadgeText({ text: " " });
 						chrome.browserAction.setBadgeBackgroundColor({color: '#FFD700' });
 					} else {
-						var firstInstallInner = firstInstall; //Reset Scope
+						var firstInstallInner = false; //firstInstall; //Reset Scope
 						chrome.browserAction.setBadgeBackgroundColor({ color: '#008000' }); 
 						chrome.browserAction.setBadgeText({ text: " " });
 						
@@ -159,10 +159,27 @@ var checkforsales = function() {
 						
 						console.log("newShirtsSoldToday", newShirtsSoldToday);
 						
-							
-						var change = sevenDaySaleCount - saleCount;
+						var change = sevenDaySaleCount - saleCount; //Needs to be seperate to account for loses
+						var diff = [];
 						
+						for(var item in newShirtsSoldToday){	
+							var thisOldShirtSale = shirtsSoldToday[item] || 0;
+							var diffInSales = newShirtsSoldToday[item] - thisOldShirtSale;
+							//console.log("thisOldShirtSale", thisOldShirtSale);
+
+							for(var k=0; k < diffInSales; k++ ){
+								for(var i=0; i < sevenDaySales.length; i++ ) { //Look Up It's Name
+									if (sevenDaySales[i]["ASIN"] == item){
+										diff.push(sevenDaySales[i]["Name"]);
+										break;
+									}
+								}
+							} 
+						}
+						
+						console.log("diff", diff);
 						console.log("change", change);
+						
 						
 						if(change != 0){ //Efficiency ;)
 							if (change < 0 ){
@@ -187,24 +204,6 @@ var checkforsales = function() {
 										SaleSound.play();    
 									}
 									if(option.showNotif) {  
-										//****************************Diff should go here
-										var diff = [];
-										
-										for(var item in newShirtsSoldToday){
-											if(shirtsSoldToday[item] && (newShirtsSoldToday[item] > shirtsSoldToday[item])){
-												console.log('diff increase');
-												
-												for(var element in sevenDaySales){ //Look Up It's Name
-													if (element["ASIN"] == newShirtsSoldToday[item]){
-														diff.push(element["Name"]);
-														break;
-													}
-												}
-											}
-										}
-										
-										console.log("diff", diff);
-										
 										for(var i=0; i < diff.length; i++ ) {
 											var shirtName = diff[i];
 											
