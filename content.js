@@ -1440,8 +1440,8 @@ function productManager() {
 							'</td>' +
 							
 							'<td class="text-center">' + ts[i].listPrice + '</td>' +
-							'<td class="text-center btn-inside">' + '<a target="_blank" href="http://merch.amazon.com/merch-tshirt/title-setup/' + ts[i].id + '/add_details" class="btn btn-primary">Edit</a>' + '</td>' +
-							'<td class="text-center btn-inside">' + '<a target="_blank" href="' + deleteLink + '" class="btn btn-danger"><i class="fa fa-trash-o fa-lg"></i></a>' + '</td>' +
+							'<td class="text-center btn-inside">' + '<a target="_blank" href="http://merch.amazon.com/merch-tshirt/title-setup/' + ts[i].id + '/add_details" class="btn btn-outline-primary">Edit</a>' + '</td>' +
+							'<td class="text-center btn-inside">' +  '<a target="_blank" href="' + deleteLink + '" class="btn btn-outline-danger"><i class="fa fa-trash-o fa-lg"></i></a>' + '</td>' +
 						'</tr>';
 			}
 		}
@@ -1601,6 +1601,7 @@ function renderIndividualProductSales(queryParams){
 					var firstPublishDate = parseInt(liveProductsArray[i]["firstPublishDate"]) / 1000;
 					var imgURL = liveProductsArray[i]["imageURL"]; 
 					var shirtName = liveProductsArray[i]["name"];	
+					var shirtID = liveProductsArray[i]["id"];
 					break;
 				}
 			}
@@ -1673,6 +1674,10 @@ function renderIndividualProductSales(queryParams){
 			var lifespan = today.diff(moment.unix(firstPublishDate), 'months', true)+1;	
 			if (lifespan == 0){ lifespan = 1}; //Minimum 1 month lifespan
 			
+			var uriEncodedName = encodeURIComponent(shirtName); 
+			var deleteLink = 'https://merch.amazon.com/manage/products?pageNumber=1&pageSize=15&keywords=' + uriEncodedName + '&statusFilters=%5B%22DELETED%22%2C%22DRAFT%22%2C%22LIVE%22%2C%22NOT_DISCOVERABLE%22%2C%22PENDING%22%2C%22PROCESSING%22%2C%22STOPPED%22%2C%22UNDER_REVIEW%22%2C%22REJECTED%22%2C%22MANUALLY_REJECTED%22%5D';
+			
+			
 			var shirtInfo = '<center>' +
 								'<h2>' + shirtName +  '</h2>' +
 								'<p class="text-muted text-uppercase ">Individual Product Info</p>'+
@@ -1714,6 +1719,8 @@ function renderIndividualProductSales(queryParams){
 											'</div>' +
 										'</dd>' +
 									'</dl>' +
+									'<a target="_blank" href="http://merch.amazon.com/merch-tshirt/title-setup/' + shirtID + '/add_details" class="btn btn-outline-primary">Edit</a>' + 
+									'<a target="_blank" href="' + deleteLink + '" class="btn btn-outline-danger"><i class="fa fa-trash-o fa-lg"></i></a>' + 
 								'</div>' +
 							'</div>';
 			
