@@ -130,7 +130,7 @@ var checkforsales = function() {
 						chrome.browserAction.setBadgeText({ text: " " });
 						chrome.browserAction.setBadgeBackgroundColor({color: '#FFD700' });
 					} else {
-						var firstInstallInner = false; //firstInstall; //Reset Scope
+						var firstInstallInner = firstInstall; //Reset Scope
 						chrome.browserAction.setBadgeBackgroundColor({ color: '#008000' }); 
 						chrome.browserAction.setBadgeText({ text: " " });
 						
