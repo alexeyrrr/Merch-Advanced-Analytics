@@ -65,15 +65,6 @@ chrome.runtime.onInstalled.addListener(function(details){
 	firstInstall = true;
 });
 
-
-function comparer(otherArray){
-  return function(current){
-    return otherArray.filter(function(other){
-      return other.value == current.value && other.display == current.display
-    }).length == 0;
-  }
-}
-
 function csvToJSON(csv) {
   var lines=csv.split("\n");
   var result = [];
@@ -152,15 +143,15 @@ var checkforsales = function() {
 						
 						chrome.browserAction.setBadgeText({ text: String(sevenDaySaleCount) }); 
 						
-						console.log("shirtsSoldToday", shirtsSoldToday);
 						
-						
-						var newShirtsSoldToday = [];
-						var todayFormated = toDate.format("MM-DD-YYYY");
-						
+						var newShirtsSoldToday = {};
 						sevenDaySales.forEach(function(element) {
-							if (element["Date"] == todayFormated ){
-								newShirtsSoldToday.push(element);
+							if (element["Date"] == toDate.format("MM-DD-YYYY") ){
+								if (newShirtsSoldToday[element["ASIN"]]){ //If exists, add it
+									newShirtsSoldToday[element["ASIN"]] += element["Units"] - element["Cancellations"];
+								} else{
+									newShirtsSoldToday[element["ASIN"]] = element["Units"] - element["Cancellations"];
+								}
 							}
 						});
 						
@@ -169,8 +160,6 @@ var checkforsales = function() {
 							
 						var change = sevenDaySaleCount - saleCount;
 						
-						console.log("change is ", change);
-							
 						if(change != 0){ //Efficiency ;)
 							if (change < 0 ){
 								if(!firstInstallInner){								
@@ -194,16 +183,21 @@ var checkforsales = function() {
 										SaleSound.play();    
 									}
 									if(option.showNotif) {  
-										var onlyInA = shirtsSoldToday.filter(comparer(newShirtsSoldToday));
-										var onlyInB = newShirtsSoldToday.filter(comparer(shirtsSoldToday));
-
-										console.log("onlyInA", onlyInA);
-										console.log("onlyInB", onlyInB);
+										//****************************Diff should go here
+										var diff = [];
 										
-										var diff = onlyInA.concat(onlyInB); //This is the issue right now
-										
-										console.log("diff", diff);
-										console.log("diff.length", diff.length);
+										for(var item in newShirtsSoldToday){
+											if(shirtsSoldToday[item] && (shirtsSoldToday[item] > newShirtsSoldToday[item])){
+												console.log('diff increase');
+												
+												for(var element in sevenDaySales){
+													if (element["ASIN"] == shirtsSoldToday[item]){
+														diff.push(element["Name"]);
+														break;
+													}
+												}
+											}
+										}
 										
 										for(var i=0; i < diff.length; i++ ) {
 											var shirtName = diff[i]["Name"];
@@ -217,6 +211,7 @@ var checkforsales = function() {
 												message: "Sold: " + shirtName +""
 											});
 										}
+										
 									}
 								}
 								chrome.browserAction.setBadgeBackgroundColor({ color: '#008000' });
