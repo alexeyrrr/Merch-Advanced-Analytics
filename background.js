@@ -155,10 +155,14 @@ var checkforsales = function() {
 							}
 						});
 						
+						console.log("sevenDaySales", sevenDaySales);
+						
 						console.log("newShirtsSoldToday", newShirtsSoldToday);
 						
 							
 						var change = sevenDaySaleCount - saleCount;
+						
+						console.log("change", change);
 						
 						if(change != 0){ //Efficiency ;)
 							if (change < 0 ){
@@ -187,11 +191,11 @@ var checkforsales = function() {
 										var diff = [];
 										
 										for(var item in newShirtsSoldToday){
-											if(shirtsSoldToday[item] && (shirtsSoldToday[item] > newShirtsSoldToday[item])){
+											if(shirtsSoldToday[item] && (newShirtsSoldToday[item] > shirtsSoldToday[item])){
 												console.log('diff increase');
 												
-												for(var element in sevenDaySales){
-													if (element["ASIN"] == shirtsSoldToday[item]){
+												for(var element in sevenDaySales){ //Look Up It's Name
+													if (element["ASIN"] == newShirtsSoldToday[item]){
 														diff.push(element["Name"]);
 														break;
 													}
@@ -199,8 +203,10 @@ var checkforsales = function() {
 											}
 										}
 										
+										console.log("diff", diff);
+										
 										for(var i=0; i < diff.length; i++ ) {
-											var shirtName = diff[i]["Name"];
+											var shirtName = diff[i];
 											
 											console.log("shirtName", shirtName);
 											
