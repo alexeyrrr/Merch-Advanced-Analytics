@@ -1135,9 +1135,9 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 							(resultSumSales[i]["Royalty"].toFixed(2) / (resultSumSales[i]["Units"] - resultSumSales[i]["Cancellations"] + 0.00001)).toFixed(2)  +
 						'</td>' +
 						'<td class="text-center btn-inside">' +  
-							'<a target="_blank" href="' + deleteLink + '" class="btn btn-outline-primary">Edit / <i class="fa fa-trash-o fa-lg"></i></a>' + 
+							'<a target="_blank" href="' + deleteLink + '" class="btn btn-outline-primary">Edit</a>' + 
 						'</td>' +
-					'</tr>' 
+					'</tr>'; 
 				}
 							
 				cp2 += '</tbody></table>';
@@ -1418,7 +1418,7 @@ function productManager() {
 				//Parse Create Date
 				var stringifiedCreateDate = moment.unix(parseInt(ts[i].createDate) / 1000).format("MM-DD-YYYY");
 				
-				var itemName = resultSumSales[i]["Name"].replace(/"/g, "");
+				var itemName = ts[i].name.replace(/"/g, "");
 				var uriEncodedName = encodeURIComponent(itemName); 
 				var deleteLink = 'https://merch.amazon.com/manage/products?pageNumber=1&pageSize=15&keywords=' + uriEncodedName + '&statusFilters=%5B%22DELETED%22%2C%22DRAFT%22%2C%22LIVE%22%2C%22NOT_DISCOVERABLE%22%2C%22PENDING%22%2C%22PROCESSING%22%2C%22STOPPED%22%2C%22UNDER_REVIEW%22%2C%22REJECTED%22%2C%22MANUALLY_REJECTED%22%5D';
 				
