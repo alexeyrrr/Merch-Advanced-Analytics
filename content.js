@@ -1044,7 +1044,6 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 					return allASINValues.indexOf(item) == pos;
 				})
 								
-				
 				//Create blank target array
 				var resultSumSales = [];
 				for(i=0; i < uniqueArray.length; i++){
@@ -1083,17 +1082,24 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 							'<th class="text-center">Revenue</th>' +
 							'<th class="text-center">Royalties</th>' +
 							'<th class="text-center">Avg Royalties / Shirt </th>' +
+							'<th class="text-center">Edit / Delete </th>' +
 						'</tr>'  +
 					'</thead><tbody>';
 
+					
 				for (i=0; i < resultSumSales.length; i++){
 					//Assign Niche
-					
 					if(nichesLookupArray[resultSumSales[i]["ASIN"]] != undefined){
 						specificNiche = JSON.parse(nichesLookupArray[resultSumSales[i]["ASIN"]])["niche"];
 					} else {
 						specificNiche = "unknown niche";
 					}
+					
+					
+					var itemName = resultSumSales[i]["Name"].replace(/"/g, "");
+					var uriEncodedName = encodeURIComponent(itemName); 
+					var deleteLink = 'https://merch.amazon.com/manage/products?pageNumber=1&pageSize=15&keywords=' + uriEncodedName + '&statusFilters=%5B%22DELETED%22%2C%22DRAFT%22%2C%22LIVE%22%2C%22NOT_DISCOVERABLE%22%2C%22PENDING%22%2C%22PROCESSING%22%2C%22STOPPED%22%2C%22UNDER_REVIEW%22%2C%22REJECTED%22%2C%22MANUALLY_REJECTED%22%5D';	
+				
 						
 					cp2 += '<tr data-href="https://www.amazon.com/dp/' + resultSumSales[i]["ASIN"]  +   '">' + 
 						'<th scope="row">' + (i + 1) + '</th>' + 
@@ -1127,7 +1133,11 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 						
 						'<td class="text-center">' +
 							(resultSumSales[i]["Royalty"].toFixed(2) / (resultSumSales[i]["Units"] - resultSumSales[i]["Cancellations"] + 0.00001)).toFixed(2)  +
-						'</td>' 
+						'</td>' +
+						'<td class="text-center btn-inside">' +  
+							'<a target="_blank" href="' + deleteLink + '" class="btn btn-outline-primary">Edit / <i class="fa fa-trash-o fa-lg"></i></a>' + 
+						'</td>' +
+					'</tr>' 
 				}
 							
 				cp2 += '</tbody></table>';
@@ -1408,7 +1418,8 @@ function productManager() {
 				//Parse Create Date
 				var stringifiedCreateDate = moment.unix(parseInt(ts[i].createDate) / 1000).format("MM-DD-YYYY");
 				
-				var uriEncodedName = encodeURIComponent(ts[i].name); 
+				var itemName = resultSumSales[i]["Name"].replace(/"/g, "");
+				var uriEncodedName = encodeURIComponent(itemName); 
 				var deleteLink = 'https://merch.amazon.com/manage/products?pageNumber=1&pageSize=15&keywords=' + uriEncodedName + '&statusFilters=%5B%22DELETED%22%2C%22DRAFT%22%2C%22LIVE%22%2C%22NOT_DISCOVERABLE%22%2C%22PENDING%22%2C%22PROCESSING%22%2C%22STOPPED%22%2C%22UNDER_REVIEW%22%2C%22REJECTED%22%2C%22MANUALLY_REJECTED%22%5D';
 				
 				cp2 += '<tr data-lifetime-sales="'+ hasLifetimeSales.toString() + '" data-href="https://www.amazon.com/dp/' + ts[i].marketplaceAsinMap.US + '">' +

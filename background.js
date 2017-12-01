@@ -44,10 +44,10 @@ chrome.runtime.onInstalled.addListener(function(details){
 		
 		chrome.notifications.create(undefined, {
 			type: 'basic',
-			title: 'Updated: Improved Sale Notifications',
+			title: 'Updated: Edit / Delete Buttons',
 			isClickable: true,
 			iconUrl: '/img/logo-square.png',
-			message: "We improved shirt sale notifications and added delete buttons in the Product Manager. For other suggestions: alex@venmarkstudio.com"
+			message: "We added quick Edit / Delete buttons to all Sales pages. For other suggestions: alex@venmarkstudio.com"
 		});	
 		
 		
