@@ -2114,7 +2114,6 @@ function readShirtNiche(){
 				parsedJson = JSON.parse(items[myKey]);
 				that.val(parsedJson["niche"]);
 				that.closest('td').attr('data-sort', parsedJson["niche"]);
-				
 				that.addClass("form-control-success");
 			}
 		});
@@ -2167,6 +2166,7 @@ function initSaveButtons(){ //Adds event listeners to all buttons
 			if ($(this).val().length > 1){
 				nicheName = $(this).closest('td').find('[name="nicheName"]').val();
 				parentASIN = $(this).closest('td').find('[name="parentASIN"]').val();
+				$(this).closest('td').attr('data-sort', $(this).val()); //Add attr for table sorting
 				saveShirtNiche(nicheName, parentASIN);
 				
 				$(this).addClass("form-control-success");
@@ -2181,6 +2181,7 @@ function initSaveButtons(){ //Adds event listeners to all buttons
 				if ($(this).val().length > 1){
 					nicheName = $(this).closest('td').find('[name="nicheName"]').val();
 					parentASIN = $(this).closest('td').find('[name="parentASIN"]').val();
+					$(this).closest('td').attr('data-sort', $(this).val()); //Add attr for table sorting
 					saveShirtNiche(nicheName, parentASIN);
 					
 					$(this).addClass("form-control-success");
