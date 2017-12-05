@@ -1089,10 +1089,12 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 					
 				for (i=0; i < resultSumSales.length; i++){
 					//Assign Niche
+					var reminderPopoverData= ''; //Blank popover data
 					if(nichesLookupArray[resultSumSales[i]["ASIN"]] != undefined){
 						specificNiche = JSON.parse(nichesLookupArray[resultSumSales[i]["ASIN"]])["niche"];
 					} else {
 						specificNiche = "unknown niche";
+						reminderPopoverData = 'data-toggle="tooltip" data-placement="bottom" title="Assign product niche on Manage Products Page"';
 					}
 					
 					
@@ -1108,7 +1110,8 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 						'</td>' + 
 						
 						'<td class="niche-tag">'+
-							'<i class="fa fa-tag" aria-hidden="true"></i> '+ specificNiche +
+							'<i class="fa fa-tag" aria-hidden="true" ' + reminderPopoverData + '></i>' +
+							specificNiche +
 						'</td>' +
 						
 						'<td class="text-center btn-inside">' +						
