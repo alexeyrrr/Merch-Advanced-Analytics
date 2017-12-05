@@ -1407,8 +1407,9 @@ function productManager() {
 		var lifetimesSalesCounter = 0;
 		var liveDesignsCounter = 0;
 		
-		for (var i = 0; i < ts.length; i++) {			
-			if (ts[i].marketplaceAsinMap.US !== undefined && (ts[i].status == "LIVE" || ts[i].status == "PROCESSING")){
+		for (var i = 0; i < ts.length; i++) {		
+			console.log(ts[i].status);
+			if (ts[i].marketplaceAsinMap.US !== undefined && (ts[i].status == "LIVE" || ts[i].status == "PROCESSING" || ts[i].status == "MANUALLY_REJECTED" || ts[i].status == "UNDER_AUTO_REVIEW")){
 				var hasLifetimeSales = false;
 				liveDesignsCounter++;
 				
@@ -1417,7 +1418,9 @@ function productManager() {
 					hasLifetimeSales = true;
 					lifetimesSalesCounter++;
 				}
-				
+			}
+		
+			if (ts[i].marketplaceAsinMap.US !== undefined && ts[i].status == "LIVE"){
 				//Parse Create Date
 				var stringifiedCreateDate = moment.unix(parseInt(ts[i].createDate) / 1000).format("MM-DD-YYYY");
 				

@@ -44,7 +44,7 @@ chrome.runtime.onInstalled.addListener(function(details){
 			title: 'Updated: Sorting by Niche',
 			isClickable: true,
 			iconUrl: '/img/logo-square.png',
-			message: "We added sorting by niches on the Product Manager Page. For other suggestions: alex@venmarkstudio.com"
+			message: "We added sorting by niches on the Product Manager Page. Improved Live Product count. For other suggestions: alex@venmarkstudio.com"
 		});	
 		
 		
