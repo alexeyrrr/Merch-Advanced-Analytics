@@ -1405,7 +1405,7 @@ function productManager() {
 		var liveDesignsCounter = 0;
 		
 		for (var i = 0; i < ts.length; i++) {			
-			if (ts[i].marketplaceAsinMap.US !== undefined && ts[i].status == "LIVE"){
+			if (ts[i].marketplaceAsinMap.US !== undefined && (ts[i].status == "LIVE" || ts[i].status == "PROCESSING")){
 				var hasLifetimeSales = false;
 				liveDesignsCounter++;
 				
@@ -1738,7 +1738,7 @@ function renderIndividualProductSales(queryParams){
 			document.getElementById("individualShirtSummary").innerHTML = shirtInfo;	
 			
 			getShirtNiche(targetASIN, function(determinedNiche){
-				if(determinedNiche != 'unknown niche'){
+				if(determinedNiche != 'unknown niche'){					
 					$(".niche-input").val(determinedNiche);
 					$(".niche-input").addClass("form-control-success");
 				}
@@ -2108,12 +2108,13 @@ function readShirtNiche(){
 		var myKey = $(this).closest('td').find('[name="parentASIN"]').val();
 		
 		var that = $(this);
-		
 		//Fetch Matching Niche
 		chrome.storage.sync.get(myKey, function(items) {
 			if (typeof(items[myKey]) != 'undefined' && items[myKey].length > 1){
 				parsedJson = JSON.parse(items[myKey]);
 				that.val(parsedJson["niche"]);
+				that.closest('td').attr('data-sort', parsedJson["niche"]);
+				
 				that.addClass("form-control-success");
 			}
 		});
