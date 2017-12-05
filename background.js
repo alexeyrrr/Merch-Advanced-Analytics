@@ -26,12 +26,9 @@ var SaleSound = new Audio();
 var losssound  = new Audio(); 
     losssound.src = "/sound/loss.wav";
 
-
 var change = 0;
 var saleCount = 0;
 var shirtsSoldToday = [];
-
-
 
 //Disable sales notification first time
 var firstInstall = false;	
@@ -44,10 +41,10 @@ chrome.runtime.onInstalled.addListener(function(details){
 		
 		chrome.notifications.create(undefined, {
 			type: 'basic',
-			title: 'Updated: Edit / Delete Buttons',
+			title: 'Updated: Sorting by Niche',
 			isClickable: true,
 			iconUrl: '/img/logo-square.png',
-			message: "We added quick Edit / Delete buttons to all Sales pages. For other suggestions: alex@venmarkstudio.com"
+			message: "We added sorting by niches on the Product Manager Page. For other suggestions: alex@venmarkstudio.com"
 		});	
 		
 		
