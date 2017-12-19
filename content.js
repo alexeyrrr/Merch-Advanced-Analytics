@@ -135,7 +135,7 @@ function globalInit(){
 		
 		$("#monthlySales").click(function(){
 			//Calculate Unix Timestamps
-			var fromDate6Mo = moment().subtract(6, 'months').startOf('month').unix();
+			var fromDate6Mo = moment().endOf('month').subtract(5, 'months').startOf('month').unix();
 			var toDate = moment().unix();
 						
 			dailySalesPage(fromDate6Mo, toDate, "month");
@@ -250,9 +250,12 @@ if (cmd.indexOf("IndividualProductPage") !== -1) {
 /********* Global Fetch Function (Sales & Live List) ***********/
 /***************************************************************/	
 function fetchSalesDataCSV(endDate, toDate, result, callback){
-	//Not the most elegant way, but by far the simplest
 	//This Function Deals in Unix Milliseconds
-	if((toDate - endDate) <= (24*60*60*90 + 12*60*60)){ //Period under 90 days (with grace period)
+	var a = moment.unix(toDate);
+	var b = moment.unix(endDate);
+	var daysDifference = a.diff(b, 'days')
+	
+	if(daysDifference <= 90){ //Period under 90 days (with grace period)
         var sls = 'https://merch.amazon.com/product-purchases-report?fromDate=' + endDate * 1000 + '&toDate=' + toDate * 1000;
         var reqs = new XMLHttpRequest();
         reqs.open("GET", sls, true);
@@ -276,7 +279,7 @@ function fetchSalesDataCSV(endDate, toDate, result, callback){
         };
         reqs.send();
     } else { //Period over 90 days (with grace period)
-		var newEndDate = toDate - (24*60*60*90);
+		var newEndDate = moment.unix(toDate).subtract(90, 'days').unix();
 	
 		var sls = 'https://merch.amazon.com/product-purchases-report?fromDate=' + newEndDate * 1000+ '&toDate=' + toDate * 1000;
 		var reqs = new XMLHttpRequest();
@@ -296,7 +299,7 @@ function fetchSalesDataCSV(endDate, toDate, result, callback){
 						
 						
 						//Shift Last Call Date Down
-						toDate -= 24*60*60*90;
+						toDate -= 24*60*60*91;
 						fetchSalesDataCSV(endDate, toDate, result, callback);
 					}
 				};
@@ -542,7 +545,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 							var startDate   = moment(axisLabels[i], "MMM YYYY"); //This date month
 							var endDate     = moment(axisLabels[i], "MMM YYYY").add(1,'months'); //Previous month
 							var compareDate = moment(responseArray[i2]["Date"], "MM-DD-YYYY");
-								
+
 							var isWithinRange = compareDate.isBetween(startDate, endDate, 'months', '[)') // left inclusive
 						
 						} else if(viewType == "week"){
