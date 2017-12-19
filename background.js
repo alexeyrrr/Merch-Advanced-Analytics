@@ -41,10 +41,10 @@ chrome.runtime.onInstalled.addListener(function(details){
 		
 		chrome.notifications.create(undefined, {
 			type: 'basic',
-			title: 'Updated: Sorting by Niche',
+			title: 'Updated: Added Review Checker',
 			isClickable: true,
 			iconUrl: '/img/logo-square.png',
-			message: "We added sorting by niches on the Product Manager Page. Improved Live Product count. For other suggestions: alex@venmarkstudio.com"
+			message: "We added a 'Review Checker' button on the Product Manager page to quickly find what products have reviews. There is an Amazon-side 500 product limit for this feature."
 		});	
 		
 		

@@ -1379,8 +1379,18 @@ function productManager() {
 								'</div>' +
 							'</div>'+ 
 							'<div class="card">' +
-								'<div class="card-header clear"><strong>Live Products</strong>' +
-									'<div id="reset-button">Clear All Niche Data</div>' +
+								'<div class="card-header clear">' +
+									'<strong>Live Products</strong>' +
+									'<div class="btn-group float-right" role="group" aria-label="Basic example">' +
+										'<a class="btn btn-outline-secondary" id="reviewChecker" data-toggle="tooltip" data-placement="bottom" title="Launch Review Checker" href="" target="_blank" >'+
+											'<i class="fa fa-star" aria-hidden="true"></i>' +
+											'<i class="fa fa-star" aria-hidden="true"></i>' +
+											'<i class="fa fa-star" aria-hidden="true"></i>' +
+											'<i class="fa fa-star-half-o" aria-hidden="true"></i>' +
+											'<i class="fa fa-star-o" aria-hidden="true"></i>' +
+										'</a>' +
+										'<div class="btn btn-outline-secondary" id="reset-button" data-toggle="tooltip" data-placement="bottom" title="Clear All Niche Data"><i class="fa fa-eraser" aria-hidden="true"></i></div>' +
+									'</div>' + 
 								'</div>' + 
 								'<div class="card-block" id="shirtlist"></div>' + 
 							'</div>'+ 
@@ -1406,9 +1416,9 @@ function productManager() {
 		//Setup counter variables
 		var lifetimesSalesCounter = 0;
 		var liveDesignsCounter = 0;
+		var strOfASINs = '';
 		
 		for (var i = 0; i < ts.length; i++) {		
-			console.log(ts[i].status);
 			if (ts[i].marketplaceAsinMap.US !== undefined && (ts[i].status == "LIVE" || ts[i].status == "PROCESSING" || ts[i].status == "MANUALLY_REJECTED" || ts[i].status == "UNDER_AUTO_REVIEW")){
 				var hasLifetimeSales = false;
 				liveDesignsCounter++;
@@ -1423,6 +1433,10 @@ function productManager() {
 			if (ts[i].marketplaceAsinMap.US !== undefined && ts[i].status == "LIVE"){
 				//Parse Create Date
 				var stringifiedCreateDate = moment.unix(parseInt(ts[i].createDate) / 1000).format("MM-DD-YYYY");
+				
+				if (liveDesignsCounter < 500){ //Only show first 500 products
+					strOfASINs += ts[i].marketplaceAsinMap.US + ',';
+				}
 				
 				var itemName = ts[i].name.replace(/"/g, "");
 				var uriEncodedName = encodeURIComponent(itemName); 
@@ -1462,6 +1476,10 @@ function productManager() {
 						'</tr>';
 			}
 		}
+		
+		$('#reviewChecker').attr("href", "https://ams.amazon.com/hsa-ad-landing-page/preview?asins=" + strOfASINs);
+		
+		
 			
 		cp2 += '</tbody></table>';
 		document.getElementById("shirtlist").innerHTML = cp2;
@@ -1501,6 +1519,8 @@ function productManager() {
 				var url = $(this).closest("tr").data("href");
 				window.open(url, '_blank');
 			});
+			
+			$('[data-toggle="tooltip"]').tooltip();//Init tooltips
 		});
 				
 			
@@ -2146,8 +2166,10 @@ function getNicheDistribution(callback){
 }
 	
 function clearAllNicheData(){
-	 chrome.storage.sync.clear();
-	 alert("All previous data has been cleared");
+	chrome.storage.sync.clear();
+	$('.niche-input').val(''); 
+	$('.form-control-success').removeClass('form-control-success');
+	alert("All previous data has been cleared");
 }
 
 function initSaveButtons(){ //Adds event listeners to all buttons	
