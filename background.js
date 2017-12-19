@@ -39,6 +39,7 @@ chrome.runtime.onInstalled.addListener(function(details){
 
 		//UPDATE MESSAGE
 		
+		/*
 		chrome.notifications.create(undefined, {
 			type: 'basic',
 			title: 'Updated: Added Review Checker',
@@ -46,6 +47,7 @@ chrome.runtime.onInstalled.addListener(function(details){
 			iconUrl: '/img/logo-square.png',
 			message: "We added a 'Review Checker' button on the Product Manager page to quickly find what products have reviews. There is an Amazon-side 500 product limit for this feature."
 		});	
+		*/
 		
 		
 	} else {

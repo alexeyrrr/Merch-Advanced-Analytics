@@ -14,6 +14,7 @@ html, body{
 .card{
 	margin-bottom: 20px;
 	height: calc(100% - 20px);
+	border-color: rgba(0, 0, 0, 0.125) !important;
 }
 #sidebar {
     z-index: 1000;
@@ -62,9 +63,10 @@ p {
 }
 
 a, a:hover, a:focus {
-    color: inherit;
+    color: rgb(33, 37, 41);
     text-decoration: none;
     transition: all 0.3s;
+	
 }
 
 #reset-button{	
@@ -182,6 +184,10 @@ div.desc {
 	border-color: #5cb85c;
 }
 
+
+table tbody{
+	font-size: 11pt !important;
+}
 
 table th{
 	border-top: none !important;
