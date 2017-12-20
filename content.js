@@ -299,7 +299,7 @@ function fetchSalesDataCSV(endDate, toDate, result, callback){
 						
 						
 						//Shift Last Call Date Down
-						toDate -= 24*60*60*91;
+						toDate = moment.unix(toDate).subtract(91, 'days').startOf('day').unix();
 						fetchSalesDataCSV(endDate, toDate, result, callback);
 					}
 				};
