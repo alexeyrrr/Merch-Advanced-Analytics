@@ -15,9 +15,16 @@ body.merch-advanced-analytics{
 .maa-card{
 	margin-bottom: 20px !important;
 	height: calc(100% - 20px); 
-	
 	border-color: rgba(0, 0, 0, 0.125) !important;
 }
+
+.merch-advanced-analytics .card{
+	border-width: 1px;
+    border-style: solid;
+    border-color: rgba(0, 0, 0, 0.125);
+    border-image: initial;
+}
+
 
 .modal-lg{
 	max-width: 1000px;
