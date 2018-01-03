@@ -110,8 +110,8 @@ var globalSidebar = '<nav id="sidebar">' +
 							'<li><a id="settingsPage"><i class="fa fa-cogs" aria-hidden="true"></i> Settings</a></li>' +
 						'</ul>' +
 				'</nav>';
-var globalLoading = '<div class="container">' +
-						'<div class="card">'+
+var globalLoading = '<div class="container maa-container">' +
+						'<div class="maa-card card">'+
 							'<div class="card-block">' +
 								'<div class="status"><center><h3>Loading...</h3><i class="fa fa-spinner fa-spin fa-4"></i></center></div>' + 
 							'</div>'+ 
@@ -407,14 +407,14 @@ function setstatus(message, type="loading"){
 /***************************************************************/	
 function dailySalesPage(fromDate, toDate, viewType = 'day'){	
 	document.title = "Daily View - Merch Advanced Analytics";
-	var pageContent = '<div class="container">' +
-					'<div class="card"></center>'+
+	var pageContent = '<div class="container maa-container">' +
+					'<div class="maa-card card"></center>'+
 						'<div class="card-block">'+ 
 							//'<center><h2>Daily Page</h2></center>' +
 							'<div id="dailystats" class="status"><center><h3>Loading...</h3><i class="fa fa-spinner fa-spin fa-4"></i></center></div>' + 
 						'</div>' +
 					'</div>' +
-					'<div class="card" id="salesPanel">' +
+					'<div class="maa-card card" id="salesPanel">' +
 						'<div class="card-header">' + 
 							'<ul class="nav nav-pills card-header-pills" role="tablist">' +
 								'<li class="nav-item"><a class="nav-link active" href="#sales" role="tab" data-toggle="tab">Sales/Cancellations</a></li>' +
@@ -457,7 +457,7 @@ function dailySalesPage(fromDate, toDate, viewType = 'day'){
 							'</div>' +
 							'<div class="tab-pane" role="tabpanel" id="niche">' +
 								'<div class="inner-container">' +
-									'<div class="container row">' +									
+									'<div class="container maa-container row">' +									
 										'<div class="col col-xs-6 col-sm-6">'+
 											'<center>' +
 												'<canvas id="canvas7" height="350" width="280" style="padding:10px"></canvas>'+
@@ -480,7 +480,7 @@ function dailySalesPage(fromDate, toDate, viewType = 'day'){
 						'</div>' +
 					'</div>' +
 					
-					'<div class="card">' + 
+					'<div class="maa-card card">' + 
 						'<div class="card-header">Shirts Sold During Selected Period</div>' +
 						'<div class="card-block" id="shirtlist"></div>' +
 					'</div>' + 
@@ -668,7 +668,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 					var periodDuration = Math.floor(duration.asDays()) + " Day Range";
 				}
 				
-				stats = '<div class="container row no-pading-top">'+
+				stats = '<div class="container maa-container row no-pading-top">'+
 							'<div class="col-sm-6 col-xs-6">' +
 								'<h3>' + pageTitle + '</h3>' +
 								'<h4 class="subheading" style="margin-bottom: 0;">' + periodDuration +'</h4>' +
@@ -680,9 +680,9 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 								'</div>' +
 							'</div>' +	
 						'</div>';	
-				stats += '<div class="container row no-gutters row-eq-height">' +
+				stats += '<div class="container maa-container row no-gutters row-eq-height">' +
 						'<div class="col-lg-2 col-sm-3 col-xs-12 offset-sm-0 offset-md-1 offset-lg-2 no-card-bottom">'+
-							'<div class="card">'+
+							'<div class="maa-card card">'+
 								'<div class="card-body">'+                                                                       
 									'<h2 class="font-weight-lighter" style="color:#474C4F;"  >'+ totals.sales + '</h2>'+
 									'<p class="text-muted text-uppercase small">Shirts Sold</p>'+
@@ -691,7 +691,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 						'</div>'+
 						
 						'<div class="col-lg-2 col-sm-3 col-xs-12 no-card-bottom">'+
-							'<div class="card">'+
+							'<div class="maa-card card">'+
 								'<div class="card-body">'+                                                                       
 									'<h2 class="font-weight-lighter" style="color:#474C4F;"  >'+ totals.cancelled + '</h2>'+
 									'<p class="text-muted text-uppercase small">Shirts Cancelled</p>'+
@@ -700,7 +700,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 						'</div>'+
 						
 						'<div class="col-lg-2 col-sm-3 col-xs-12 no-card-bottom">'+
-							'<div class="card">'+
+							'<div class="maa-card card">'+
 								'<div class="card-body">'+                                                                       
 									'<h2 class="font-weight-lighter" style="color:#474C4F;"  >$'+ parseFloat(totals.revenue).formatMoney(2) + '</h2>'+
 									'<p class="text-muted text-uppercase small">Revenue</p>'+
@@ -709,7 +709,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 						'</div>'+
 						
 						'<div class="col-lg-2 col-sm-3 col-xs-12 no-card-bottom">'+
-							'<div class="card">'+
+							'<div class="maa-card card">'+
 								'<div class="card-body">'+                                                                       
 									'<h2 class="font-weight-lighter" style="color:#474C4F;"  >$'+ parseFloat(totals.royalty).formatMoney(2) + '</h2>'+
 									'<p class="text-muted text-uppercase small">Royalties</p>'+
@@ -718,7 +718,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 						'</div>'+
 						
 						'<div class="col-lg-2 col-sm-4 col-xs-12 offset-md-3 offset-lg-3 no-card-bottom">'+
-							'<div class="card">'+
+							'<div class="maa-card card">'+
 								'<div class="card-body">'+                                                                       
 									'<h2 class="font-weight-lighter" style="color:#474C4F;"  >$'+ (totals.royalty /(totals.sales - totals.cancelled + 0.00001)).formatMoney(2) + '</h2>'+
 									'<p class="text-muted text-uppercase small">Average Royalties / Shirt</p>'+
@@ -727,7 +727,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 						'</div>'+
 						
 						'<div class="col-lg-2 col-sm-4 col-xs-12 no-card-bottom ">'+
-							'<div class="card">'+
+							'<div class="maa-card card">'+
 								'<div class="card-body">'+                                                                       
 									'<h2 class="font-weight-lighter" style="color:#474C4F;"  >'+ ((totals.sales - totals.cancelled) /(numberofDaysInner+ 0.00001)).formatMoney(2) + '</h2>'+
 									'<p class="text-muted text-uppercase small">Average Net Sales / '+ periodTitle +'</p>'+
@@ -736,7 +736,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 						'</div>'+
 						
 						'<div class="col-lg-2 col-sm-4 col-xs-12 no-card-bottom ">'+
-							'<div class="card">'+
+							'<div class="maa-card card">'+
 								'<div class="card-body">'+                                                                       
 									'<h2 class="font-weight-lighter" style="color:#474C4F;"  >$'+ (totals.royalty /(numberofDaysInner+ 0.00001)).toFixed(2) + '</h2>'+
 									'<p class="text-muted text-uppercase small">Average Royalties / '+ periodTitle +'</p>'+
@@ -1080,7 +1080,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 				}
 									
 				// Assemble Sales History Table
-				var cp2 = '<table class="table table-striped sortable" id="itemizedList">' +
+				var cp2 = '<table class="maa-table table table-striped sortable" id="itemizedList">' +
 					'<thead>' + 
 						'<tr>' +
 							'<th>#</th>' +
@@ -1282,9 +1282,9 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 					
 					
 					//Generate Top Niches
-					topNichesData = '<div class="container row">' +					
+					topNichesData = '<div class="container maa-container row">' +					
 										'<div class="col-lg-3 col-sm-4 col-xs-12 offset-md-0 offset-lg-2">'+
-											'<div class="card">'+
+											'<div class="maa-card card">'+
 												'<div class="card-body">'+                                                                       
 													'<h2 class="font-weight-lighter" style="color:#474C4F;"  >'+ topSellingNiches[0] + '</h2>'+
 													'<p class="text-muted text-uppercase small">#1 Top Selling Niche</p>'+
@@ -1293,7 +1293,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 										'</div>'+
 									
 										'<div class="col-lg-3 col-sm-4 col-xs-12 ">'+
-											'<div class="card">'+
+											'<div class="maa-card card">'+
 												'<div class="card-body">'+                                                                       
 													'<h2 class="font-weight-lighter" style="color:#474C4F;"  >'+ topSellingNiches[1] + '</h2>'+
 													'<p class="text-muted text-uppercase small">#2 Top Selling Niche</p>'+
@@ -1302,7 +1302,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 										'</div>'+
 										
 										'<div class="col-lg-3 col-sm-4 col-xs-12 ">'+
-											'<div class="card">'+
+											'<div class="maa-card card">'+
 												'<div class="card-body">'+                                                                       
 													'<h2 class="font-weight-lighter" style="color:#474C4F;"  >'+ topSellingNiches[2] + '</h2>'+
 													'<p class="text-muted text-uppercase small">#3 Top Selling Niche</p>'+
@@ -1382,13 +1382,13 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 function productManager() {
 	document.title = "Manage Products - Merch Advanced Analytics";
 		
-	var pageContent = '<div class="container">' + 
-							'<div class="card">' +
+	var pageContent = '<div class="container maa-container">' + 
+							'<div class="maa-card card">' +
 								'<div class="card-block">'+
 									'<div id="manager-stats" class="status"><center><h3>Loading...</h3><i class="fa fa-spinner fa-spin fa-4"></i></center></div>' + 
 								'</div>' +
 							'</div>'+ 
-							'<div class="card">' +
+							'<div class="maa-card card">' +
 								'<div class="card-header clear">' +
 									'<strong>Live Products</strong>' +
 									'<div class="btn-group float-right" role="group" aria-label="Basic example">' +
@@ -1410,7 +1410,7 @@ function productManager() {
 	$(".wrapper").append(pageContent);	
     
 	fetchAllLiveProducts(1, '0', ts = [], null, function(){
-		var cp2 = '<table id="productManagerTable" class="sortable table table-striped"><thead><tr>' +
+		var cp2 = '<table id="productManagerTable" class="maa-table sortable table table-striped"><thead><tr>' +
 			'<th class="text-center">Design</th>' +
 			'<th>Title</th>' +
 			'<th>Niche</th>' +
@@ -1495,7 +1495,7 @@ function productManager() {
 		document.getElementById("shirtlist").innerHTML = cp2;
 						
 		managerStats = '<center><h2>Product Manager</h2></center>' +
-			'<table class="table table-striped"><thead>' + 
+			'<table class="maa-table table table-striped"><thead>' + 
 				'<tr>' +
 					'<th class="text-center">Shirts With Atleast One Lifetime Sale</th>'+
 					'<th class="text-center">Total Live Shirts</th>' + 
@@ -1544,14 +1544,14 @@ function productManager() {
 /***************************************************************/
 function individualProductPage(queryParams){
 	if (queryParams["ASIN"]){
-		pageContent = '<div class="container">' +
-							'<div class="card"></center>'+
+		pageContent = '<div class="container maa-container">' +
+							'<div class="maa-card card"></center>'+
 								'<div class="card-block">'+ 
 									'<div id="individualShirtSummary" class="status"><center><h3>Loading...</h3><i class="fa fa-spinner fa-spin fa-4"></i></center></div>' + 
 								'</div>' +
 							'</div>' +
 							
-							'<div class="card" id="">' +
+							'<div class="maa-card card" id="">' +
 								'<div class="card-header">' + 
 									'<ul class="nav nav-pills card-header-pills" role="tablist">' +
 										'<li class="nav-item"><a class="nav-link active" href="#sales" role="tab" data-toggle="tab">Sales/Cancellations</a></li>' +
@@ -1591,7 +1591,7 @@ function individualProductPage(queryParams){
 							'</div>' +
 								
 
-							'<div class="card">' + 
+							'<div class="maa-card card">' + 
 								'<div class="card-header">Sales History</div>' + 
 								'<div class="card-block" id="individualShirtSales"></div>' +
 							'</div>' +
@@ -1602,8 +1602,8 @@ function individualProductPage(queryParams){
 		
 		renderIndividualProductSales(queryParams);
 	} else {
-		pageContent = '<div class="container">' +
-						'<div class="card"></center>'+
+		pageContent = '<div class="container maa-container">' +
+						'<div class="maa-card card"></center>'+
 							'<div class="card-block">'+ 
 								'<div id="individualShirtSummary" class="status text-center">' +
 									'<h2>Enter Your Product ASIN</h2>' +
@@ -1735,7 +1735,7 @@ function renderIndividualProductSales(queryParams){
 										'<img class="img-responsive" src="' +  imgURL + '">' +
 									'</a>' +
 								'</div>' +
-								'<div class="col col-xs-9 col-sm-10">' +	
+								'<div class="dl-list col col-xs-9 col-sm-10">' +	
 									'<dl>' +
 										'<dt>First Published Date:&nbsp;</dt>' +
 										'<dd>' + moment.unix(firstPublishDate).format("MM-DD-YYYY") + '</dd>' +
@@ -1943,7 +1943,7 @@ function renderIndividualProductSales(queryParams){
 			var myChart = new Chart(ctxColors, lineChartData5);
 				
 			/*Assemble Sales History Table */
-			var cp2 = '<table id="indvTable" class="table table-striped sortable"><thead><tr><th>#</th>' +
+			var cp2 = '<table id="indvTable" class="maa-table table table-striped sortable"><thead><tr><th>#</th>' +
 				'<th class="text-center">Date Sold</th>' +
 				'<th class="text-center">Units</th>' +
 				'<th class="text-center">Revenue</th>' +
