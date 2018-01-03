@@ -1289,7 +1289,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 											'<div class="maa-card card">'+
 												'<div class="card-body">'+                                                                       
 													'<h2 class="font-weight-lighter" style="color:#474C4F;"  >'+ topSellingNiches[0] + '</h2>'+
-													'<p class="text-muted text-uppercase small">#1 Top Selling Niche</p>'+
+													'<span class="text-muted text-uppercase small">#1 Top Selling Niche</span>'+
 												'</div>'+
 											'</div>'+
 										'</div>'+
@@ -1298,7 +1298,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 											'<div class="maa-card card">'+
 												'<div class="card-body">'+                                                                       
 													'<h2 class="font-weight-lighter" style="color:#474C4F;"  >'+ topSellingNiches[1] + '</h2>'+
-													'<p class="text-muted text-uppercase small">#2 Top Selling Niche</p>'+
+													'<span class="text-muted text-uppercase small">#2 Top Selling Niche</span>'+
 												'</div>'+
 											'</div>'+
 										'</div>'+
@@ -1307,7 +1307,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 											'<div class="maa-card card">'+
 												'<div class="card-body">'+                                                                       
 													'<h2 class="font-weight-lighter" style="color:#474C4F;"  >'+ topSellingNiches[2] + '</h2>'+
-													'<p class="text-muted text-uppercase small">#3 Top Selling Niche</p>'+
+													'<span class="text-muted text-uppercase small">#3 Top Selling Niche</span>'+
 												'</div>'+
 											'</div>'+
 										'</div>'+
