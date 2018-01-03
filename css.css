@@ -1,6 +1,6 @@
 /*Sidebar Styling */
 
-html, body{
+body.merch-advanced-analytics{
 	font-size: 11pt;
 }
 
@@ -13,8 +13,9 @@ html, body{
 }
 
 .maa-card{
-	margin-bottom: 20px;
+	margin-bottom: 20px !important;
 	height: calc(100% - 20px); 
+	
 	border-color: rgba(0, 0, 0, 0.125) !important;
 }
 
