@@ -12,7 +12,6 @@ html, body{
 	padding-left: 250px;
 }
 
-
 .maa-card{
 	margin-bottom: 20px;
 	height: calc(100% - 20px); 
@@ -57,11 +56,11 @@ html, body{
 	clear: both;
 }
 
-a[data-toggle="collapse"] {
+.merch-advanced-analytics a[data-toggle="collapse"] {
     position: relative;
 }
 
-p {
+.merch-advanced-analytics p {
     font-family: 'Poppins', sans-serif;
     font-size: 1.1em;
     font-weight: 300;
@@ -69,7 +68,7 @@ p {
     color: #999;
 }
 
-a, a:hover, a:focus {
+.merch-advanced-analytics a:not(.btn), .merch-advanced-analytics a:not(.btn):hover, .merch-advanced-analytics a:not(.btn):focus {
     color: rgb(33, 37, 41);
     text-decoration: none;
     transition: all 0.3s;
@@ -106,15 +105,13 @@ a, a:hover, a:focus {
     color: #fff;
     background: #494949;
 }
-ul ul a {
+.merch-advanced-analytics ul ul a {
     font-size: 0.9em !important;
     padding-left: 30px !important;
     background: #494949;
 }
 
 /* End Sidebar */
-
-
 
 div.desc {
     padding: 15px;
@@ -171,11 +168,11 @@ div.desc {
 	margin: 0;
 }
 
-.btn{
+.merch-advanced-analytics .btn{
 	padding: 0.375rem 0.9rem;
 }
 
-.btn ~ .btn{
+.merch-advanced-analytics .btn ~ .btn{
 	margin-left: 8px;
 }
 
@@ -186,10 +183,8 @@ div.desc {
     background-position: center right .5625rem;
     -webkit-background-size: 1.125rem 1.125rem;
     background-size: 1.125rem 1.125rem;
-	
 	border-color: #5cb85c;
 }
-
 
 table.maa-table tbody{
 	font-size: 11pt !important;

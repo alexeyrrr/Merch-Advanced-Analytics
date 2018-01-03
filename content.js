@@ -117,12 +117,14 @@ var globalLoading = '<div class="container maa-container">' +
 							'</div>'+ 
 						'</div>' +
 					'</div>';
-var globalBody = '<body><div class="wrapper">' + globalSidebar + globalLoading + '</div></body>';
+var globalBody = '<body class=""><div class="wrapper">' + globalSidebar + globalLoading + '</div></body>';
 		
 function globalInit(){
 	document.head.innerHTML = globalHeader;
 	document.body.innerHTML = globalBody;
 	document.body.style.backgroundColor = "#ecf1f2";  
+	
+	document.body.classList.add('merch-advanced-analytics');
 		
 	//Initialize Sidebar
 	$(function(){		
@@ -685,7 +687,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 							'<div class="maa-card card">'+
 								'<div class="card-body">'+                                                                       
 									'<h2 class="font-weight-lighter" style="color:#474C4F;"  >'+ totals.sales + '</h2>'+
-									'<p class="text-muted text-uppercase small">Shirts Sold</p>'+
+									'<span class="text-muted text-uppercase small">Shirts Sold</span>'+
 								'</div>'+
 							'</div>'+
 						'</div>'+
@@ -694,7 +696,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 							'<div class="maa-card card">'+
 								'<div class="card-body">'+                                                                       
 									'<h2 class="font-weight-lighter" style="color:#474C4F;"  >'+ totals.cancelled + '</h2>'+
-									'<p class="text-muted text-uppercase small">Shirts Cancelled</p>'+
+									'<span class="text-muted text-uppercase small">Shirts Cancelled</span>'+
 								'</div>'+
 							'</div>'+
 						'</div>'+
@@ -703,7 +705,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 							'<div class="maa-card card">'+
 								'<div class="card-body">'+                                                                       
 									'<h2 class="font-weight-lighter" style="color:#474C4F;"  >$'+ parseFloat(totals.revenue).formatMoney(2) + '</h2>'+
-									'<p class="text-muted text-uppercase small">Revenue</p>'+
+									'<span class="text-muted text-uppercase small">Revenue</span>'+
 								'</div>'+
 							'</div>'+
 						'</div>'+
@@ -712,7 +714,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 							'<div class="maa-card card">'+
 								'<div class="card-body">'+                                                                       
 									'<h2 class="font-weight-lighter" style="color:#474C4F;"  >$'+ parseFloat(totals.royalty).formatMoney(2) + '</h2>'+
-									'<p class="text-muted text-uppercase small">Royalties</p>'+
+									'<span class="text-muted text-uppercase small">Royalties</span>'+
 								'</div>'+
 							'</div>'+
 						'</div>'+
@@ -721,7 +723,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 							'<div class="maa-card card">'+
 								'<div class="card-body">'+                                                                       
 									'<h2 class="font-weight-lighter" style="color:#474C4F;"  >$'+ (totals.royalty /(totals.sales - totals.cancelled + 0.00001)).formatMoney(2) + '</h2>'+
-									'<p class="text-muted text-uppercase small">Average Royalties / Shirt</p>'+
+									'<span class="text-muted text-uppercase small">Average Royalties / Shirt</span>'+
 								'</div>'+
 							'</div>'+
 						'</div>'+
@@ -730,7 +732,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 							'<div class="maa-card card">'+
 								'<div class="card-body">'+                                                                       
 									'<h2 class="font-weight-lighter" style="color:#474C4F;"  >'+ ((totals.sales - totals.cancelled) /(numberofDaysInner+ 0.00001)).formatMoney(2) + '</h2>'+
-									'<p class="text-muted text-uppercase small">Average Net Sales / '+ periodTitle +'</p>'+
+									'<span class="text-muted text-uppercase small">Average Net Sales / '+ periodTitle +'</span>'+
 								'</div>'+
 							'</div>'+
 						'</div>'+
@@ -739,7 +741,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 							'<div class="maa-card card">'+
 								'<div class="card-body">'+                                                                       
 									'<h2 class="font-weight-lighter" style="color:#474C4F;"  >$'+ (totals.royalty /(numberofDaysInner+ 0.00001)).toFixed(2) + '</h2>'+
-									'<p class="text-muted text-uppercase small">Average Royalties / '+ periodTitle +'</p>'+
+									'<span class="text-muted text-uppercase small">Average Royalties / '+ periodTitle +'</span>'+
 								'</div>'+
 							'</div>'+
 						'</div>';
