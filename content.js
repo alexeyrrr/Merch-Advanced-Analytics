@@ -179,7 +179,6 @@ var globalLineChartOptions = {
 /***************************************************************/
 /******* Login Functions / Timezone Global Options *************/
 /***************************************************************/
-
 function generateLoginModal(){
 	loginerr = '<div id="myModal" class="modal fade" role="dialog">' +
 	'<div class="modal-dialog">' +
@@ -205,8 +204,6 @@ function generateLoginModal(){
 	});
 }
 
-//Add header and sidebar
-globalInit();
 
 function getQueryParams() {	
 	// Get Query Params
@@ -224,7 +221,6 @@ function getQueryParams() {
 };
 
 function router(queryParams){
-	
 	if (queryParams["page"] == "test"){
 		//This works
 	}
@@ -232,19 +228,21 @@ function router(queryParams){
 
 router(getQueryParams());
 
-//Get Base Path
+//Add header and sidebar
 var cmd = window.location.href.split('?')[0];
-
-if (cmd.indexOf("MerchAnalytics") !== -1) {
-	var fromDate7 = moment().subtract(7, 'days').unix();
-	var toDate = moment().unix();
-	
-	dailySalesPage(fromDate7, toDate);
-};
-
-if (cmd.indexOf("IndividualProductPage") !== -1) {	
-	individualProductPage(getQueryParams());
-};
+if (cmd.indexOf("MerchAnalytics") !== -1 || cmd.indexOf("IndividualProductPage") !== -1) {
+	globalInit();
+	if (cmd.indexOf("MerchAnalytics") !== -1) {
+		var fromDate7 = moment().subtract(7, 'days').unix();
+		var toDate = moment().unix();
+		dailySalesPage(fromDate7, toDate);
+	} else if (cmd.indexOf("IndividualProductPage") !== -1) {	
+		individualProductPage(getQueryParams());
+	} 
+} else {
+	console.log('testing');
+	$('.top-nav-links-container ul').append('<li class="a-align-center top-nav-link-unselected"><a class="a-link-normal" href="/MerchAnalytics">Merch Analytics</a></li>');
+}
 		
 /***************************************************************/
 /********* Global Fetch Function (Sales & Live List) ***********/
@@ -804,12 +802,9 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 					//Set Limits
 					if (projectedRevenue >= revenueLastMonth*3){
 						projectedRevenue = revenueLastMonth*3;
-					} else if (projectedRevenue <= revenueLastMonth*0.5){
-						projectedRevenue = revenueLastMonth*0.5;
-					}
+					} 
 					
 					projectionRevenueArray[projectionRevenueArray.length - 1] = projectedRevenue; 
-					
 					
 					/* Projected Profit */
 					royaltiesLastMonth = royaltyData[royaltyData.length - 2];
