@@ -507,3 +507,7 @@ table tr, table td{
 h2.font-weight-lighter{
 	font-size: calc(12px + 0.83vw);
 }
+
+.nav-pills .nav-link.active{
+	color: #fff !important;
+}
