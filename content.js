@@ -102,7 +102,8 @@ var globalSidebar = '<nav id="sidebar">' +
 							'<img class="img-fluid" src="'+ logoURL +'"></img>' +
 						'</div>' +
 						'<ul class="list-unstyled components">' +
-							'<li class="active"><a id="dailySales"><i class="fa fa-calendar-o" aria-hidden="true"></i> Daily Sales</a></li>' +
+							'<li><a id="todaySales"><i class="fa fa-calendar-o" aria-hidden="true"></i> Today\'s Sales</a></li>' +
+							'<li class="active"><a id="dailySales"><i class="fa fa-th-large" aria-hidden="true"></i> 7 Day Sales</a></li>' +
 							'<li><a id="monthlySales"><i class="fa fa-calendar" aria-hidden="true"></i> Monthly Sales</a></li>' +
 							'<li><a id="productManager"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Manage Products</a></li>' +
 							'<li style="display:none;"><a id="indvProduct"><i class="fa fa-crosshairs" aria-hidden="true"></i> Individual Product Info</a></li>' +
@@ -125,6 +126,12 @@ function globalInit(){
 		
 	//Initialize Sidebar
 	$(function(){		
+		$("#todaySales").click(function(){
+			var fromDateToday = moment().startOf('day').unix();
+			var toDateToday = moment().endOf('day').unix();
+			
+			dailySalesPage(fromDateToday, toDateToday);
+		});
 		$("#dailySales, #logo").click(function(){
 			//Calculate Unix Timestamps
 			var fromDate7 = moment().subtract(7, 'days').unix();
@@ -787,9 +794,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 					//Set Limits
 					if (projectedSales >= salesLastMonth*3){
 						projectedSales = salesLastMonth*3;
-					} else if (projectedSales <= salesLastMonth*0.5){
-						projectedSales = salesLastMonth*0.5;
-					}
+					} 
 					
 					projectionSalesArray[projectionSalesArray.length - 1] = projectedSales; 
 					
@@ -815,9 +820,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 					//Set Limits
 					if (projectedRoyalties >= royaltiesLastMonth*3){
 						projectedRoyalties = royaltiesLastMonth*3;
-					} else if (projectedRoyalties <= royaltiesLastMonth*0.5){
-						projectedRoyalties = royaltiesLastMonth*0.5;
-					}
+					} 
 					
 					projectionRoyaltiesArray[projectionRoyaltiesArray.length - 1] = projectedRoyalties; 
 				} else if(viewType == "week"){ //Weekly Labels
