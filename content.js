@@ -247,8 +247,17 @@ if (cmd.indexOf("MerchAnalytics") !== -1 || cmd.indexOf("IndividualProductPage")
 		individualProductPage(getQueryParams());
 	} 
 } else {
-	console.log('testing');
-	$('.top-nav-links-container ul').append('<li class="a-align-center top-nav-link-unselected"><a class="a-link-normal" href="/MerchAnalytics">Merch Analytics</a></li>');
+	chrome.storage.sync.get("Settings", function(items) {
+		var showNavTab = 1;
+		if(Object.values(items).length != 0){
+			var parsedJson = JSON.parse(items["Settings"]);
+			showNavTab = parsedJson["optionDashboard"];
+		}
+		
+		if (showNavTab != 0){
+			$('.top-nav-links-container ul').append('<li class="a-align-center top-nav-link-unselected"><a class="a-link-normal" href="/MerchAnalytics">Merch Analytics</a></li>');
+		}
+	});
 }
 		
 /***************************************************************/
@@ -2037,13 +2046,9 @@ function restore_options() {
 		if(Object.values(items).length != 0){
 			parsedJson = JSON.parse(items["Settings"]);
 			
-			optionTimezone = parsedJson["timezone"];
 			optionSound	= parsedJson["sound"];
 			optionNotif	= parsedJson["popup"];
-			
-			if (optionTimezone){				
-				$("#timezone").val(optionTimezone);
-			} 
+			optionDashboard	= parsedJson["optionDashboard"];
 			
 			if (optionSound){
 				$('#notificationSound').prop('checked', true);
@@ -2056,20 +2061,26 @@ function restore_options() {
 			}else{
 				$('#notificationPopup').prop('checked', false);
 			}
+			
+			if (optionDashboard){
+				$('#optionDashboard').prop('checked', true);
+			}else{
+				$('#optionDashboard').prop('checked', false);
+			}
 		}
 	});
 }
 
 // Saves options to chrome.storage
 function save_options() {
-	var optionTimeZone = $('#timezone').find(":selected").val();
 	var optionSound = $('#notificationSound').prop("checked") ? 1 : 0;
 	var optionNotif = $('#notificationPopup').prop("checked") ? 1 : 0;
+	var optionDashboard = $('#optionDashboard').prop("checked") ? 1 : 0;
 	
 	var data = JSON.stringify({
-		'timezone': parseInt(optionTimeZone),
 		'sound': optionSound,
-		'popup': optionNotif
+		'popup': optionNotif,
+		'optionDashboard': optionDashboard,
 	});
     var jsonfile = {};
     jsonfile["Settings"] = data;

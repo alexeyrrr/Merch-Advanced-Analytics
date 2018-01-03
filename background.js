@@ -234,17 +234,9 @@ var checkforsales = function() {
 							}
 						}
 					   
-						console.log("saleCount", saleCount);
-						console.log("sevenDaySaleCount", sevenDaySaleCount);
-					   
-					   
-					   
 						saleCount = sevenDaySaleCount;
 						shirtsSoldToday = newShirtsSoldToday;
 						firstInstall = false;
-						
-						
-						console.log("Updated saleCount", saleCount);
 					}
 				};
 			};
