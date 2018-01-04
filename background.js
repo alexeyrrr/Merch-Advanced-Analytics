@@ -38,16 +38,13 @@ chrome.runtime.onInstalled.addListener(function(details){
 		let newVersion = chrome.runtime.getManifest().version;
 
 		//UPDATE MESSAGE
-		
-		/*
 		chrome.notifications.create(undefined, {
 			type: 'basic',
-			title: 'Updated: Added Review Checker',
+			title: 'Updated: Added Tab Shortcut In Dashboard',
 			isClickable: true,
 			iconUrl: '/img/logo-square.png',
-			message: "We added a 'Review Checker' button on the Product Manager page to quickly find what products have reviews. There is an Amazon-side 500 product limit for this feature."
+			message: "We added a quick tab shortcut in the Merch Dashboard to MAA. If you'd like to disable this, visit the MAA settings page."
 		});	
-		*/
 		
 		
 	} else {
