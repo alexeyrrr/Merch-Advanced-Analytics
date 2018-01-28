@@ -43,7 +43,7 @@ chrome.runtime.onInstalled.addListener(function(details){
 			title: 'Updated: Added Tab Shortcut In Dashboard',
 			isClickable: true,
 			iconUrl: '/img/logo-square.png',
-			message: "We added a quick tab shortcut in the Merch Dashboard to MAA. If you'd like to disable this, visit the MAA settings page."
+			message: "We added product type columns to all tables and product graphs to sales pages."
 		});	
 		
 		
@@ -53,7 +53,7 @@ chrome.runtime.onInstalled.addListener(function(details){
 			title: 'Welcome To Merch Advanced Analytics',
 			isClickable: true,
 			iconUrl: '/img/logo-square.png',
-			message: "Your niche optimization journey begins! Click to go to dashboard."
+			message: "Your MBA sales niche optimization journey begins! Click to go to the MAA dashboard."
 		});	
 	}
 	

@@ -537,10 +537,11 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 		
 		//Tally Numbers
 		var gendersArray = {'Men': 0, 'Women': 0, 'Youth': 0};
-		var sizesArray = {'Small': 0, 'Medium': 0, 'Large': 0, 'XL': 0, '2XL': 0, '3XL': 0, '4': 0, '6': 0, '8': 0, '10': 0, '12': 0};
+		var sizesArray = {'Small': 0, 'Medium': 0, 'Large': 0, 'XL': 0, '2XL': 0, '3XL': 0, '4': 0, '6': 0, '8': 0, '10': 0, '12': 0};		
 		var shirtColorsArray = {'Dark Heather': 0, 'Heather Grey': 0, 'Heather Blue': 0, 'Black': 0, 'Navy': 0, 'Silver': 0, 'Royal Blue': 0, 'Brown': 0, 'Slate': 0, 'Red': 0, 'Asphalt': 0, 'Grass': 0, 'Olive': 0, 'Kelly Green': 0, 'Baby Blue': 0, 'White': 0, 'Lemon': 0, 'Cranberry': 0, 'Pink': 0, 'Orange': 0, 'Purple': 0};
 		var priceObject = {};
-					
+		var productTypeObject = {};
+		
 		//Assemble Dynamic Blank Array For Niches
 		var nicheArray = {};
 				
@@ -615,15 +616,23 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 								}
 							}
 							
-							//Determing Unit Price & Count it
+							//Determine Unit Price & Count it
 							var unitsSold = responseArray[i2]["Units"] - responseArray[i2]["Cancellations"];
 							if (unitsSold != 0){ //Disregding canceled units intentionally								
 								var unitPrice = "$"+(responseArray[i2]["Revenue"] / (unitsSold)).toFixed(2);	
-									if (unitPrice in priceObject){
+								if (unitPrice in priceObject){
 									priceObject[unitPrice] += 1;
 								} else {
 									priceObject[unitPrice] = 1;
 								}
+							}
+							
+							//Determine Product Type & Count it
+							var productType = responseArray[i2]["Product Type"];							
+							if (productType in productTypeObject){
+								productTypeObject[productType] += 1;
+							} else {
+								productTypeObject[productType] = 1;
 							}
 						}
 					}
@@ -723,7 +732,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 							'<div class="maa-card card">'+
 								'<div class="card-body">'+                                                                       
 									'<h2 class="font-weight-lighter" style="color:#474C4F;"  >$'+ (totals.royalty /(totals.sales - totals.cancelled + 0.00001)).formatMoney(2) + '</h2>'+
-									'<span class="text-muted text-uppercase small">Average Royalties / Shirt</span>'+
+									'<span class="text-muted text-uppercase small">Avg Royalties / Shirt</span>'+
 								'</div>'+
 							'</div>'+
 						'</div>'+
@@ -732,7 +741,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 							'<div class="maa-card card">'+
 								'<div class="card-body">'+                                                                       
 									'<h2 class="font-weight-lighter" style="color:#474C4F;"  >'+ ((totals.sales - totals.cancelled) /(numberofDaysInner+ 0.00001)).formatMoney(2) + '</h2>'+
-									'<span class="text-muted text-uppercase small">Average Net Sales / '+ periodTitle +'</span>'+
+									'<span class="text-muted text-uppercase small">Avg Net Sales / '+ periodTitle +'</span>'+
 								'</div>'+
 							'</div>'+
 						'</div>'+
@@ -741,7 +750,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 							'<div class="maa-card card">'+
 								'<div class="card-body">'+                                                                       
 									'<h2 class="font-weight-lighter" style="color:#474C4F;"  >$'+ (totals.royalty /(numberofDaysInner+ 0.00001)).toFixed(2) + '</h2>'+
-									'<span class="text-muted text-uppercase small">Average Royalties / '+ periodTitle +'</span>'+
+									'<span class="text-muted text-uppercase small">Avg Royalties / '+ periodTitle +'</span>'+
 								'</div>'+
 							'</div>'+
 						'</div>';
@@ -1062,6 +1071,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 					resultSumSales.push({
 						ASIN: uniqueArray[i],
 						Name: '',
+						ProductType: '',
 						Units: 0,
 						Cancellations: 0,
 						Royalty: 0,
@@ -1073,6 +1083,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 					for (i2 = 0; i2 < responseArray.length; i2++){
 						if(resultSumSales[i]["ASIN"] == responseArray[i2]["ASIN"]){
 							resultSumSales[i]["Name"] = responseArray[i2]["Name"];
+							resultSumSales[i]["ProductType"] = responseArray[i2]["Product Type"];
 							resultSumSales[i]["Units"] += parseInt(responseArray[i2]["Units"]);
 							resultSumSales[i]["Cancellations"] += parseInt(responseArray[i2]["Cancellations"]);
 							resultSumSales[i]["Royalty"] += parseFloat(responseArray[i2]["Royalty"]);
@@ -1086,14 +1097,15 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 					'<thead>' + 
 						'<tr>' +
 							'<th>#</th>' +
-							'<th>Shirt Name</th>' +
+							'<th>Product Name</th>' +
+							'<th>Product Type</th>' +
 							'<th>Niche Category</th>' +
 							'<th class="text-center">Product Details</th>' +
 							'<th class="text-center">Units Sold</th>' +
 							'<th class="text-center">Units Cancelled</th>' +
 							'<th class="text-center">Revenue</th>' +
 							'<th class="text-center">Royalties</th>' +
-							'<th class="text-center">Avg Royalties / Shirt </th>' +
+							'<th class="text-center">Avg Royalties / Product </th>' +
 							'<th class="text-center">Edit / Delete </th>' +
 						'</tr>'  +
 					'</thead><tbody>';
@@ -1119,6 +1131,10 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 						'<th scope="row">' + (i + 1) + '</th>' + 
 						'<td>' + 
 							resultSumSales[i]["Name"]  + 
+						'</td>' + 
+						
+						'<td>' + 
+							resultSumSales[i]["ProductType"]   + 
 						'</td>' + 
 						
 						'<td class="niche-tag">'+
@@ -1416,6 +1432,7 @@ function productManager() {
 			'<th class="text-center">Design</th>' +
 			'<th>Title</th>' +
 			'<th>Niche</th>' +
+			'<th class="text-center">Product Type</th>' +
 			'<th class="text-center">Creation Date</th>' +
 			'<th class="text-center">Days Until Deletion</th>' +
 			'<th class="text-center">Product Details</th>' +
@@ -1429,8 +1446,9 @@ function productManager() {
 		var lifetimesSalesCounter = 0;
 		var liveDesignsCounter = 0;
 		var strOfASINs = '';
+		var productType = '';
 		
-		for (var i = 0; i < ts.length; i++) {		
+		for (var i = 0; i < ts.length; i++) {					
 			if (ts[i].marketplaceAsinMap.US !== undefined && (ts[i].status == "LIVE" || ts[i].status == "PROCESSING" || ts[i].status == "MANUALLY_REJECTED" || ts[i].status == "UNDER_AUTO_REVIEW")){
 				var hasLifetimeSales = false;
 				liveDesignsCounter++;
@@ -1444,7 +1462,7 @@ function productManager() {
 		
 			if (ts[i].marketplaceAsinMap.US !== undefined && ts[i].status == "LIVE"){
 				//Parse Create Date
-				var stringifiedCreateDate = moment.unix(parseInt(ts[i].createDate) / 1000).format("MM-DD-YYYY");
+				var stringifiedCreateDate = moment.unix(parseInt(ts[i].createDate) / 1000).format("MM[&#8209;]DD[&#8209;]YYYY");
 				
 				if (liveDesignsCounter < 500){ //Only show first 500 products
 					strOfASINs += ts[i].marketplaceAsinMap.US + ',';
@@ -1453,6 +1471,26 @@ function productManager() {
 				var itemName = ts[i].name.replace(/"/g, "");
 				var uriEncodedName = encodeURIComponent(itemName); 
 				var deleteLink = 'https://merch.amazon.com/manage/products?pageNumber=1&pageSize=15&keywords=' + uriEncodedName + '&statusFilters=%5B%22DELETED%22%2C%22DRAFT%22%2C%22LIVE%22%2C%22NOT_DISCOVERABLE%22%2C%22PENDING%22%2C%22PROCESSING%22%2C%22STOPPED%22%2C%22UNDER_REVIEW%22%2C%22REJECTED%22%2C%22MANUALLY_REJECTED%22%5D';
+				switch (ts[i].shirtType) {
+					case "AMERICAN_APPAREL":
+					case "HOUSE_BRAND":
+						productType = "Standard T&#8209;Shirt";
+						break;
+					case "PREMIUM_BRAND":
+						productType = "Premium T&#8209;Shirt";
+						break;
+					case "STANDARD_SWEATSHIRT":
+						productType = "Sweatshirt";
+						break;
+					case "STANDARD_PULLOVER_HOODIE":
+						productType = "Pullover Hoodie";
+						break;
+					case "STANDARD_LONG_SLEEVE":
+						productType = "Long-Sleeve T&#8209;Shirt";
+						break;
+					default: 
+						productType = "";
+				}
 				
 				cp2 += '<tr data-lifetime-sales="'+ hasLifetimeSales.toString() + '" data-href="https://www.amazon.com/dp/' + ts[i].marketplaceAsinMap.US + '">' +
 							'<td class="text-center">' +	
@@ -1466,8 +1504,11 @@ function productManager() {
 								'<div class="form-group has-success">' +
 								  '<input type="text" name="nicheName" class="form-control niche-input"/>' +
 								  '<input type="hidden" name="parentASIN" value='+ ts[i].marketplaceAsinMap.US + '>' +
-								  //'<button class="btn btn-primary save"/>Save</button>' +
 								'</div>' +
+							'</td>' +
+							
+							'<td class="text-center">' +	
+								productType +
 							'</td>' +
 							
 							'<td class="text-center">' +	
@@ -1499,8 +1540,8 @@ function productManager() {
 		managerStats = '<center><h2>Product Manager</h2></center>' +
 			'<table class="maa-table table table-striped"><thead>' + 
 				'<tr>' +
-					'<th class="text-center">Shirts With Atleast One Lifetime Sale</th>'+
-					'<th class="text-center">Total Live Shirts</th>' + 
+					'<th class="text-center">Products With Atleast One Lifetime Sale</th>'+
+					'<th class="text-center">Total Live Products</th>' + 
 					'<th class="text-center">% Of Designs that Have Ever Sold</th>' + 
 				'</tr></thead><tbody>' + 
 				'<tr class="success text-center">' + 
