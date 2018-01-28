@@ -1742,6 +1742,7 @@ function renderIndividualProductSales(queryParams){
 			var sizesArray = {'Small': 0, 'Medium': 0, 'Large': 0, 'XL': 0, '2XL': 0, '3XL': 0, '4': 0, '6': 0, '8': 0, '10': 0, '12': 0};
 			var shirtColorsArray = {'Dark Heather': 0, 'Heather Grey': 0, 'Heather Blue': 0, 'Black': 0, 'Navy': 0, 'Silver': 0, 'Royal Blue': 0, 'Brown': 0, 'Slate': 0, 'Red': 0, 'Asphalt': 0, 'Grass': 0, 'Olive': 0, 'Kelly Green': 0, 'Baby Blue': 0, 'White': 0, 'Lemon': 0, 'Cranberry': 0, 'Pink': 0, 'Orange': 0, 'Purple': 0};
 			var priceObject = {};
+			var productType = ""
 			
 			//Sales Data (Not Very Efficient)
 			for (i = 0; i < axisLabels.length; i++) {
@@ -1772,6 +1773,9 @@ function renderIndividualProductSales(queryParams){
 								shirtColorsArray[key] += 1;
 							}
 						}
+						
+						//Set Product Type 
+						productType = responseArray[i2]["Product Type"]
 					} 
 				}
 			}
@@ -1798,6 +1802,10 @@ function renderIndividualProductSales(queryParams){
 									'</a>' +
 								'</div>' +
 								'<div class="dl-list col col-xs-9 col-sm-10">' +	
+									'<dl>' +
+										'<dt>Product Type:&nbsp; </dt>' +
+										'<dd>' + productType + '</dd>' +
+									'</dl>' +
 									'<dl>' +
 										'<dt>First Published Date:&nbsp;</dt>' +
 										'<dd>' + moment.unix(firstPublishDate).format("MM-DD-YYYY") + '</dd>' +
