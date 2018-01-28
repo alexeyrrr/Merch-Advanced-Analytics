@@ -439,21 +439,25 @@ function dailySalesPage(fromDate, toDate, viewType = 'day'){
 							'</div>' + 
 							'<div class="tab-pane" role="tabpanel"  id="advanced">' +
 								'<center class="row">' +
-									'<div class="col col-xs-3 col-sm-3">' +
-										'<canvas id="canvas3" height="350" width="280" style="padding:10px"></canvas>' +
+									'<div class="col col-xs-2 col-sm-2">' +
+										'<canvas id="canvas3" height="350" width="220" style="padding:10px"></canvas>' +
 										'<h5 class="canvas-title">Gender Distribution</h5>' +
 									'</div>' +
-									'<div class="col col-xs-3 col-sm-3">'+
-										'<canvas id="canvas4" height="350" width="280" style="padding:10px"></canvas>' +
+									'<div class="col col-xs-2 col-sm-2">' +
+										'<canvas id="canvas4" height="350" width="220" style="padding:10px"></canvas>' +
 										'<h5 class="canvas-title">Size Distribution</h5>' +
 									'</div>'+
-									'<div class="col col-xs-3 col-sm-3">'+
-										'<canvas id="canvas5" height="350" width="280" style="padding:10px"></canvas>'+
+									'<div class="col col-xs-2 col-sm-2">' +
+										'<canvas id="canvas5" height="350" width="220" style="padding:10px"></canvas>'+
 										'<h5 class="canvas-title">Color Distribution</h5>' +
 									'</div>' +
-									'<div class="col col-xs-3 col-sm-3">'+
-										'<canvas id="canvas6" height="350" width="280" style="padding:10px"></canvas>'+
+									'<div class="col col-xs-2 col-sm-2">' +
+										'<canvas id="canvas6" height="350" width="220" style="padding:10px"></canvas>'+
 										'<h5 class="canvas-title">Pricing Distribution</h5>' +
+									'</div>' +
+									'<div class="col col-xs-2 col-sm-2">' +
+										'<canvas id="canvas7" height="350" width="220" style="padding:10px"></canvas>'+
+										'<h5 class="canvas-title">Product Type Distribution</h5>' +
 									'</div>' +
 								'</center>' +
 							'</div>' +
@@ -462,14 +466,14 @@ function dailySalesPage(fromDate, toDate, viewType = 'day'){
 									'<div class="container maa-container row">' +									
 										'<div class="col col-xs-6 col-sm-6">'+
 											'<center>' +
-												'<canvas id="canvas7" height="350" width="280" style="padding:10px"></canvas>'+
+												'<canvas id="canvas8" height="350" width="280" style="padding:10px"></canvas>'+
 												'<h5 class="canvas-title">Niche Distribution (Number Sold)</h5>' +
 											'</center>' +
 										'</div>' +
 										
 										'<div class="col col-xs-6 col-sm-6">'+
 											'<center>' +
-												'<canvas id="canvas8" height="350" width="280" style="padding:10px"></canvas>'+
+												'<canvas id="canvas9" height="350" width="280" style="padding:10px"></canvas>'+
 												'<div class="canvas-title">' +
 													'<h5>Normalized Niche Distribution (%)</h5>' +
 													'<i class="fa fa-info-circle" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="A normalized distribution takes into account the number of shirts for each niche and factors out the relative availablilty of each niche. (i.e. think like comparing a country\'s GDP vs GDP Per Capita)"></i>'+
@@ -779,11 +783,10 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 				}
 				
 				sortedPriceObject = {};
- 				
 				Object.keys(priceObject)
 					.sort().forEach(function(key) {
 					sortedPriceObject[key] = priceObject[key];
-				});;
+				});
 				
 				var shirtNicheColorsSeed = ["#e0f2f1", "#b2dfdb", "#80cbc4", "#4db6ac", "#26a69a", "#009688", "#00897b", "#00796b", "#00695c", "#004d40"];
 				//Extend Array Length
@@ -1020,9 +1023,22 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 					options: globalLineChartOptions,
 				};
 				
-
-				//Shirt Niches (Non-normalized) 
+				//Pricing Charts
 				var lineChartData7 = {
+					type: 'doughnut',
+					data: {
+						labels: Object.keys(productTypeObject),
+						datasets: [{							
+							data: Object.values(productTypeObject),
+							backgroundColor: shirtNicheColorsLUT,
+						}]
+					},
+					options: globalLineChartOptions,
+				};
+				
+				
+				//Shirt Niches (Non-normalized) 
+				var lineChartData8 = {
 					type: 'doughnut',
 					data: {
 						labels: Object.keys(nicheArray),
@@ -1049,11 +1065,14 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 				var ctxColors = document.getElementById("canvas5").getContext("2d");	
 				var myChart = new Chart(ctxColors, lineChartData5);
 				
-				var ctxNiches = document.getElementById("canvas6").getContext("2d");	
-				var myChart = new Chart(ctxNiches, lineChartData6);
+				var ctxPricing = document.getElementById("canvas6").getContext("2d");	
+				var myChart = new Chart(ctxPricing, lineChartData6);
 				
-				var ctxNiches = document.getElementById("canvas7").getContext("2d");	
-				var myChart = new Chart(ctxNiches, lineChartData7);
+				var ctxProdTypes = document.getElementById("canvas7").getContext("2d");	
+				var myChart = new Chart(ctxProdTypes, lineChartData7);
+				
+				var ctxNiches = document.getElementById("canvas8").getContext("2d");	
+				var myChart = new Chart(ctxNiches, lineChartData8);
 				
 				//Summing up all values
 				var allASINValues = [];
@@ -1283,7 +1302,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 						options: globalLineChartOptions,
 					};
 					
-					var ctxNormNiches = document.getElementById("canvas8").getContext("2d");	
+					var ctxNormNiches = document.getElementById("canvas9").getContext("2d");	
 					var myChart = new Chart(ctxNormNiches, lineChartData8);
 					
 					
