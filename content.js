@@ -113,7 +113,7 @@ var globalSidebar = '<nav id="sidebar">' +
 var globalLoading = '<div class="container maa-container">' +
 						'<div class="maa-card card">'+
 							'<div class="card-block">' +
-								'<div class="status"><center><h3>Loading...</h3><i class="fa fa-spinner fa-spin fa-4"></i></center></div>' + 
+								'<div class="status clear"><center><h3>Loading...</h3><i class="fa fa-spinner fa-spin fa-4"></i></center></div>' + 
 							'</div>'+ 
 						'</div>' +
 					'</div>';
@@ -182,6 +182,12 @@ var globalLineChartOptions = {
 						},
 						legend: {
 							display: false
+						},		
+						title: {
+							display: true,
+							position: 'bottom',
+							text: 'Custom Chart Title'
+							
 						}						
 					};
 													
@@ -413,7 +419,7 @@ function dailySalesPage(fromDate, toDate, viewType = 'day'){
 					'<div class="maa-card card"></center>'+
 						'<div class="card-block">'+ 
 							//'<center><h2>Daily Page</h2></center>' +
-							'<div id="dailystats" class="status"><center><h3>Loading...</h3><i class="fa fa-spinner fa-spin fa-4"></i></center></div>' + 
+							'<div id="dailystats" class="status clear"><center><h3>Loading...</h3><i class="fa fa-spinner fa-spin fa-4"></i></center></div>' + 
 						'</div>' +
 					'</div>' +
 					'<div class="maa-card card" id="salesPanel">' +
@@ -435,29 +441,24 @@ function dailySalesPage(fromDate, toDate, viewType = 'day'){
 							'</div>' +
 							
 							'<div class="tab-pane" role="tabpanel" id="revenue">' +
-								'<div class="inner-container"><canvas id="canvas2"></canvas></div>' +
+								'<center class="inner-container"><canvas id="canvas2"></canvas></center>' +
 							'</div>' + 
 							'<div class="tab-pane" role="tabpanel" id="advanced">' +
 								'<center class="row">' +
-									'<div class="canvas-wrapper col col-xs-2 col-sm-2">' +
+									'<div class="canvas-wrapper col col-xs-2 col-sm-2 col-md-offset-1">' +
 										'<canvas id="canvas3"></canvas>' +
-										'<h5 class="canvas-title">Gender Distribution</h5>' +
 									'</div>' +
 									'<div class="canvas-wrapper col col-xs-2 col-sm-2">' +
 										'<canvas id="canvas4"></canvas>' +
-										'<h5 class="canvas-title">Size Distribution</h5>' +
 									'</div>'+
 									'<div class="canvas-wrapper col col-xs-2 col-sm-2">' +
 										'<canvas id="canvas5"></canvas>'+
-										'<h5 class="canvas-title">Color Distribution</h5>' +
 									'</div>' +
 									'<div class="canvas-wrapper col col-xs-2 col-sm-2">' +
 										'<canvas id="canvas6"></canvas>'+
-										'<h5 class="canvas-title">Pricing Distribution</h5>' +
 									'</div>' +
 									'<div class="canvas-wrapper col col-xs-2 col-sm-2">' +
 										'<canvas id="canvas7"></canvas>'+
-										'<h5 class="canvas-title">Product Type Distribution</h5>' +
 									'</div>' +
 								'</center>' +
 							'</div>' +
@@ -467,17 +468,18 @@ function dailySalesPage(fromDate, toDate, viewType = 'day'){
 										'<div class="col col-xs-6 col-sm-6">'+
 											'<center class="canvas-wrapper">' +
 												'<canvas id="canvas8"></canvas>'+
-												'<h5 class="canvas-title">Niche Distribution (Number Sold)</h5>' +
+												//'<h5 class="canvas-title">Niche Distribution (Number Sold)</h5>' +
 											'</center>' +
 										'</div>' +
 										
 										'<div class="col col-xs-6 col-sm-6">'+
 											'<center class="canvas-wrapper">' +
 												'<canvas id="canvas9"></canvas>'+
-												'<div class="canvas-title">' +
+												/*'<div class="canvas-title">' +
 													'<h5>Normalized Niche Distribution (%)</h5>' +
 													'<i class="fa fa-info-circle" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="A normalized distribution takes into account the number of shirts for each niche and factors out the relative availablilty of each niche. (i.e. think like comparing a country\'s GDP vs GDP Per Capita)"></i>'+
 												'</div>' +
+												*/
 											'</center>' +
 										'</div>' +
 									'</div>' +
@@ -1139,7 +1141,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 					if(nichesLookupArray[resultSumSales[i]["ASIN"]] != undefined){
 						specificNiche = JSON.parse(nichesLookupArray[resultSumSales[i]["ASIN"]])["niche"];
 					} else {
-						specificNiche = "unknown niche";
+						specificNiche = "unknown";
 						reminderPopoverData = 'data-toggle="tooltip" data-placement="bottom" title="Assign product niche on Manage Products Page"';
 					}
 					
@@ -1428,7 +1430,7 @@ function productManager() {
 	var pageContent = '<div class="container maa-container">' + 
 							'<div class="maa-card card">' +
 								'<div class="card-block">'+
-									'<div id="manager-stats" class="status"><center><h3>Loading...</h3><i class="fa fa-spinner fa-spin fa-4"></i></center></div>' + 
+									'<div id="manager-stats" class="status clear"><center><h3>Loading...</h3><i class="fa fa-spinner fa-spin fa-4"></i></center></div>' + 
 								'</div>' +
 							'</div>'+ 
 							'<div class="maa-card card">' +
@@ -1615,7 +1617,7 @@ function individualProductPage(queryParams){
 		pageContent = '<div class="container maa-container">' +
 							'<div class="maa-card card"></center>'+
 								'<div class="card-block">'+ 
-									'<div id="individualShirtSummary" class="status"><center><h3>Loading...</h3><i class="fa fa-spinner fa-spin fa-4"></i></center></div>' + 
+									'<div id="individualShirtSummary" class="status clear"><center><h3>Loading...</h3><i class="fa fa-spinner fa-spin fa-4"></i></center></div>' + 
 								'</div>' +
 							'</div>' +
 							
@@ -1640,17 +1642,14 @@ function individualProductPage(queryParams){
 									
 									'<div class="tab-pane" role="tabpanel"  id="advanced">' +
 										'<center class="inner-container row">' +
-											'<div class="col col-xs-4 col-sm-4">' +
-												'<canvas id="canvas3" height="350" width="280" style="padding:10px"></canvas>' +
-												'<h5 class="canvas-title">Gender Distribution</h5>' +
+											'<div class="canvas-wrapper col col-xs-4 col-sm-4">' +
+												'<canvas id="canvas3"></canvas>' +
 											'</div>' +
-											'<div class="col col-xs-4 col-sm-4">'+
-												'<canvas id="canvas4" height="350" width="280" style="padding:10px"></canvas>' +
-												'<h5 class="canvas-title">Size Distribution</h5>' +
+											'<div class="canvas-wrapper col col-xs-4 col-sm-4">'+
+												'<canvas id="canvas4"></canvas>' +
 											'</div>'+
-											'<div class="col col-xs-4 col-sm-4">'+
-												'<canvas id="canvas5" height="350" width="280" style="padding:10px"></canvas>'+
-												'<h5 class="canvas-title">Color Distribution</h5>' +
+											'<div class="canvas-wrapper col col-xs-4 col-sm-4">'+
+												'<canvas id="canvas5"></canvas>'+
 											'</div>' +
 										'</center>' +
 									'</div>' +
@@ -1673,7 +1672,7 @@ function individualProductPage(queryParams){
 		pageContent = '<div class="container maa-container">' +
 						'<div class="maa-card card"></center>'+
 							'<div class="card-block">'+ 
-								'<div id="individualShirtSummary" class="status text-center">' +
+								'<div id="individualShirtSummary" class="status clear text-center">' +
 									'<h2>Enter Your Product ASIN</h2>' +
 									'<div class="form-group">' +
 										'<input type="text">' +
