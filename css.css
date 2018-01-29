@@ -420,8 +420,8 @@ input[type="text"]{
 	margin: 10px;
 }
 
-.no-pading-top{
-	padding-top: 0;
+.no-padding-top{
+	padding-top: 0 !important;
 }
 
 .no-card-bottom .card{

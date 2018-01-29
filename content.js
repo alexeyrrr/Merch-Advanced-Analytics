@@ -685,7 +685,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 					var periodDuration = Math.floor(duration.asDays()) + " Day Range";
 				}
 				
-				stats = '<div class="container maa-container row no-pading-top">'+
+				stats = '<div class="container maa-container row no-padding-top">'+
 							'<div class="col-sm-6 col-xs-6">' +
 								'<h3>' + pageTitle + '</h3>' +
 								'<h4 class="subheading" style="margin-bottom: 0;">' + periodDuration +'</h4>' +
