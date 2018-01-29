@@ -25,6 +25,13 @@ body.merch-advanced-analytics{
     border-image: initial;
 }
 
+.canvas-wrapper {
+	display:block;
+}
+
+.canvas-wrapper canvas{
+	padding: 10px;
+}
 
 .modal-lg{
 	max-width: 1000px;
@@ -57,6 +64,7 @@ body.merch-advanced-analytics{
 	width: 100%;
 	max-width: 1000px;
 	margin: 0 auto;
+	display:block;
 }
 .clear::after { 
 	content: "";

@@ -169,7 +169,7 @@ function globalInit(){
 }
 
 var globalLineChartOptions = {
-						responsive: false,
+						responsive: true,
 						animation: {
 							duration: 0, // general animation time
 						},
@@ -184,7 +184,7 @@ var globalLineChartOptions = {
 							display: false
 						}						
 					};
-								
+													
 /***************************************************************/
 /******* Login Functions / Timezone Global Options *************/
 /***************************************************************/
@@ -431,32 +431,32 @@ function dailySalesPage(fromDate, toDate, viewType = 'day'){
 						
 						'<div class="card-block tab-content">' +
 							'<div class="tab-pane active" role="tabpanel" id="sales">' +
-								'<center class="inner-container"><canvas id="canvas1" height="450" width="800" ></canvas></center>' + 
+								'<center class="inner-container"><canvas id="canvas1"></canvas></center>' + 
 							'</div>' +
 							
 							'<div class="tab-pane" role="tabpanel" id="revenue">' +
-								'<center class="inner-container"><canvas id="canvas2" height="450" width="800" ></canvas></center>' +
+								'<div class="inner-container"><canvas id="canvas2"></canvas></div>' +
 							'</div>' + 
-							'<div class="tab-pane" role="tabpanel"  id="advanced">' +
+							'<div class="tab-pane" role="tabpanel" id="advanced">' +
 								'<center class="row">' +
-									'<div class="col col-xs-2 col-sm-2">' +
-										'<canvas id="canvas3" height="350" width="220" style="padding:10px"></canvas>' +
+									'<div class="canvas-wrapper col col-xs-2 col-sm-2">' +
+										'<canvas id="canvas3"></canvas>' +
 										'<h5 class="canvas-title">Gender Distribution</h5>' +
 									'</div>' +
-									'<div class="col col-xs-2 col-sm-2">' +
-										'<canvas id="canvas4" height="350" width="220" style="padding:10px"></canvas>' +
+									'<div class="canvas-wrapper col col-xs-2 col-sm-2">' +
+										'<canvas id="canvas4"></canvas>' +
 										'<h5 class="canvas-title">Size Distribution</h5>' +
 									'</div>'+
-									'<div class="col col-xs-2 col-sm-2">' +
-										'<canvas id="canvas5" height="350" width="220" style="padding:10px"></canvas>'+
+									'<div class="canvas-wrapper col col-xs-2 col-sm-2">' +
+										'<canvas id="canvas5"></canvas>'+
 										'<h5 class="canvas-title">Color Distribution</h5>' +
 									'</div>' +
-									'<div class="col col-xs-2 col-sm-2">' +
-										'<canvas id="canvas6" height="350" width="220" style="padding:10px"></canvas>'+
+									'<div class="canvas-wrapper col col-xs-2 col-sm-2">' +
+										'<canvas id="canvas6"></canvas>'+
 										'<h5 class="canvas-title">Pricing Distribution</h5>' +
 									'</div>' +
-									'<div class="col col-xs-2 col-sm-2">' +
-										'<canvas id="canvas7" height="350" width="220" style="padding:10px"></canvas>'+
+									'<div class="canvas-wrapper col col-xs-2 col-sm-2">' +
+										'<canvas id="canvas7"></canvas>'+
 										'<h5 class="canvas-title">Product Type Distribution</h5>' +
 									'</div>' +
 								'</center>' +
@@ -465,15 +465,15 @@ function dailySalesPage(fromDate, toDate, viewType = 'day'){
 								'<div class="inner-container">' +
 									'<div class="container maa-container row">' +									
 										'<div class="col col-xs-6 col-sm-6">'+
-											'<center>' +
-												'<canvas id="canvas8" height="350" width="280" style="padding:10px"></canvas>'+
+											'<center class="canvas-wrapper">' +
+												'<canvas id="canvas8"></canvas>'+
 												'<h5 class="canvas-title">Niche Distribution (Number Sold)</h5>' +
 											'</center>' +
 										'</div>' +
 										
 										'<div class="col col-xs-6 col-sm-6">'+
-											'<center>' +
-												'<canvas id="canvas9" height="350" width="280" style="padding:10px"></canvas>'+
+											'<center class="canvas-wrapper">' +
+												'<canvas id="canvas9"></canvas>'+
 												'<div class="canvas-title">' +
 													'<h5>Normalized Niche Distribution (%)</h5>' +
 													'<i class="fa fa-info-circle" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="A normalized distribution takes into account the number of shirts for each niche and factors out the relative availablilty of each niche. (i.e. think like comparing a country\'s GDP vs GDP Per Capita)"></i>'+
@@ -980,7 +980,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 							backgroundColor: ["#3498db", "#e86dab", "#84cb74"],
 						}]
 					},
-					options: globalLineChartOptions,
+					options: globalLineChartOptions, 
 				};
 				
 				//Size Charts
@@ -1053,26 +1053,29 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 				var ctxSales = document.getElementById("canvas1").getContext("2d");	
 				var myChart = new Chart(ctxSales, lineChartData1);
 					
+				$('.nav-pills [href="#revenue"]').tab('show');
 				var ctxRevenue = document.getElementById("canvas2").getContext("2d");	
-				var myChart = new Chart(ctxRevenue, lineChartData2);
+				var myChart2 = new Chart(ctxRevenue, lineChartData2);
 				
+				$('.nav-pills [href="#advanced"]').tab('show');
 				var ctxGenders = document.getElementById("canvas3").getContext("2d");	
-				var myChart = new Chart(ctxGenders, lineChartData3);
+				var myChart3 = new Chart(ctxGenders, lineChartData3);
 				
 				var ctxSizes = document.getElementById("canvas4").getContext("2d");	
-				var myChart = new Chart(ctxSizes, lineChartData4);
+				var myChart4 = new Chart(ctxSizes, lineChartData4);
 				
 				var ctxColors = document.getElementById("canvas5").getContext("2d");	
-				var myChart = new Chart(ctxColors, lineChartData5);
+				var myChart5 = new Chart(ctxColors, lineChartData5);
 				
 				var ctxPricing = document.getElementById("canvas6").getContext("2d");	
-				var myChart = new Chart(ctxPricing, lineChartData6);
+				var myChart6 = new Chart(ctxPricing, lineChartData6);
 				
 				var ctxProdTypes = document.getElementById("canvas7").getContext("2d");	
-				var myChart = new Chart(ctxProdTypes, lineChartData7);
+				var myChart7 = new Chart(ctxProdTypes, lineChartData7);
 				
+				$('.nav-pills [href="#niche"]').tab('show');
 				var ctxNiches = document.getElementById("canvas8").getContext("2d");	
-				var myChart = new Chart(ctxNiches, lineChartData8);
+				var myChart8 = new Chart(ctxNiches, lineChartData8);
 				
 				//Summing up all values
 				var allASINValues = [];
@@ -1303,7 +1306,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 					};
 					
 					var ctxNormNiches = document.getElementById("canvas9").getContext("2d");	
-					var myChart = new Chart(ctxNormNiches, lineChartData8);
+					var myChart9 = new Chart(ctxNormNiches, lineChartData8);
 					
 					
 					
@@ -1401,6 +1404,9 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 					//Initialize Tooltips
 					$(function () {
 					  $('[data-toggle="tooltip"]').tooltip()
+					  
+
+		
 					})
 				
 				
