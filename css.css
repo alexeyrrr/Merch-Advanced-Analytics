@@ -14,7 +14,6 @@ body.merch-advanced-analytics{
 
 .maa-card{
 	margin-bottom: 20px !important;
-	height: calc(100% - 20px); 
 	border-color: rgba(0, 0, 0, 0.125) !important;
 }
 
@@ -31,6 +30,8 @@ body.merch-advanced-analytics{
 
 .canvas-wrapper canvas{
 	padding: 10px;
+	width: 100% !important;
+	height: 100% !important;
 }
 
 .modal-lg{
@@ -425,7 +426,7 @@ input[type="text"]{
 }
 
 .no-card-bottom .card{
-	margin-bottom: 0;
+	margin-bottom: 0 !important;
 }
 
 [name="numberOfDaysInput"]{
@@ -508,7 +509,8 @@ table tr, table td{
 }
 
 h2.font-weight-lighter{
-	font-size: calc(12px + 0.83vw);
+	font-size: calc(12px + 0.8vw);
+	margin-bottom: 2px;
 }
 
 .nav-pills .nav-link.active{

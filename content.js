@@ -184,7 +184,7 @@ var globalLineChartOptions = {
 							display: false
 						},		
 						title: {
-							display: true,
+							display: false,
 							position: 'bottom',
 							text: 'Custom Chart Title'
 							
@@ -489,7 +489,7 @@ function dailySalesPage(fromDate, toDate, viewType = 'day'){
 					'</div>' +
 					
 					'<div class="maa-card card">' + 
-						'<div class="card-header">Shirts Sold During Selected Period</div>' +
+						'<div class="card-header">Products Sold During Selected Period</div>' +
 						'<div class="card-block" id="shirtlist"></div>' +
 					'</div>' + 
 				'</div>';
@@ -698,25 +698,25 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 							'</div>' +	
 						'</div>';	
 				stats += '<div class="container maa-container row no-gutters row-eq-height">' +
-						'<div class="col-lg-2 col-sm-3 col-xs-12 offset-sm-0 offset-md-1 offset-lg-2 no-card-bottom">'+
+						'<div class="col-lg-2 col-sm-3 col-xs-12 offset-sm-0 offset-md-1 offset-lg-2">'+
 							'<div class="maa-card card">'+
 								'<div class="card-body">'+                                                                       
 									'<h2 class="font-weight-lighter" style="color:#474C4F;"  >'+ totals.sales + '</h2>'+
-									'<span class="text-muted text-uppercase small">Shirts Sold</span>'+
+									'<span class="text-muted text-uppercase small">Units Sold</span>'+
 								'</div>'+
 							'</div>'+
 						'</div>'+
 						
-						'<div class="col-lg-2 col-sm-3 col-xs-12 no-card-bottom">'+
+						'<div class="col-lg-2 col-sm-3 col-xs-12">'+
 							'<div class="maa-card card">'+
 								'<div class="card-body">'+                                                                       
 									'<h2 class="font-weight-lighter" style="color:#474C4F;"  >'+ totals.cancelled + '</h2>'+
-									'<span class="text-muted text-uppercase small">Shirts Cancelled</span>'+
+									'<span class="text-muted text-uppercase small">Units Cancelled</span>'+
 								'</div>'+
 							'</div>'+
 						'</div>'+
 						
-						'<div class="col-lg-2 col-sm-3 col-xs-12 no-card-bottom">'+
+						'<div class="col-lg-2 col-sm-3 col-xs-12">'+
 							'<div class="maa-card card">'+
 								'<div class="card-body">'+                                                                       
 									'<h2 class="font-weight-lighter" style="color:#474C4F;"  >$'+ parseFloat(totals.revenue).formatMoney(2) + '</h2>'+
