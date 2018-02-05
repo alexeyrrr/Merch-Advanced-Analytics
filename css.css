@@ -3,6 +3,10 @@
 	font-size: 1.7rem;
 }
 
+.merch-advanced-analytics .nav-item{
+	margin-right: 3px;
+}
+
 body.merch-advanced-analytics{
 	font-size: 11pt;
 }

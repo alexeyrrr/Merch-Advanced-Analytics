@@ -424,7 +424,8 @@ function dailySalesPage(fromDate, toDate, viewType = 'day'){
 							'<ul class="nav nav-pills card-header-pills" role="tablist">' +
 								'<li class="nav-item"><a class="nav-link active" href="#sales" role="tab" data-toggle="tab">Sales/Cancellations</a></li>' +
 								'<li class="nav-item"><a class="nav-link" href="#revenue" role="tab" data-toggle="tab">Revenue/Royalties</a></li>' +
-								'<li class="nav-item"><a class="nav-link" href="#advanced" role="tab" data-toggle="tab">Advanced Analytics</a></li>' +
+								'<li class="nav-item"><a class="nav-link" href="#productAnalysis" role="tab" data-toggle="tab">Product Analysis</a></li>' +
+								'<li class="nav-item"><a class="nav-link" href="#pricing" role="tab" data-toggle="tab">Pricing Analysis</a></li>' +
 								'<li class="nav-item"><a class="nav-link" href="#niche" role="tab" data-toggle="tab">'+
 									'Niche Analysis' +
 									'<i class="fa fa-info-circle" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="Group together TShirt designs of similar niches or styles to help forecast future winners on a broader scale. Niche tags can be set on the Manage Products page"></i>'+
@@ -440,28 +441,32 @@ function dailySalesPage(fromDate, toDate, viewType = 'day'){
 							'<div class="tab-pane" role="tabpanel" id="revenue">' +
 								'<center class="inner-container"><canvas id="canvas2" height="450" width="800"></canvas></center>' +
 							'</div>' + 
-							'<div class="tab-pane" role="tabpanel" id="advanced">' +
+							'<div class="tab-pane" role="tabpanel" id="productAnalysis">' +
 								'<center class="row">' +
-									'<div class="canvas-wrapper col col-xs-2 col-sm-2 offset-sm-1">' +
+									'<div class="canvas-wrapper col col-xs-3 col-sm-3">' +
 										'<canvas id="canvas3" height="'+smallChartHeight+'" width="'+smallChartWidth+'"></canvas>' +
 										'<h5 class="canvas-title">Cut/Style Distribution</h5>' +
 									'</div>' +
-									'<div class="canvas-wrapper col col-xs-2 col-sm-2">' +
+									'<div class="canvas-wrapper col col-xs-3 col-sm-3">' +
 										'<canvas id="canvas4" height="'+smallChartHeight+'" width="'+smallChartWidth+'"></canvas>' +
 										'<h5 class="canvas-title">Size Distribution</h5>' +
 									'</div>'+
-									'<div class="canvas-wrapper col col-xs-2 col-sm-2">' +
+									'<div class="canvas-wrapper col col-xs-3 col-sm-3">' +
 										'<canvas id="canvas5" height="'+smallChartHeight+'" width="'+smallChartWidth+'"></canvas>'+
 										'<h5 class="canvas-title">Color Distribution</h5>' +
 									'</div>' +
-									'<div class="canvas-wrapper col col-xs-2 col-sm-2">' +
-										'<canvas id="canvas6" height="'+smallChartHeight+'" width="'+smallChartWidth+'"></canvas>'+
-										'<h5 class="canvas-title">Pricing Distribution</h5>' +
-									'</div>' +
-									'<div class="canvas-wrapper col col-xs-2 col-sm-2">' +
+									'<div class="canvas-wrapper col col-xs-3 col-sm-3">' +
 										'<canvas id="canvas7" height="'+smallChartHeight+'" width="'+smallChartWidth+'"></canvas>'+
-										'<h5 class="canvas-title">Product Distribution</h5>' +
+										'<h5 class="canvas-title">Product Type Distribution</h5>' +
 									'</div>' +
+								'</center>' +
+							'</div>' +
+							'<div class="tab-pane" role="tabpanel" id="pricing">' +
+								'<center class="row">' +
+									'<div class="canvas-wrapper col col-xs-12 col-sm-12">' +
+										'<canvas id="canvas6" height="350" width="500"></canvas>'+
+									'</div>' +
+
 								'</center>' +
 							'</div>' +
 							'<div class="tab-pane" role="tabpanel" id="niche">' +
@@ -625,7 +630,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 							
 							//Determine Unit Price & Count it
 							var unitsSold = responseArray[i2]["Units"] - responseArray[i2]["Cancellations"];
-							if (unitsSold != 0){ //Disregding canceled units intentionally								
+							if (unitsSold != 0){ //Disregarding canceled units intentionally								
 								var unitPrice = "$"+(responseArray[i2]["Revenue"] / (unitsSold)).toFixed(2);	
 								if (unitPrice in priceObject){
 									priceObject[unitPrice] += 1;
@@ -633,7 +638,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 									priceObject[unitPrice] = 1;
 								}
 							}
-							
+														
 							//Determine Product Type & Count it
 							var productType = responseArray[i2]["Product Type"];							
 							if (productType in productTypeObject){
@@ -784,18 +789,17 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 				for (var key in shirtColorsArray){
 					finalShirtColorsLUT.push(shirtColorsColorsLUT[key]);
 				}
-				
+								
 				sortedPriceObject = {};
-				Object.keys(priceObject)
-					.sort().forEach(function(key) {
+				Object.keys(priceObject).sort(function(a,b){return priceObject[b]-priceObject[a]}).forEach(function(key) {
 					sortedPriceObject[key] = priceObject[key];
 				});
 				
-				var shirtNicheColorsSeed = ["#e0f2f1", "#b2dfdb", "#80cbc4", "#4db6ac", "#26a69a", "#009688", "#00897b", "#00796b", "#00695c", "#004d40"];
+				var tealColorScheme = ["#e0f2f1", "#b2dfdb", "#80cbc4", "#4db6ac", "#26a69a", "#009688", "#00897b", "#00796b", "#00695c", "#004d40"];
+				var greenColorScheme = ["#429d54", "#4db461", "#65be76", "#7dc88b", "#95d2a1", "#addcb6", "#c4e6cb"]; 
 				//Extend Array Length
-				var shirtNicheColorsLUT = replicateArray(shirtNicheColorsSeed, 20);
-				
-				
+				var shirtNicheColorsLUT = replicateArray(tealColorScheme, 20);
+				var pricingColorsLUT = replicateArray(greenColorScheme, 20);
 				
 				if(viewType == "month"){ //Monthly Labels
 					//Projections
@@ -1015,12 +1019,12 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 				
 				//Pricing Charts
 				var lineChartData6 = {
-					type: 'doughnut',
+					type: 'bar',
 					data: {
 						labels: Object.keys(sortedPriceObject),
 						datasets: [{							
 							data: Object.values(sortedPriceObject),
-							backgroundColor: shirtNicheColorsLUT,
+							backgroundColor: pricingColorsLUT,
 						}]
 					},
 					options: globalLineChartOptions,
