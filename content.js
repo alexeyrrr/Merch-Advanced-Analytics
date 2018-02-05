@@ -1862,13 +1862,13 @@ function renderIndividualProductSales(queryParams){
 			getShirtNiche(targetASIN, function(determinedNiche){
 				if(determinedNiche != 'unknown niche'){					
 					$(".niche-input").val(determinedNiche);
-					$(".niche-input").closest('form-group').addClass("has-success");
+					$(".niche-input").closest('.form-group').addClass("has-success");
 					$(".niche-input").addClass("form-control-success");
 				}
 				
 				//Remove success on focus 
 				$('.niche-input').focusin(function() {
-					$(this).removeClass("form-control-success");
+					$(this).removeClass("form-control-success").removeClass("form-control-danger");
 				});
 				
 				//Unfocus auto saves
@@ -2286,12 +2286,10 @@ function initSaveButtons(){ //Adds event listeners to all buttons
 			} 
 		}, false);
 		
-		
 		//Remove success on focus 
 		$('#shirtlist input[type="text"]').focusin(function() {
-			$(this).removeClass("form-control-success");
+			$(this).removeClass("form-control-success").removeClass("form-control-danger");
 		})
-		
 		
 		var enterPressed = false; //Flag to prevent double saving
 		//Unfocus auto saves
