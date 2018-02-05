@@ -409,8 +409,8 @@ function setstatus(message, type="loading"){
 /***************************************************************/	
 function dailySalesPage(fromDate, toDate, viewType = 'day'){	
 	document.title = "Daily View - Merch Advanced Analytics";
-	var smallChartWidth = window.screen.availWidth / 8.2 ;
-	var smallChartHeight = window.screen.availWidth / 5.5 ;
+	var smallChartWidth = window.screen.availWidth / 6.9;
+	var smallChartHeight = window.screen.availWidth / 5.4;
 	
 	var pageContent = '<div class="container maa-container">' +
 					'<div class="maa-card card"></center>'+
@@ -445,7 +445,7 @@ function dailySalesPage(fromDate, toDate, viewType = 'day'){
 								'<center class="row">' +
 									'<div class="canvas-wrapper col col-xs-3 col-sm-3">' +
 										'<canvas id="canvas3" height="'+smallChartHeight+'" width="'+smallChartWidth+'"></canvas>' +
-										'<h5 class="canvas-title">Cut/Style Distribution</h5>' +
+										'<h5 class="canvas-title">Fit Distribution</h5>' +
 									'</div>' +
 									'<div class="canvas-wrapper col col-xs-3 col-sm-3">' +
 										'<canvas id="canvas4" height="'+smallChartHeight+'" width="'+smallChartWidth+'"></canvas>' +
@@ -548,7 +548,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 		var royaltyData = new Array(axisLabels.length).fill(0);
 		
 		//Tally Numbers
-		var gendersArray = {'Men': 0, 'Women': 0, 'Youth': 0};
+		var gendersArray = {'Men': 0, 'Women': 0, 'Youth': 0, 'Unisex': 0};
 		var sizesArray = {'Small': 0, 'Medium': 0, 'Large': 0, 'XL': 0, '2XL': 0, '3XL': 0, '4': 0, '6': 0, '8': 0, '10': 0, '12': 0};		
 		var shirtColorsArray = {'Dark Heather': 0, 'Heather Grey': 0, 'Heather Blue': 0, 'Black': 0, 'Navy': 0, 'Silver': 0, 'Royal Blue': 0, 'Brown': 0, 'Slate': 0, 'Red': 0, 'Asphalt': 0, 'Grass': 0, 'Olive': 0, 'Kelly Green': 0, 'Baby Blue': 0, 'White': 0, 'Lemon': 0, 'Cranberry': 0, 'Pink': 0, 'Orange': 0, 'Purple': 0};
 		var priceObject = {};
@@ -1647,7 +1647,7 @@ function individualProductPage(queryParams){
 										'<center class="row">' +
 											'<div class="canvas-wrapper col col-xs-4 col-sm-4">' +
 												'<canvas id="canvas3" height="350" width="280" ></canvas>' +
-												'<h5 class="canvas-title">Gender Distribution</h5>' +
+												'<h5 class="canvas-title">Fit Distribution</h5>' +
 											'</div>' +
 											'<div class="canvas-wrapper col col-xs-4 col-sm-4">'+
 												'<canvas id="canvas4" height="350" width="280" ></canvas>' +
@@ -1749,7 +1749,7 @@ function renderIndividualProductSales(queryParams){
 			var royaltyData = new Array(axisLabels.length).fill(0);
 			
 			//Tally Numbers
-			var gendersArray = {'Men': 0, 'Women': 0, 'Youth': 0};
+			var gendersArray = {'Men': 0, 'Women': 0, 'Youth': 0, 'Unisex': 0};
 			var sizesArray = {'Small': 0, 'Medium': 0, 'Large': 0, 'XL': 0, '2XL': 0, '3XL': 0, '4': 0, '6': 0, '8': 0, '10': 0, '12': 0};
 			var shirtColorsArray = {'Dark Heather': 0, 'Heather Grey': 0, 'Heather Blue': 0, 'Black': 0, 'Navy': 0, 'Silver': 0, 'Royal Blue': 0, 'Brown': 0, 'Slate': 0, 'Red': 0, 'Asphalt': 0, 'Grass': 0, 'Olive': 0, 'Kelly Green': 0, 'Baby Blue': 0, 'White': 0, 'Lemon': 0, 'Cranberry': 0, 'Pink': 0, 'Orange': 0, 'Purple': 0};
 			var priceObject = {};
