@@ -9,7 +9,7 @@ body.merch-advanced-analytics{
     margin-bottom: -10px;
 }
 .wrapper {
-	padding-left: 250px;
+	padding-left: 220px;
 }
 
 .maa-card{
@@ -19,9 +19,9 @@ body.merch-advanced-analytics{
 
 .merch-advanced-analytics .card{
 	border-width: 1px;
-    border-style: solid;
-    border-color: rgba(0, 0, 0, 0.125);
-    border-image: initial;
+	border-style: solid;
+	border-color: rgba(0, 0, 0, 0.125);
+	border-image: initial;
 }
 
 .canvas-wrapper {
@@ -29,9 +29,7 @@ body.merch-advanced-analytics{
 }
 
 .canvas-wrapper canvas{
-	padding: 10px;
 	width: 100% !important;
-	height: 100% !important;
 }
 
 .modal-lg{
@@ -41,10 +39,10 @@ body.merch-advanced-analytics{
 #sidebar {
     z-index: 1000;
     position: fixed;
-    left: 250px;
-    width: 250px;
+    left: 220px;
+    width: 220px;
     height: 100%;
-    margin-left: -250px;
+    margin-left: -220px;
     overflow-y: hidden;
 	background: #323232;
     color: #fff;
@@ -166,6 +164,9 @@ div.desc {
 .fa-info-circle, .fa-tag{
 	margin: 0 6px;
     font-size: 1.2rem;
+}
+.fa-inline{
+	display: inline;
 }
 .panel-heading .fa-info-circle{
 	margin: 0;

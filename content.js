@@ -169,7 +169,8 @@ function globalInit(){
 }
 
 var globalLineChartOptions = {
-						responsive: true,
+						responsive: false,
+						maintainAspectRatio : false,
 						animation: {
 							duration: 0, // general animation time
 						},
@@ -184,9 +185,9 @@ var globalLineChartOptions = {
 							display: false
 						},		
 						title: {
-							display: false,
+							display: true,
 							position: 'bottom',
-							text: 'Custom Chart Title'
+							text: 'Chart Title'
 							
 						}						
 					};
@@ -445,7 +446,7 @@ function dailySalesPage(fromDate, toDate, viewType = 'day'){
 							'</div>' + 
 							'<div class="tab-pane" role="tabpanel" id="advanced">' +
 								'<center class="row">' +
-									'<div class="canvas-wrapper col col-xs-2 col-sm-2 col-md-offset-1">' +
+									'<div class="canvas-wrapper col col-xs-2 col-sm-2 offset-sm-1">' +
 										'<canvas id="canvas3"></canvas>' +
 									'</div>' +
 									'<div class="canvas-wrapper col col-xs-2 col-sm-2">' +
@@ -738,7 +739,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 							'<div class="maa-card card">'+
 								'<div class="card-body">'+                                                                       
 									'<h2 class="font-weight-lighter" style="color:#474C4F;"  >$'+ (totals.royalty /(totals.sales - totals.cancelled + 0.00001)).formatMoney(2) + '</h2>'+
-									'<span class="text-muted text-uppercase small">Avg Royalties / Shirt</span>'+
+									'<span class="text-muted text-uppercase small">Avg Royalties / Unit Sold</span>'+
 								'</div>'+
 							'</div>'+
 						'</div>'+
@@ -1061,6 +1062,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 				
 				$('.nav-pills [href="#advanced"]').tab('show');
 				var ctxGenders = document.getElementById("canvas3").getContext("2d");	
+				ctxGenders.height = 500;
 				var myChart3 = new Chart(ctxGenders, lineChartData3);
 				
 				var ctxSizes = document.getElementById("canvas4").getContext("2d");	
@@ -1107,7 +1109,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 					for (i2 = 0; i2 < responseArray.length; i2++){
 						if(resultSumSales[i]["ASIN"] == responseArray[i2]["ASIN"]){
 							resultSumSales[i]["Name"] = responseArray[i2]["Name"];
-							resultSumSales[i]["ProductType"] = responseArray[i2]["Product Type"];
+							resultSumSales[i]["ProductType"] = responseArray[i2]["Product Type"].replace(/-/i, '&#8209;');
 							resultSumSales[i]["Units"] += parseInt(responseArray[i2]["Units"]);
 							resultSumSales[i]["Cancellations"] += parseInt(responseArray[i2]["Cancellations"]);
 							resultSumSales[i]["Royalty"] += parseFloat(responseArray[i2]["Royalty"]);
@@ -1129,7 +1131,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 							'<th class="text-center">Units Cancelled</th>' +
 							'<th class="text-center">Revenue</th>' +
 							'<th class="text-center">Royalties</th>' +
-							'<th class="text-center">Avg Royalties / Product </th>' +
+							'<th class="text-center">Avg Royalties / Unit</th>' +
 							'<th class="text-center">Edit / Delete </th>' +
 						'</tr>'  +
 					'</thead><tbody>';
@@ -1152,7 +1154,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 				
 						
 					cp2 += '<tr data-href="https://www.amazon.com/dp/' + resultSumSales[i]["ASIN"]  +   '">' + 
-						'<th scope="row">' + (i + 1) + '</th>' + 
+						'<td>' + (i + 1) + '</td>' + 
 						'<td>' + 
 							resultSumSales[i]["Name"]  + 
 						'</td>' + 
@@ -1162,7 +1164,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 						'</td>' + 
 						
 						'<td class="niche-tag">'+
-							'<i class="fa fa-tag" aria-hidden="true" ' + reminderPopoverData + '></i>' +
+							'<i class="fa fa-tag fa-inline" aria-hidden="true" ' + reminderPopoverData + '></i>' +
 							specificNiche +
 						'</td>' +
 						
