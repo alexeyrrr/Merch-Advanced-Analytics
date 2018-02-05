@@ -9,7 +9,7 @@
 	},
 	"content_scripts": [ {
 	  "css": [ "bootstrap.min.css", "font-awesome.css", "css.css", "daterangepicker.css" ],
-	  "js": [ "jquery-3.2.1.slim.min.js", "popper.min.js", "bootstrap.min.js", "Chart.min.js", "tablesort.min.js", "tablesort.number.js", "moment.min.js", "daterangepicker.js", "popup.js", "content.js" ],
+	  "js": [ "jquery-3.2.1.slim.min.js", "popper.min.js", "bootstrap.min.js", "Chart.min.js", "tablesort.min.js", "tablesort.number.js", "tablesort.date.js","moment.min.js", "daterangepicker.js", "popup.js", "content.js" ],
 	  "matches": [ "https://merch.amazon.com/*", "https://*/MerchAnalytics/*", "https://*/IndividualProductPage/*"],
 	  "run_at": "document_end"
 	} ],

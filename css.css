@@ -1,4 +1,7 @@
 /*Sidebar Styling */
+.merch-advanced-analytics h3{
+	font-size: 1.7rem;
+}
 
 body.merch-advanced-analytics{
 	font-size: 11pt;
@@ -27,9 +30,20 @@ body.merch-advanced-analytics{
 .canvas-wrapper {
 	display:block;
 }
+.canvas-title{
+	width: 100%;
+	position: absolute;
+	left: 0;
+	bottom: 0;
+	left: 50%;
+	transform: translate(-50%, 0);
 
-.canvas-wrapper canvas{
-	width: 100% !important;
+}
+.canvas-title, .canvas-title h5{
+	display: inline-block;
+	color: #666;
+	font-size: 0.95rem;
+	font-weight: 700;
 }
 
 .modal-lg{
@@ -163,7 +177,7 @@ div.desc {
 }
 .fa-info-circle, .fa-tag{
 	margin: 0 6px;
-    font-size: 1.2rem;
+	font-size: 1rem;
 }
 .fa-inline{
 	display: inline;
@@ -172,6 +186,10 @@ div.desc {
 	margin: 0;
 	margin-left: 5px;
 	float: none;
+}
+
+.btn-group-inline .btn{
+	margin-right: 5px;
 }
 
 .btn-inside .form-group{
@@ -393,9 +411,9 @@ input[type="text"]{
 	outline-style:none;
 	box-shadow:none;
 	border-color:transparent;
-	font-size: 1.75rem;
+	font-size: 1.7rem;
 	font-weight: 500;
-    line-height: 1.2;
+	line-height: 1.2;
 	width: 100%;
 	float:right;
 	color: #222;

@@ -170,7 +170,6 @@ function globalInit(){
 
 var globalLineChartOptions = {
 						responsive: false,
-						maintainAspectRatio : false,
 						animation: {
 							duration: 0, // general animation time
 						},
@@ -179,17 +178,11 @@ var globalLineChartOptions = {
 						},
 						responsiveAnimationDuration: 0, // animation duration after a resize
 						tooltips: {
-							mode: 'index'
+							mode: 'label'
 						},
 						legend: {
 							display: false
-						},		
-						title: {
-							display: true,
-							position: 'bottom',
-							text: 'Chart Title'
-							
-						}						
+						}					
 					};
 													
 /***************************************************************/
@@ -264,7 +257,7 @@ if (cmd.indexOf("MerchAnalytics") !== -1 || cmd.indexOf("IndividualProductPage")
 		}
 		
 		if (showNavTab != 0){
-			$('.top-nav-links-container ul').append('<li class="a-align-center top-nav-link-unselected"><a class="a-link-normal" href="/MerchAnalytics">Merch Analytics</a></li>');
+			$('.top-nav-links-container ul').append('<li class="a-align-center top-nav-link-unselected"><a class="a-link-normal" target="_blank" href="/MerchAnalytics">Merch Analytics</a></li>');
 		}
 	});
 }
@@ -416,6 +409,9 @@ function setstatus(message, type="loading"){
 /***************************************************************/	
 function dailySalesPage(fromDate, toDate, viewType = 'day'){	
 	document.title = "Daily View - Merch Advanced Analytics";
+	var smallChartWidth = window.screen.availWidth / 8.2 ;
+	var smallChartHeight = window.screen.availWidth / 5.5 ;
+	
 	var pageContent = '<div class="container maa-container">' +
 					'<div class="maa-card card"></center>'+
 						'<div class="card-block">'+ 
@@ -438,49 +434,53 @@ function dailySalesPage(fromDate, toDate, viewType = 'day'){
 						
 						'<div class="card-block tab-content">' +
 							'<div class="tab-pane active" role="tabpanel" id="sales">' +
-								'<center class="inner-container"><canvas id="canvas1"></canvas></center>' + 
+								'<center class="inner-container"><canvas id="canvas1" height="450" width="800"></canvas></center>' + 
 							'</div>' +
 							
 							'<div class="tab-pane" role="tabpanel" id="revenue">' +
-								'<center class="inner-container"><canvas id="canvas2"></canvas></center>' +
+								'<center class="inner-container"><canvas id="canvas2" height="450" width="800"></canvas></center>' +
 							'</div>' + 
 							'<div class="tab-pane" role="tabpanel" id="advanced">' +
 								'<center class="row">' +
 									'<div class="canvas-wrapper col col-xs-2 col-sm-2 offset-sm-1">' +
-										'<canvas id="canvas3"></canvas>' +
+										'<canvas id="canvas3" height="'+smallChartHeight+'" width="'+smallChartWidth+'"></canvas>' +
+										'<h5 class="canvas-title">Cut/Style Distribution</h5>' +
 									'</div>' +
 									'<div class="canvas-wrapper col col-xs-2 col-sm-2">' +
-										'<canvas id="canvas4"></canvas>' +
+										'<canvas id="canvas4" height="'+smallChartHeight+'" width="'+smallChartWidth+'"></canvas>' +
+										'<h5 class="canvas-title">Size Distribution</h5>' +
 									'</div>'+
 									'<div class="canvas-wrapper col col-xs-2 col-sm-2">' +
-										'<canvas id="canvas5"></canvas>'+
+										'<canvas id="canvas5" height="'+smallChartHeight+'" width="'+smallChartWidth+'"></canvas>'+
+										'<h5 class="canvas-title">Color Distribution</h5>' +
 									'</div>' +
 									'<div class="canvas-wrapper col col-xs-2 col-sm-2">' +
-										'<canvas id="canvas6"></canvas>'+
+										'<canvas id="canvas6" height="'+smallChartHeight+'" width="'+smallChartWidth+'"></canvas>'+
+										'<h5 class="canvas-title">Pricing Distribution</h5>' +
 									'</div>' +
 									'<div class="canvas-wrapper col col-xs-2 col-sm-2">' +
-										'<canvas id="canvas7"></canvas>'+
+										'<canvas id="canvas7" height="'+smallChartHeight+'" width="'+smallChartWidth+'"></canvas>'+
+										'<h5 class="canvas-title">Product Distribution</h5>' +
 									'</div>' +
 								'</center>' +
 							'</div>' +
 							'<div class="tab-pane" role="tabpanel" id="niche">' +
 								'<div class="inner-container">' +
-									'<div class="container maa-container row">' +									
+									'<div class="container row">' +									
 										'<div class="col col-xs-6 col-sm-6">'+
 											'<center class="canvas-wrapper">' +
-												'<canvas id="canvas8"></canvas>'+
-												//'<h5 class="canvas-title">Niche Distribution (Number Sold)</h5>' +
+												'<canvas id="canvas8" height="340" width="280"></canvas>'+
+												'<h5 class="canvas-title">Niche Distribution (Number Sold)</h5>' +
 											'</center>' +
 										'</div>' +
 										
 										'<div class="col col-xs-6 col-sm-6">'+
 											'<center class="canvas-wrapper">' +
-												'<canvas id="canvas9"></canvas>'+
-												/*'<div class="canvas-title">' +
+												'<canvas id="canvas9" height="340" width="280"></canvas>'+
+												'<div class="canvas-title">' +
 													'<h5>Normalized Niche Distribution (%)</h5>' +
-													'<i class="fa fa-info-circle" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="A normalized distribution takes into account the number of shirts for each niche and factors out the relative availablilty of each niche. (i.e. think like comparing a country\'s GDP vs GDP Per Capita)"></i>'+
+													'<i class="fa fa-info-circle" style="font-size:1rem;" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="A normalized distribution takes into account the number of shirts for each niche and factors out the relative availablilty of each niche. (i.e. think like comparing a country\'s GDP vs GDP Per Capita)"></i>'+
 												'</div>' +
-												*/
 											'</center>' +
 										'</div>' +
 									'</div>' +
@@ -1056,11 +1056,9 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 				var ctxSales = document.getElementById("canvas1").getContext("2d");	
 				var myChart = new Chart(ctxSales, lineChartData1);
 					
-				$('.nav-pills [href="#revenue"]').tab('show');
 				var ctxRevenue = document.getElementById("canvas2").getContext("2d");	
 				var myChart2 = new Chart(ctxRevenue, lineChartData2);
-				
-				$('.nav-pills [href="#advanced"]').tab('show');
+								
 				var ctxGenders = document.getElementById("canvas3").getContext("2d");	
 				ctxGenders.height = 500;
 				var myChart3 = new Chart(ctxGenders, lineChartData3);
@@ -1077,7 +1075,6 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 				var ctxProdTypes = document.getElementById("canvas7").getContext("2d");	
 				var myChart7 = new Chart(ctxProdTypes, lineChartData7);
 				
-				$('.nav-pills [href="#niche"]').tab('show');
 				var ctxNiches = document.getElementById("canvas8").getContext("2d");	
 				var myChart8 = new Chart(ctxNiches, lineChartData8);
 				
@@ -1643,15 +1640,18 @@ function individualProductPage(queryParams){
 									
 									
 									'<div class="tab-pane" role="tabpanel"  id="advanced">' +
-										'<center class="inner-container row">' +
+										'<center class="row">' +
 											'<div class="canvas-wrapper col col-xs-4 col-sm-4">' +
-												'<canvas id="canvas3"></canvas>' +
+												'<canvas id="canvas3" height="350" width="280" ></canvas>' +
+												'<h5 class="canvas-title">Gender Distribution</h5>' +
 											'</div>' +
 											'<div class="canvas-wrapper col col-xs-4 col-sm-4">'+
-												'<canvas id="canvas4"></canvas>' +
+												'<canvas id="canvas4" height="350" width="280" ></canvas>' +
+												'<h5 class="canvas-title">Size Distribution</h5>' +
 											'</div>'+
 											'<div class="canvas-wrapper col col-xs-4 col-sm-4">'+
-												'<canvas id="canvas5"></canvas>'+
+												'<canvas id="canvas5" height="350" width="280" ></canvas>'+
+												'<h5 class="canvas-title">Color Distribution</h5>' +
 											'</div>' +
 										'</center>' +
 									'</div>' +
@@ -1843,8 +1843,10 @@ function renderIndividualProductSales(queryParams){
 											'</div>' +
 										'</dd>' +
 									'</dl>' +
-									'<a target="_blank" href="http://merch.amazon.com/merch-tshirt/title-setup/' + shirtID + '/add_details" class="btn btn-outline-primary">Edit</a>' + 
-									'<a target="_blank" href="' + deleteLink + '" class="btn btn-outline-danger"><i class="fa fa-trash-o fa-lg"></i></a>' + 
+									'<div class="btn-group-inline">' +
+										'<a target="_blank" href="http://merch.amazon.com/merch-tshirt/title-setup/' + shirtID + '/add_details" class="btn btn-outline-primary">Edit</a>' + 
+										'<a target="_blank" href="' + deleteLink + '" class="btn btn-outline-danger"><i class="fa fa-trash-o fa-lg"></i></a>' + 
+									'</div>' +
 								'</div>' +
 							'</div>';
 			
