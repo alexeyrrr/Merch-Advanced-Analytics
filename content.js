@@ -2215,14 +2215,10 @@ function saveShirtNiche(nicheName, parentASIN, targetHTMLitem = null) {
 	
 	// Save it using the Chrome extension storage API.	
     chrome.storage.sync.set(jsonfile, function () {
-		if (chrome.runtime.error) {
+		if (chrome.runtime.lastError) {	
 			targetHTMLitem.closest('.form-group').addClass('has-danger');
 			targetHTMLitem.addClass("form-control-danger");
-			//alert("Cannot store tag. 500 niche tag limit exceeded.");
-		} else if (chrome.runtime.lastError) {	
-			targetHTMLitem.closest('.form-group').addClass('has-danger');
-			targetHTMLitem.addClass("form-control-danger");
-			//alert("Cannot store tag. Either you have entered tags too quickly or the 500 niche tag limit was exceeded.");
+			console.log("Cannot store tag. Either you have entered tags too quickly or the 500 niche tag limit was exceeded.");
 		} else{
 			console.log('Saved', key, data);
 			targetHTMLitem.closest('.form-group').addClass('has-success');
