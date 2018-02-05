@@ -532,7 +532,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 		} else if(viewType == "week"){	
 			while (localUnixFromDate <= localUnixToDate) {	
 				axisLabels.push(String(localUnixFromDate.format("ww YYYY")));
-				localUnixFromDate.add(7, 'days');
+				localUnixFromDate.add(1, 'weeks');
 			}
 		} else if(viewType == "day"){ //daily Labels
 			while (localUnixFromDate <= localUnixToDate) {			
@@ -541,7 +541,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 			}
 			
 		}
-				
+			
 		var salesData = new Array(axisLabels.length).fill(0);
 		var cancelData = new Array(axisLabels.length).fill(0);
 		var revenueData = new Array(axisLabels.length).fill(0);
@@ -579,7 +579,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 						
 						} else if(viewType == "week"){
 							var startDate   = moment(axisLabels[i], "ww YYYY"); //This date week
-							var endDate     = moment(axisLabels[i], "WW YYYY").add(7,'days'); //Previous week
+							var endDate     = moment(axisLabels[i], "WW YYYY").add(1,'weeks'); //Previous week
 							var compareDate = moment(responseArray[i2]["Date"], "MM-DD-YYYY");
 							
 							var isWithinRange = compareDate.isBetween(startDate, endDate, 'weeks', '[)') // left inclusive
@@ -594,7 +594,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 						
 						
 						if(isWithinRange){ //See if inside range
-							//If niche tag matches, incremeent count
+							//If niche tag matches, increment count
 							if (responseArray[i2]["ASIN"] in nichesLookupArray){ 
 								var shirtNiche = JSON.parse(nichesLookupArray[responseArray[i2]["ASIN"]])["niche"];
 								nicheArray[shirtNiche] += 1;
@@ -1182,15 +1182,15 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 						'</td>' +
 						
 						'<td class="text-center">' +
-							resultSumSales[i]["Revenue"].toFixed(2)  +
+							'$' + resultSumSales[i]["Revenue"].toFixed(2)  +
 						'</td>' +
 						
 						'<td class="text-center">' +
-							resultSumSales[i]["Royalty"].toFixed(2)  +
+							'$' + resultSumSales[i]["Royalty"].toFixed(2)  +
 						'</td>' +
 						
 						'<td class="text-center">' +
-							(resultSumSales[i]["Royalty"].toFixed(2) / (resultSumSales[i]["Units"] - resultSumSales[i]["Cancellations"] + 0.00001)).toFixed(2)  +
+							'$' + (resultSumSales[i]["Royalty"].toFixed(2) / (resultSumSales[i]["Units"] - resultSumSales[i]["Cancellations"] + 0.00001)).toFixed(2)  +
 						'</td>' +
 						'<td class="text-center btn-inside">' +  
 							'<a target="_blank" href="' + deleteLink + '" class="btn btn-outline-primary">Edit</a>' + 
@@ -1492,7 +1492,7 @@ function productManager() {
 		
 			if (ts[i].marketplaceAsinMap.US !== undefined && ts[i].status == "LIVE"){
 				//Parse Create Date
-				var stringifiedCreateDate = moment.unix(parseInt(ts[i].createDate) / 1000).format("MM[&#8209;]DD[&#8209;]YYYY");
+				var stringifiedCreateDate = moment.unix(parseInt(ts[i].createDate) / 1000).format("MM-DD-YYYY");
 				
 				if (liveDesignsCounter < 500){ //Only show first 500 products
 					strOfASINs += ts[i].marketplaceAsinMap.US + ',';
@@ -1531,7 +1531,7 @@ function productManager() {
 							'<td class="product-name"><span>' + ts[i].name + '</span></td>' + 
 								
 							'<td class="text-center btn-inside">' +
-								'<div class="form-group has-success">' +
+								'<div class="form-group">' +
 								  '<input type="text" name="nicheName" class="form-control niche-input"/>' +
 								  '<input type="hidden" name="parentASIN" value='+ ts[i].marketplaceAsinMap.US + '>' +
 								'</div>' +
@@ -1541,7 +1541,7 @@ function productManager() {
 								productType +
 							'</td>' +
 							
-							'<td class="text-center">' +	
+							'<td class="text-center no-wrap">' +	
 								stringifiedCreateDate +
 							'</td>' +
 							
@@ -1791,19 +1791,24 @@ function renderIndividualProductSales(queryParams){
 				}
 			}
 			
+
 			var lifetimeSales = salesData.reduce(function(a, b) { return a + b; }, 0) - cancelData.reduce(function(a, b) { return a + b; }, 0) ;
 			var lifetimeRevenue = revenueData.reduce(function(a, b) { return a + b; }, 0).toFixed(2);
 			var lifetimeRoyalties = royaltyData.reduce(function(a, b) { return a + b; }, 0).toFixed(2);
 			
-			var lifespan = today.diff(moment.unix(firstPublishDate), 'months', true)+1;	
-			if (lifespan == 0){ lifespan = 1}; //Minimum 1 month lifespan
+			var lifespan = Math.round(today.diff(moment.unix(firstPublishDate), 'days', true));	
+			if (lifespan <= 30){ 
+				lifespan = 30 //Minimum 1 month lifespan
+			}; 
 			
 			var uriEncodedName = encodeURIComponent(shirtName); 
 			var deleteLink = 'https://merch.amazon.com/manage/products?pageNumber=1&pageSize=15&keywords=' + uriEncodedName + '&statusFilters=%5B%22DELETED%22%2C%22DRAFT%22%2C%22LIVE%22%2C%22NOT_DISCOVERABLE%22%2C%22PENDING%22%2C%22PROCESSING%22%2C%22STOPPED%22%2C%22UNDER_REVIEW%22%2C%22REJECTED%22%2C%22MANUALLY_REJECTED%22%5D';
 			
 			
 			var shirtInfo = '<center>' +
-								'<h2>' + shirtName +  '</h2>' +
+								'<h2><a target="_blank" href="https://www.amazon.com/dp/' + targetASIN + '">' +
+									shirtName +
+								'</a></h2>' +
 								'<p class="text-muted text-uppercase ">Individual Product Info</p>'+
 							'</center>' + 
 							'<div class="row">' +	
@@ -1821,11 +1826,9 @@ function renderIndividualProductSales(queryParams){
 										'<dt>First Published Date:&nbsp;</dt>' +
 										'<dd>' + moment.unix(firstPublishDate).format("MM-DD-YYYY") + '</dd>' +
 									'</dl><dl>' +
-										'<dt>ASIN:&nbsp; </dt>' +
+										'<dt>Days Live:&nbsp; </dt>' +
 										'<dd>' + 
-											'<a target="_blank" href="https://www.amazon.com/dp/' + targetASIN + '">' +
-											targetASIN + 
-											'</a>' +
+												lifespan + " days"+
 										'</dd>' +
 									'</dl><dl>' +
 										'<dt>Lifetime Sales:&nbsp; </dt>' +
@@ -1837,12 +1840,12 @@ function renderIndividualProductSales(queryParams){
 										'<dt>Lifetime Royalties:&nbsp; </dt>' +
 										'<dd>$' + lifetimeRoyalties + '</dd>' +
 									'</dl><dl>' +
-										'<dt>Average Revenue / Month :&nbsp; </dt>' +
-										'<dd>$' + (lifetimeRoyalties / lifespan).toFixed(2) + '</dd>' +
+										'<dt>Average Royalties / Month :&nbsp; </dt>' +
+										'<dd>$' + (lifetimeRoyalties / (lifespan / 30)).toFixed(2) + '</dd>' +
 									'</dl><dl>' +
 										'<dt style="margin: 5px 5px 5px 0;">Niche: </dt>' +
 										'<dd>'+
-											'<div class="form-group has-success">' +
+											'<div class="form-group">' +
 												'<input type="text" class="form-control niche-input">'  +
 											'</div>' +
 										'</dd>' +
@@ -1859,23 +1862,20 @@ function renderIndividualProductSales(queryParams){
 			getShirtNiche(targetASIN, function(determinedNiche){
 				if(determinedNiche != 'unknown niche'){					
 					$(".niche-input").val(determinedNiche);
+					$(".niche-input").closest('form-group').addClass("has-success");
 					$(".niche-input").addClass("form-control-success");
 				}
-				
 				
 				//Remove success on focus 
 				$('.niche-input').focusin(function() {
 					$(this).removeClass("form-control-success");
 				});
 				
-				
 				//Unfocus auto saves
 				$('.niche-input').focusout(function() {
 					if ($(this).val().length > 1){
 						nicheName = $(this).val();
-						saveShirtNiche(nicheName, targetASIN);
-						
-						$(this).addClass("form-control-success");
+						saveShirtNiche(nicheName, targetASIN, $(this));
 					}
 				});
 				
@@ -1886,14 +1886,11 @@ function renderIndividualProductSales(queryParams){
 								
 						if ($(this).val().length > 1){
 							nicheName = $(this).val();
-							saveShirtNiche(nicheName, targetASIN);
-							
-							$(this).addClass("form-control-success");
+							saveShirtNiche(nicheName, targetASIN, $(this));
 						}
 					}
 				});
 			})
-			
 			
 			//Regroup all youth sizes to just Youth
 			var adjustedSizesArray = {'Youth': 0, 'Small': 0, 'Medium': 0, 'Large': 0, 'XL': 0, '2XL': 0, '3XL': 0};
@@ -2095,7 +2092,7 @@ function fetchIndividualProductSales(targetASIN, callback){
 /*********************** Settings Page *************************/
 /***************************************************************/
 function settingsPage (e) {
-    document.title = "Settings  - Merch Advanced Analytics";
+    document.title = "Settings - Merch Advanced Analytics";
 	
 	$(".wrapper").children().filter(":not(#sidebar)").remove();
 	
@@ -2207,7 +2204,7 @@ function getAllShirtNiches(callback){
 	});
 }
 		
-function saveShirtNiche(nicheName, parentASIN) {		
+function saveShirtNiche(nicheName, parentASIN, targetHTMLitem = null) {		
 	//Assemble Stringified JSON	
 	var key = parentASIN,
 	data = JSON.stringify({
@@ -2216,10 +2213,21 @@ function saveShirtNiche(nicheName, parentASIN) {
     var jsonfile = {};
     jsonfile[key] = data;
 	
-	
 	// Save it using the Chrome extension storage API.	
     chrome.storage.sync.set(jsonfile, function () {
-        console.log('Saved', key, data);
+		if (chrome.runtime.error) {
+			targetHTMLitem.closest('.form-group').addClass('has-danger');
+			targetHTMLitem.addClass("form-control-danger");
+			//alert("Cannot store tag. 500 niche tag limit exceeded.");
+		} else if (chrome.runtime.lastError) {	
+			targetHTMLitem.closest('.form-group').addClass('has-danger');
+			targetHTMLitem.addClass("form-control-danger");
+			//alert("Cannot store tag. Either you have entered tags too quickly or the 500 niche tag limit was exceeded.");
+		} else{
+			console.log('Saved', key, data);
+			targetHTMLitem.closest('.form-group').addClass('has-success');
+			targetHTMLitem.addClass("form-control-success");
+		}
     });
 }
 
@@ -2235,6 +2243,7 @@ function readShirtNiche(){
 				parsedJson = JSON.parse(items[myKey]);
 				that.val(parsedJson["niche"]);
 				that.closest('td').attr('data-sort', parsedJson["niche"]);
+				that.closest('.form-group').addClass("has-success");
 				that.addClass("form-control-success");
 			}
 		});
@@ -2284,44 +2293,47 @@ function initSaveButtons(){ //Adds event listeners to all buttons
 		})
 		
 		
+		var enterPressed = false; //Flag to prevent double saving
 		//Unfocus auto saves
-		$('#shirtlist input[type="text"]').focusout(function() {
-			if ($(this).val().length > 1){
-				nicheName = $(this).closest('td').find('[name="nicheName"]').val();
-				parentASIN = $(this).closest('td').find('[name="parentASIN"]').val();
-				$(this).closest('td').attr('data-sort', $(this).val()); //Add attr for table sorting
-				saveShirtNiche(nicheName, parentASIN);
-				
-				$(this).addClass("form-control-success");
-			}
-		})
-		
-		//Enter key goes to next field
-		$('#shirtlist input[type="text"]').keydown(function(e) {
-			if (e.which == 13 || e.which == 9) { //Enter Key
-				e.preventDefault();
+		$('#shirtlist input[type="text"]')
+			.keydown(function(e) { 
+				//Enter key goes to next field
+				if (e.which == 13 || e.which == 9) { //Enter Key
+					e.preventDefault();
+							
+					if ($(this).val().length > 1){
+						nicheName = $(this).closest('td').find('[name="nicheName"]').val();
+						parentASIN = $(this).closest('td').find('[name="parentASIN"]').val();
+						$(this).closest('td').attr('data-sort', $(this).val()); //Add attr for table sorting
+						saveShirtNiche(nicheName, parentASIN, $(this));
+						enterPressed = true;
 						
-				if ($(this).val().length > 1){
+						$(this).closest("tr").next().find('input[type="text"]').focus(); //Focus on Next Field
+					}
+				}
+					
+				if (e.which == 38) { //Up Key
+					e.preventDefault();
+					$(this).closest("tr").prev().find('input[type="text"]').focus(); //Focus on Next Field
+				}
+				
+				if (e.which == 40) { //Down Key
+					e.preventDefault();
+					$(this).closest("tr").next().find('input[type="text"]').focus(); //Focus on Next Field
+				}
+	
+			})
+			.focusout(function() { //Unfocus also saves
+				if ($(this).val().length > 1 && !enterPressed){
 					nicheName = $(this).closest('td').find('[name="nicheName"]').val();
 					parentASIN = $(this).closest('td').find('[name="parentASIN"]').val();
 					$(this).closest('td').attr('data-sort', $(this).val()); //Add attr for table sorting
-					saveShirtNiche(nicheName, parentASIN);
+					saveShirtNiche(nicheName, parentASIN, $(this));
 					
-					$(this).addClass("form-control-success");
-					$(this).closest("tr").next().find('input[type="text"]').focus(); //Focus on Next Field
+
 				}
-			}
-			
-			if (e.which == 38) { //Up Key
-				e.preventDefault();
-				$(this).closest("tr").prev().find('input[type="text"]').focus(); //Focus on Next Field
-			}
-			
-			if (e.which == 40) { //Down Key
-				e.preventDefault();
-				$(this).closest("tr").next().find('input[type="text"]').focus(); //Focus on Next Field
-			}
-		});
+				enterPressed = false;
+		})
 		
 		readShirtNiche();		
 	})
