@@ -793,7 +793,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 				
 				var shirtNicheColorsSeed = ["#e0f2f1", "#b2dfdb", "#80cbc4", "#4db6ac", "#26a69a", "#009688", "#00897b", "#00796b", "#00695c", "#004d40"];
 				//Extend Array Length
-				var shirtNicheColorsLUT = replicateArray(shirtNicheColorsSeed, 6);
+				var shirtNicheColorsLUT = replicateArray(shirtNicheColorsSeed, 20);
 				
 				
 				
@@ -1921,7 +1921,7 @@ function renderIndividualProductSales(queryParams){
 			
 			var shirtNicheColorsSeed = ["#e0f2f1", "#b2dfdb", "#80cbc4", "#4db6ac", "#26a69a", "#009688", "#00897b", "#00796b", "#00695c", "#004d40"];
 			//Extend Array Length
-			var shirtNicheColorsLUT = replicateArray(shirtNicheColorsSeed, 6);
+			var shirtNicheColorsLUT = replicateArray(shirtNicheColorsSeed, 20);
 			
 
 			var lineChartData1 = {
