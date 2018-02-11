@@ -2187,12 +2187,22 @@ function getShirtNiche(shirtASIN, callback){
 	var myKey = String(shirtASIN);
 	var determinedNiche = 'unknown niche'; //default state
 	
-	chrome.storage.local.get(myKey, function(items) { //This gets from both sync and local apparently
+	chrome.storage.sync.get(myKey, function(items) {
 		if(Object.values(items).length > 0){ 
 			parsedJson = JSON.parse(items[myKey]);
 			determinedNiche = parsedJson["niche"];
-		} 
-		callback(determinedNiche); //Run Callback
+		
+			callback(determinedNiche); //Run Callback     
+		} else{ //If no matches, try locally
+			chrome.storage.local.get(myKey, function(localItems) {
+				if(Object.values(localItems).length > 0){
+					parsedJson = JSON.parse(localItems[myKey]);
+					determinedNiche = parsedJson["niche"];
+				}
+				
+				callback(determinedNiche); //ALWAYS Run Callback
+			});
+		}
 	});
 }
 			
