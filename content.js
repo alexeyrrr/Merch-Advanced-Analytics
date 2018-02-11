@@ -2215,25 +2215,49 @@ function saveShirtNiche(nicheName, parentASIN, targetHTMLitem = null) {
 	
 	// Save it using the Chrome extension storage API.	
     chrome.storage.sync.set(jsonfile, function () {
-		if (chrome.runtime.lastError) {	
+		if (chrome.runtime.lastError && chrome.runtime.lastError.message == 'This request exceeds the MAX_WRITE_OPERATIONS_PER_MINUTE quota.') {	
 			targetHTMLitem.closest('.form-group').addClass('has-danger');
 			targetHTMLitem.addClass("form-control-danger");
-			console.log("Cannot store tag. Either you have entered tags too quickly or the 500 niche tag limit was exceeded.");
+			
+			console.log("Cannot store tag. Entering items too quickly. Please slow down.");
+			
+			
+		} else if (chrome.runtime.lastError && chrome.runtime.lastError.message == 'MAX_ITEMS quota exceeded'){
+			//targetHTMLitem.closest('.form-group').addClass('has-danger');
+			//targetHTMLitem.addClass("form-control-danger")
+			
+			//console.log("Cannot store tag. The 500 niche tag limit was exceeded.");
+			
+			//Attempt to store it locally
+			chrome.storage.local.set(jsonfile, function () {
+				console.log('Saved in local:', key, data);
+				targetHTMLitem.closest('.form-group').addClass('has-success');
+				targetHTMLitem.addClass("form-control-success");
+			});
+			
+			
+			
+		} else if (chrome.runtime.lastError){
+			targetHTMLitem.closest('.form-group').addClass('has-danger');
+			targetHTMLitem.addClass("form-control-danger")
+			
+			console.log("Caught generic error");
+
 		} else{
-			console.log('Saved', key, data);
+			console.log('Saved in Sync:', key, data);
 			targetHTMLitem.closest('.form-group').addClass('has-success');
 			targetHTMLitem.addClass("form-control-success");
 		}
     });
 }
 
-function readShirtNiche(){	
+function readShirtNiche(){	//Used only on Product Manager Page
 	$('[name="nicheName"]').each(function () {
 		//Get ASIN
 		var myKey = $(this).closest('td').find('[name="parentASIN"]').val();
 		
 		var that = $(this);
-		//Fetch Matching Niche
+		//Fetch Matching Niche, Sync first, if not, attempt to get it locally.
 		chrome.storage.sync.get(myKey, function(items) {
 			if (typeof(items[myKey]) != 'undefined' && items[myKey].length > 1){
 				parsedJson = JSON.parse(items[myKey]);
@@ -2241,6 +2265,17 @@ function readShirtNiche(){
 				that.closest('td').attr('data-sort', parsedJson["niche"]);
 				that.closest('.form-group').addClass("has-success");
 				that.addClass("form-control-success");
+			} else{
+				//Try to get it locally
+				chrome.storage.local.get(myKey, function(items) {
+					if (typeof(items[myKey]) != 'undefined' && items[myKey].length > 1){
+						parsedJson = JSON.parse(items[myKey]);
+						that.val(parsedJson["niche"]);
+						that.closest('td').attr('data-sort', parsedJson["niche"]);
+						that.closest('.form-group').addClass("has-success");
+						that.addClass("form-control-success");
+					}
+				});
 			}
 		});
 	});
@@ -2272,7 +2307,7 @@ function clearAllNicheData(){
 	alert("All previous data has been cleared");
 }
 
-function initSaveButtons(){ //Adds event listeners to all buttons	
+function initSaveButtons(){ //(Used only on Product Manager: Adds event listeners to all buttons	
 	$(function(){			
 		//Listener for reset button
 		document.getElementById('reset-button').addEventListener("click", function(){
