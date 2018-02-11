@@ -50,27 +50,28 @@ function csvToJSON(csv) {
 
 function assembleDynamicBlankArray(callback){
 	chrome.storage.sync.get(null, function(items) {
-		var allValues = Object.values(items);
-		
-		for (i = 0; i < allValues.length; i++){
-			allValues[i] =  JSON.parse(allValues[i]);
-			allValues[i] = allValues[i]["niche"]
-		}
-		
-		uniqueArray = allValues.filter(function(item, pos) {
-			return allValues.indexOf(item) == pos;
-		})
-		
-		var resultBlankArray = {};
-		//Init count to 0
-		for (i = 0; i < uniqueArray.length; i++){
-			resultBlankArray[uniqueArray[i]] = 0;
-		}
-		
-		resultBlankArray["unknown niche"] = 0;
-		
-		
-		callback(resultBlankArray);
+		//chrome.storage.local.get(null, function(localItems) { //Get both sync and local storage
+			var allValues = Object.values(items); // + Object.values(localItems);
+			
+			for (i = 0; i < allValues.length; i++){
+				allValues[i] =  JSON.parse(allValues[i]);
+				allValues[i] = allValues[i]["niche"]
+			}
+			
+			uniqueArray = allValues.filter(function(item, pos) {
+				return allValues.indexOf(item) == pos;
+			})
+			
+			var resultBlankArray = {};
+			//Init count to 0
+			for (i = 0; i < uniqueArray.length; i++){
+				resultBlankArray[uniqueArray[i]] = 0;
+			}
+			
+			resultBlankArray["unknown niche"] = 0;
+			
+			callback(resultBlankArray);
+		//});
 	});
 }
 
@@ -213,6 +214,18 @@ function generateLoginModal(){
 	});
 }
 
+function generateStatusBar(message, type) {
+	var html = '<div class="alert alert-' + type + ' alert-dismissable maa-alert">';    
+	html += '<button type="button" class="close"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>';
+	html += message;
+	html += '</div>';    
+	$(html).prependTo('body');
+	
+	$('.maa-alert .close').click(function(e) {
+		e.preventDefault();
+		$(this).closest('.maa-alert').remove();
+	});
+};
 
 function getQueryParams() {	
 	// Get Query Params
@@ -510,7 +523,7 @@ function dailySalesPage(fromDate, toDate, viewType = 'day'){
 		$("#sidebar li").removeClass("active");
 		$("#dailySales").closest("li").addClass('active');
 	}
-		
+	
 	renderDailyView(fromDate, toDate, viewType);
 }
 
@@ -1797,8 +1810,9 @@ function renderIndividualProductSales(queryParams){
 			var lifetimeRoyalties = royaltyData.reduce(function(a, b) { return a + b; }, 0).toFixed(2);
 			
 			var lifespan = Math.round(today.diff(moment.unix(firstPublishDate), 'days', true));	
-			if (lifespan <= 30){ 
-				lifespan = 30 //Minimum 1 month lifespan
+			var computedLifespan = lifespan;
+			if (computedLifespan <= 30){ 
+				computedLifespan = 30 //Minimum 1 month lifespan
 			}; 
 			
 			var uriEncodedName = encodeURIComponent(shirtName); 
@@ -1841,7 +1855,7 @@ function renderIndividualProductSales(queryParams){
 										'<dd>$' + lifetimeRoyalties + '</dd>' +
 									'</dl><dl>' +
 										'<dt>Average Royalties / Month :&nbsp; </dt>' +
-										'<dd>$' + (lifetimeRoyalties / (lifespan / 30)).toFixed(2) + '</dd>' +
+										'<dd>$' + (lifetimeRoyalties / (computedLifespan / 30)).toFixed(2) + '</dd>' +
 									'</dl><dl>' +
 										'<dt style="margin: 5px 5px 5px 0;">Niche: </dt>' +
 										'<dd>'+
@@ -1871,25 +1885,28 @@ function renderIndividualProductSales(queryParams){
 					$(this).removeClass("form-control-success").removeClass("form-control-danger");
 				});
 				
-				//Unfocus auto saves
-				$('.niche-input').focusout(function() {
-					if ($(this).val().length > 1){
-						nicheName = $(this).val();
-						saveShirtNiche(nicheName, targetASIN, $(this));
-					}
-				});
+				var enterPressed = false; //Flag to prevent double saving
 				
-				//Enter key goes to next field
-				$('.niche-input').keydown(function(e) {
-					if (e.which == 13 || e.which == 9) { //Enter Key
-						e.preventDefault();
-								
-						if ($(this).val().length > 1){
+				//Enter key also saves
+				$('.niche-input')
+					.keydown(function(e) {
+						if (e.which == 13 || e.which == 9) { //Enter Key
+							e.preventDefault();
+									
+							if ($(this).val().length > 1){
+								nicheName = $(this).val();
+								saveShirtNiche(nicheName, targetASIN, $(this));
+								enterPressed = true;
+							}
+						}
+					}).focusout(function() {
+						if ($(this).val().length > 1 && !enterPressed){
 							nicheName = $(this).val();
 							saveShirtNiche(nicheName, targetASIN, $(this));
 						}
-					}
-				});
+						
+						enterPressed = false;
+				});			
 			})
 			
 			//Regroup all youth sizes to just Youth
@@ -2184,23 +2201,33 @@ function save_options() {
 /***************************************************************/
 function getShirtNiche(shirtASIN, callback){
 	var myKey = String(shirtASIN);
+	var determinedNiche = 'unknown niche'; //default state
 	
 	chrome.storage.sync.get(myKey, function(items) {
-		if(Object.values(items).length == 0){ //If no matches, set to unknown
-			determinedNiche = "unknown niche";
-			
-		} else{
+		if(Object.values(items).length > 0){ 
 			parsedJson = JSON.parse(items[myKey]);
 			determinedNiche = parsedJson["niche"];
-		}
 		
-		callback(determinedNiche); //Run Callback
+			callback(determinedNiche); //Run Callback     
+		} else{ //If no matches, try locally
+			chrome.storage.local.get(myKey, function(localItems) {
+				if(Object.values(localItems).length > 0){
+					parsedJson = JSON.parse(localItems[myKey]);
+					determinedNiche = parsedJson["niche"];
+				}
+				
+				callback(determinedNiche); //ALWAYS Run Callback
+			});
+		}
 	});
 }
 			
 function getAllShirtNiches(callback){
 	chrome.storage.sync.get(null, function(items) {
-		callback(items);
+		chrome.storage.local.get(null, function(localItems) {			
+			var itemsTogether = Object.assign({}, items, localItems);
+			callback(itemsTogether);
+		});
 	});
 }
 		
@@ -2215,25 +2242,41 @@ function saveShirtNiche(nicheName, parentASIN, targetHTMLitem = null) {
 	
 	// Save it using the Chrome extension storage API.	
     chrome.storage.sync.set(jsonfile, function () {
-		if (chrome.runtime.lastError) {	
+		if (chrome.runtime.lastError && chrome.runtime.lastError.message == 'This request exceeds the MAX_WRITE_OPERATIONS_PER_MINUTE quota.') {	
 			targetHTMLitem.closest('.form-group').addClass('has-danger');
 			targetHTMLitem.addClass("form-control-danger");
-			console.log("Cannot store tag. Either you have entered tags too quickly or the 500 niche tag limit was exceeded.");
+			
+			generateStatusBar('Cannot store tag. You are entering items too quickly. Please slow down.', 'danger');
+			
+		} else if (chrome.runtime.lastError && chrome.runtime.lastError.message == 'MAX_ITEMS quota exceeded'){		
+			//Store it locally
+			chrome.storage.local.set(jsonfile, function () {
+				console.log('Saved in local:', key, data);
+				targetHTMLitem.closest('.form-group').addClass('has-success');
+				targetHTMLitem.addClass("form-control-success");
+			});
+			
+		} else if (chrome.runtime.lastError){
+			targetHTMLitem.closest('.form-group').addClass('has-danger');
+			targetHTMLitem.addClass("form-control-danger")
+			
+			console.log("Caught generic error");
+
 		} else{
-			console.log('Saved', key, data);
+			console.log('Saved in Sync:', key, data);
 			targetHTMLitem.closest('.form-group').addClass('has-success');
 			targetHTMLitem.addClass("form-control-success");
 		}
     });
 }
 
-function readShirtNiche(){	
+function readShirtNiche(){	//Used only on Product Manager Page
 	$('[name="nicheName"]').each(function () {
 		//Get ASIN
 		var myKey = $(this).closest('td').find('[name="parentASIN"]').val();
 		
 		var that = $(this);
-		//Fetch Matching Niche
+		//Fetch Matching Niche, Sync first, if not, attempt to get it locally.
 		chrome.storage.sync.get(myKey, function(items) {
 			if (typeof(items[myKey]) != 'undefined' && items[myKey].length > 1){
 				parsedJson = JSON.parse(items[myKey]);
@@ -2241,6 +2284,17 @@ function readShirtNiche(){
 				that.closest('td').attr('data-sort', parsedJson["niche"]);
 				that.closest('.form-group').addClass("has-success");
 				that.addClass("form-control-success");
+			} else{
+				//Try to get it locally
+				chrome.storage.local.get(myKey, function(items) {
+					if (typeof(items[myKey]) != 'undefined' && items[myKey].length > 1){
+						parsedJson = JSON.parse(items[myKey]);
+						that.val(parsedJson["niche"]);
+						that.closest('td').attr('data-sort', parsedJson["niche"]);
+						that.closest('.form-group').addClass("has-success");
+						that.addClass("form-control-success");
+					}
+				});
 			}
 		});
 	});
@@ -2267,12 +2321,13 @@ function getNicheDistribution(callback){
 	
 function clearAllNicheData(){
 	chrome.storage.sync.clear();
+	chrome.storage.local.clear();
 	$('.niche-input').val(''); 
 	$('.form-control-success').removeClass('form-control-success');
 	alert("All previous data has been cleared");
 }
 
-function initSaveButtons(){ //Adds event listeners to all buttons	
+function initSaveButtons(){ //(Used only on Product Manager: Adds event listeners to all buttons	
 	$(function(){			
 		//Listener for reset button
 		document.getElementById('reset-button').addEventListener("click", function(){
