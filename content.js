@@ -1798,8 +1798,9 @@ function renderIndividualProductSales(queryParams){
 			var lifetimeRoyalties = royaltyData.reduce(function(a, b) { return a + b; }, 0).toFixed(2);
 			
 			var lifespan = Math.round(today.diff(moment.unix(firstPublishDate), 'days', true));	
-			if (lifespan <= 30){ 
-				lifespan = 30 //Minimum 1 month lifespan
+			var computedLifespan = lifespan;
+			if (computedLifespan <= 30){ 
+				computedLifespan = 30 //Minimum 1 month lifespan
 			}; 
 			
 			var uriEncodedName = encodeURIComponent(shirtName); 
@@ -1842,7 +1843,7 @@ function renderIndividualProductSales(queryParams){
 										'<dd>$' + lifetimeRoyalties + '</dd>' +
 									'</dl><dl>' +
 										'<dt>Average Royalties / Month :&nbsp; </dt>' +
-										'<dd>$' + (lifetimeRoyalties / (lifespan / 30)).toFixed(2) + '</dd>' +
+										'<dd>$' + (lifetimeRoyalties / (computedLifespan / 30)).toFixed(2) + '</dd>' +
 									'</dl><dl>' +
 										'<dt style="margin: 5px 5px 5px 0;">Niche: </dt>' +
 										'<dd>'+
