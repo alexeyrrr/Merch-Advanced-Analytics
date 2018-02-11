@@ -38,6 +38,7 @@ chrome.runtime.onInstalled.addListener(function(details){
 		let newVersion = chrome.runtime.getManifest().version;
 
 		//UPDATE MESSAGE
+		/*
 		chrome.notifications.create(undefined, {
 			type: 'basic',
 			title: 'Updated: Added Tab Shortcut In Dashboard',
@@ -45,7 +46,7 @@ chrome.runtime.onInstalled.addListener(function(details){
 			iconUrl: '/img/logo-square.png',
 			message: "We added product type columns to all tables and product graphs to sales pages."
 		});	
-		
+		*/
 		
 	} else {
 		chrome.notifications.create(undefined, {
