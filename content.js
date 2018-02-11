@@ -1873,25 +1873,28 @@ function renderIndividualProductSales(queryParams){
 					$(this).removeClass("form-control-success").removeClass("form-control-danger");
 				});
 				
-				//Unfocus auto saves
-				$('.niche-input').focusout(function() {
-					if ($(this).val().length > 1){
-						nicheName = $(this).val();
-						saveShirtNiche(nicheName, targetASIN, $(this));
-					}
-				});
+				var enterPressed = false; //Flag to prevent double saving
 				
-				//Enter key goes to next field
-				$('.niche-input').keydown(function(e) {
-					if (e.which == 13 || e.which == 9) { //Enter Key
-						e.preventDefault();
-								
-						if ($(this).val().length > 1){
+				//Enter key also saves
+				$('.niche-input')
+					.keydown(function(e) {
+						if (e.which == 13 || e.which == 9) { //Enter Key
+							e.preventDefault();
+									
+							if ($(this).val().length > 1){
+								nicheName = $(this).val();
+								saveShirtNiche(nicheName, targetASIN, $(this));
+								enterPressed = true;
+							}
+						}
+					}).focusout(function() {
+						if ($(this).val().length > 1 && !enterPressed){
 							nicheName = $(this).val();
 							saveShirtNiche(nicheName, targetASIN, $(this));
 						}
-					}
-				});
+						
+						enterPressed = false;
+				});			
 			})
 			
 			//Regroup all youth sizes to just Youth
