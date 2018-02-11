@@ -50,39 +50,28 @@ function csvToJSON(csv) {
 
 function assembleDynamicBlankArray(callback){
 	chrome.storage.sync.get(null, function(items) {
-		var allValues = Object.values(items);
-		
-		
-		//WIP
-		if(Object.values(items).length > 500){ //If used up all sync values, also get local values
-			chrome.storage.local.get(null, function(localItems) {
-				allValues += Object.values(localItems);
-				console.log("ran this");
-			});
-		}
-		
-		console.log(allValues.length);
-		
-		
-		for (i = 0; i < allValues.length; i++){
-			allValues[i] =  JSON.parse(allValues[i]);
-			allValues[i] = allValues[i]["niche"]
-		}
-		
-		uniqueArray = allValues.filter(function(item, pos) {
-			return allValues.indexOf(item) == pos;
-		})
-		
-		var resultBlankArray = {};
-		//Init count to 0
-		for (i = 0; i < uniqueArray.length; i++){
-			resultBlankArray[uniqueArray[i]] = 0;
-		}
-		
-		resultBlankArray["unknown niche"] = 0;
-		
-		
-		callback(resultBlankArray);
+		//chrome.storage.local.get(null, function(localItems) { //Get both sync and local storage
+			var allValues = Object.values(items); // + Object.values(localItems);
+			
+			for (i = 0; i < allValues.length; i++){
+				allValues[i] =  JSON.parse(allValues[i]);
+				allValues[i] = allValues[i]["niche"]
+			}
+			
+			uniqueArray = allValues.filter(function(item, pos) {
+				return allValues.indexOf(item) == pos;
+			})
+			
+			var resultBlankArray = {};
+			//Init count to 0
+			for (i = 0; i < uniqueArray.length; i++){
+				resultBlankArray[uniqueArray[i]] = 0;
+			}
+			
+			resultBlankArray["unknown niche"] = 0;
+			
+			callback(resultBlankArray);
+		//});
 	});
 }
 
@@ -2198,7 +2187,7 @@ function getShirtNiche(shirtASIN, callback){
 	var myKey = String(shirtASIN);
 	var determinedNiche = 'unknown niche'; //default state
 	
-	chrome.storage.local.get(myKey, function(items) {
+	chrome.storage.local.get(myKey, function(items) { //This gets from both sync and local apparently
 		if(Object.values(items).length > 0){ 
 			parsedJson = JSON.parse(items[myKey]);
 			determinedNiche = parsedJson["niche"];
@@ -2209,7 +2198,10 @@ function getShirtNiche(shirtASIN, callback){
 			
 function getAllShirtNiches(callback){
 	chrome.storage.sync.get(null, function(items) {
-		callback(items);
+		chrome.storage.local.get(null, function(localItems) {			
+			var itemsTogether = Object.assign({}, items, localItems);
+			callback(itemsTogether);
+		});
 	});
 }
 		
