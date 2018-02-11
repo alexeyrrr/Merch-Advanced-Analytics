@@ -52,6 +52,18 @@ function assembleDynamicBlankArray(callback){
 	chrome.storage.sync.get(null, function(items) {
 		var allValues = Object.values(items);
 		
+		
+		//WIP
+		if(Object.values(items).length > 500){ //If used up all sync values, also get local values
+			chrome.storage.local.get(null, function(localItems) {
+				allValues += Object.values(localItems);
+				console.log("ran this");
+			});
+		}
+		
+		console.log(allValues.length);
+		
+		
 		for (i = 0; i < allValues.length; i++){
 			allValues[i] =  JSON.parse(allValues[i]);
 			allValues[i] = allValues[i]["niche"]
@@ -2184,17 +2196,24 @@ function save_options() {
 /***************************************************************/
 function getShirtNiche(shirtASIN, callback){
 	var myKey = String(shirtASIN);
+	var determinedNiche = 'unknown niche'; //default state
 	
 	chrome.storage.sync.get(myKey, function(items) {
-		if(Object.values(items).length == 0){ //If no matches, set to unknown
-			determinedNiche = "unknown niche";
-			
-		} else{
+		if(Object.values(items).length > 0){ 
 			parsedJson = JSON.parse(items[myKey]);
 			determinedNiche = parsedJson["niche"];
+			
+			callback(determinedNiche); //Run Callback
+		} else{ //If no matches, try locally
+			chrome.storage.local.get(myKey, function(localItems) {
+				if(Object.values(localItems).length > 0){
+					parsedJson = JSON.parse(localItems[myKey]);
+					determinedNiche = parsedJson["niche"];
+					
+					callback(determinedNiche); //Run Callback
+				}
+			});
 		}
-		
-		callback(determinedNiche); //Run Callback
 	});
 }
 			
