@@ -24,6 +24,16 @@ body.merch-advanced-analytics{
 	border-color: rgba(0, 0, 0, 0.125) !important;
 }
 
+.maa-alert{
+	position: fixed;
+	width: 100%;
+	z-index: 9999;
+}
+
+.maa-alert.alert-danger .close{
+	color: rgb(114, 28, 36);
+}
+
 .merch-advanced-analytics .card{
 	border-width: 1px;
 	border-style: solid;

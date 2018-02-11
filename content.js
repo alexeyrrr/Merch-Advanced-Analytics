@@ -214,6 +214,18 @@ function generateLoginModal(){
 	});
 }
 
+function generateStatusBar(message, type) {
+	var html = '<div class="alert alert-' + type + ' alert-dismissable maa-alert">';    
+	html += '<button type="button" class="close"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>';
+	html += message;
+	html += '</div>';    
+	$(html).prependTo('body');
+	
+	$('.maa-alert .close').click(function(e) {
+		e.preventDefault();
+		$(this).closest('.maa-alert').remove();
+	});
+};
 
 function getQueryParams() {	
 	// Get Query Params
@@ -511,7 +523,7 @@ function dailySalesPage(fromDate, toDate, viewType = 'day'){
 		$("#sidebar li").removeClass("active");
 		$("#dailySales").closest("li").addClass('active');
 	}
-		
+	
 	renderDailyView(fromDate, toDate, viewType);
 }
 
@@ -2234,7 +2246,7 @@ function saveShirtNiche(nicheName, parentASIN, targetHTMLitem = null) {
 			targetHTMLitem.closest('.form-group').addClass('has-danger');
 			targetHTMLitem.addClass("form-control-danger");
 			
-			console.log("Cannot store tag. Entering items too quickly. Please slow down.");
+			generateStatusBar('Cannot store tag. You are entering items too quickly. Please slow down.', 'danger');
 			
 		} else if (chrome.runtime.lastError && chrome.runtime.lastError.message == 'MAX_ITEMS quota exceeded'){		
 			//Store it locally
@@ -2309,6 +2321,7 @@ function getNicheDistribution(callback){
 	
 function clearAllNicheData(){
 	chrome.storage.sync.clear();
+	chrome.storage.local.clear();
 	$('.niche-input').val(''); 
 	$('.form-control-success').removeClass('form-control-success');
 	alert("All previous data has been cleared");
