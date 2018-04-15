@@ -1453,14 +1453,7 @@ function productManager() {
 								'<div class="card-header clear">' +
 									'<strong>Live Products</strong>' +
 									'<div class="btn-group float-right" role="group" aria-label="Basic example">' +
-										'<a class="btn btn-outline-secondary" id="reviewChecker" data-toggle="tooltip" data-placement="bottom" title="Launch Review Checker" href="" target="_blank" >'+
-											'<i class="fa fa-star" aria-hidden="true"></i>' +
-											'<i class="fa fa-star" aria-hidden="true"></i>' +
-											'<i class="fa fa-star" aria-hidden="true"></i>' +
-											'<i class="fa fa-star-half-o" aria-hidden="true"></i>' +
-											'<i class="fa fa-star-o" aria-hidden="true"></i>' +
-										'</a>' +
-										'<div class="btn btn-outline-secondary" id="reset-button" data-toggle="tooltip" data-placement="bottom" title="Clear All Niche Data"><i class="fa fa-eraser" aria-hidden="true"></i></div>' +
+										'<div class="btn btn-outline-secondary" id="reset-button" data-toggle="tooltip" data-placement="bottom" title="Clear All Niche Data"><i class="fa fa-trash" aria-hidden="true"></i></div>' +
 									'</div>' + 
 								'</div>' + 
 								'<div class="card-block" id="shirtlist"></div>' + 
@@ -1506,11 +1499,7 @@ function productManager() {
 			if (ts[i].marketplaceAsinMap.US !== undefined && ts[i].status == "LIVE"){
 				//Parse Create Date
 				var stringifiedCreateDate = moment.unix(parseInt(ts[i].createDate) / 1000).format("MM-DD-YYYY");
-				
-				if (liveDesignsCounter < 500){ //Only show first 500 products
-					strOfASINs += ts[i].marketplaceAsinMap.US + ',';
-				}
-				
+							
 				var itemName = ts[i].name.replace(/"/g, "");
 				var uriEncodedName = encodeURIComponent(itemName); 
 				var deleteLink = 'https://merch.amazon.com/manage/products?pageNumber=1&pageSize=15&keywords=' + uriEncodedName + '&statusFilters=%5B%22DELETED%22%2C%22DRAFT%22%2C%22LIVE%22%2C%22NOT_DISCOVERABLE%22%2C%22PENDING%22%2C%22PROCESSING%22%2C%22STOPPED%22%2C%22UNDER_REVIEW%22%2C%22REJECTED%22%2C%22MANUALLY_REJECTED%22%5D';
@@ -1572,11 +1561,7 @@ function productManager() {
 						'</tr>';
 			}
 		}
-		
-		$('#reviewChecker').attr("href", "https://ams.amazon.com/hsa-ad-landing-page/preview?asins=" + strOfASINs);
-		
-		
-			
+				
 		cp2 += '</tbody></table>';
 		document.getElementById("shirtlist").innerHTML = cp2;
 						
@@ -1724,20 +1709,22 @@ function renderIndividualProductSales(queryParams){
 	
 	var targetASIN = queryParams["ASIN"];
 	
-	fetchIndividualProductSales(targetASIN, function(responseArray){	
-		// Need To get First Publication Date
-		fetchAllLiveProducts(1, '0', liveProductsArray = [], targetASIN, function(){
-			var firstPublishDate = {};
-						
-			for ( i =0; i < liveProductsArray.length; i++){
-				if(liveProductsArray[i]["marketplaceAsinMap"]["US"] == targetASIN){
-					var firstPublishDate = parseInt(liveProductsArray[i]["firstPublishDate"]) / 1000;
-					var imgURL = liveProductsArray[i]["imageURL"]; 
-					var shirtName = liveProductsArray[i]["name"];	
-					var shirtID = liveProductsArray[i]["id"];
-					break;
-				}
+	
+	// Need To get First Publication Date
+	fetchAllLiveProducts(1, '0', liveProductsArray = [], targetASIN, function(){
+		var firstPublishDate = {};
+					
+		for ( i =0; i < liveProductsArray.length; i++){
+			if(liveProductsArray[i]["marketplaceAsinMap"]["US"] == targetASIN){
+				var firstPublishDate = parseInt(liveProductsArray[i]["firstPublishDate"]) / 1000;
+				var imgURL = liveProductsArray[i]["imageURL"]; 
+				var shirtName = liveProductsArray[i]["name"];	
+				var shirtID = liveProductsArray[i]["id"];
+				break;
 			}
+		}
+			
+		fetchIndividualProductSales(targetASIN, firstPublishDate,function(responseArray){	
 			
 			//TODO workaround error handling
 			if (!firstPublishDate){
@@ -2089,9 +2076,9 @@ function renderIndividualProductSales(queryParams){
 	});	
 }
 
-function fetchIndividualProductSales(targetASIN, callback){
+function fetchIndividualProductSales(targetASIN, publishDate, callback){
 	var toDate = moment().unix();
-	var fromDate = moment().subtract(90, 'days').unix();
+	var fromDate = publishDate;
 
 	fetchSalesDataCSV(fromDate, toDate, responseArray = [], function(){
 		infoAboutTargetASIN = []
