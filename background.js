@@ -38,15 +38,13 @@ chrome.runtime.onInstalled.addListener(function(details){
 		let newVersion = chrome.runtime.getManifest().version;
 
 		//UPDATE MESSAGE
-		/*
 		chrome.notifications.create(undefined, {
 			type: 'basic',
-			title: 'Updated: Added Tab Shortcut In Dashboard',
+			title: 'Updated: Individual Product Analysis',
 			isClickable: true,
 			iconUrl: '/img/logo-square.png',
-			message: "We added product type columns to all tables and product graphs to sales pages."
+			message: "We added updated the individual product analysis page to display all past information. Previously this was limited to 90 days."
 		});	
-		*/
 		
 	} else {
 		chrome.notifications.create(undefined, {
