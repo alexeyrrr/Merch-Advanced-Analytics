@@ -953,6 +953,13 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 							pointBorderColor: "#ddd",
 							borderColor: "#ddd"
 						}, {
+							label: 'Returns',
+							data: returnData,
+							backgroundColor: "rgba(255, 88, 39, 0.75)",
+							pointBorderColor: "rgba(255, 88, 39,1)",
+							borderColor: "rgba(255, 88, 39,1)"
+							
+						}, {
 							label: 'Cancellations',
 							data: cancelData,
 							backgroundColor: "rgba(255, 61, 61, 0.75)",
