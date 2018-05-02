@@ -40,10 +40,10 @@ chrome.runtime.onInstalled.addListener(function(details){
 		//UPDATE MESSAGE
 		chrome.notifications.create(undefined, {
 			type: 'basic',
-			title: 'Updated: Individual Product Analysis',
+			title: 'Updated: Return Stats Added',
 			isClickable: true,
 			iconUrl: '/img/logo-square.png',
-			message: "We added updated the individual product analysis page to display all past information. Previously this was limited to 90 days."
+			message: "We added updated all the stats to include newly added Return stats."
 		});	
 		
 	} else {
@@ -131,9 +131,11 @@ var checkforsales = function() {
 						
 						var sevenDaySales = csvToJSON(reqs.responseText);
 
+						console.log(sevenDaySales); //Cancellations Cancelled, Returned
+						
 						var sevenDaySaleCount = 0;
 						sevenDaySales.forEach(function(element) { //Tally up net units sold
-							sevenDaySaleCount += element["Units"] - element["Cancellations"];
+							sevenDaySaleCount += element["Units"] - element["Cancelled"];
 						});
 						
 						chrome.browserAction.setBadgeText({ text: String(sevenDaySaleCount) }); 
@@ -143,9 +145,9 @@ var checkforsales = function() {
 						sevenDaySales.forEach(function(element) {
 							if (element["Date"] == toDate.format("MM-DD-YYYY") ){
 								if (newShirtsSoldToday[element["ASIN"]]){ //If exists, add it
-									newShirtsSoldToday[element["ASIN"]] += element["Units"] - element["Cancellations"];
+									newShirtsSoldToday[element["ASIN"]] += element["Units"] - element["Cancelled"];
 								} else{
-									newShirtsSoldToday[element["ASIN"]] = element["Units"] - element["Cancellations"];
+									newShirtsSoldToday[element["ASIN"]] = element["Units"] - element["Cancelled"];
 								}
 							}
 						});

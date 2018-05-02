@@ -557,6 +557,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 			
 		var salesData = new Array(axisLabels.length).fill(0);
 		var cancelData = new Array(axisLabels.length).fill(0);
+		var returnData = new Array(axisLabels.length).fill(0);
 		var revenueData = new Array(axisLabels.length).fill(0);
 		var royaltyData = new Array(axisLabels.length).fill(0);
 		
@@ -616,7 +617,8 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 							}
 											
 							salesData[i] += parseInt(responseArray[i2]["Units"]);
-							cancelData[i] += parseInt(responseArray[i2]["Cancellations"]);
+							cancelData[i] += parseInt(responseArray[i2]["Cancelled"]);
+							returnData[i] += parseInt(responseArray[i2]["Returned"]);
 							revenueData[i] += parseFloat(responseArray[i2]["Revenue"]);
 							royaltyData[i] += parseFloat(responseArray[i2]["Royalty"]);
 
@@ -642,7 +644,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 							}
 							
 							//Determine Unit Price & Count it
-							var unitsSold = responseArray[i2]["Units"] - responseArray[i2]["Cancellations"];
+							var unitsSold = responseArray[i2]["Units"] - responseArray[i2]["Cancelled"];
 							if (unitsSold != 0){ //Disregarding canceled units intentionally								
 								var unitPrice = "$"+(responseArray[i2]["Revenue"] / (unitsSold)).toFixed(2);	
 								if (unitPrice in priceObject){
@@ -679,6 +681,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 				var totals = {};				
 				totals.sales = salesData.reduce(function(a, b) { return a + b; }, 0);
 				totals.cancelled = cancelData.reduce(function(a, b) { return a + b; }, 0);
+				totals.returned = returnData.reduce(function(a, b) { return a + b; }, 0);
 				totals.revenue = revenueData.reduce(function(a, b) { return a + b; }, 0).toFixed(2);				
 				totals.royalty = royaltyData.reduce(function(a, b) { return a + b; }, 0).toFixed(2);
 				
@@ -738,22 +741,31 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 						'<div class="col-lg-2 col-sm-3 col-xs-12">'+
 							'<div class="maa-card card">'+
 								'<div class="card-body">'+                                                                       
+									'<h2 class="font-weight-lighter" style="color:#474C4F;"  >'+ totals.returned + '</h2>'+
+									'<span class="text-muted text-uppercase small">Units Returned</span>'+
+								'</div>'+
+							'</div>'+
+						'</div>'+
+						
+						'<div class="col-lg-2 col-sm-3 col-xs-12 offset-sm-1 offset-md-1 offset-lg-0">'+
+							'<div class="maa-card card">'+
+								'<div class="card-body">'+                                                                       
 									'<h2 class="font-weight-lighter" style="color:#474C4F;"  >$'+ parseFloat(totals.revenue).formatMoney(2) + '</h2>'+
-									'<span class="text-muted text-uppercase small">Revenue</span>'+
+									'<span class="text-muted text-uppercase small">Revenue Earned</span>'+
+								'</div>'+
+							'</div>'+
+						'</div>'+
+						
+						'<div class="col-lg-2 col-sm-3 col-xs-12 no-card-bottom offset-lg-2">'+ 
+							'<div class="maa-card card">'+
+								'<div class="card-body">'+                                                                       
+									'<h2 class="font-weight-lighter" style="color:#474C4F;"  >$'+ parseFloat(totals.royalty).formatMoney(2) + '</h2>'+
+									'<span class="text-muted text-uppercase small">Royalties Earned</span>'+
 								'</div>'+
 							'</div>'+
 						'</div>'+
 						
 						'<div class="col-lg-2 col-sm-3 col-xs-12 no-card-bottom">'+
-							'<div class="maa-card card">'+
-								'<div class="card-body">'+                                                                       
-									'<h2 class="font-weight-lighter" style="color:#474C4F;"  >$'+ parseFloat(totals.royalty).formatMoney(2) + '</h2>'+
-									'<span class="text-muted text-uppercase small">Royalties</span>'+
-								'</div>'+
-							'</div>'+
-						'</div>'+
-						
-						'<div class="col-lg-2 col-sm-4 col-xs-12 offset-md-3 offset-lg-3 no-card-bottom">'+
 							'<div class="maa-card card">'+
 								'<div class="card-body">'+                                                                       
 									'<h2 class="font-weight-lighter" style="color:#474C4F;"  >$'+ (totals.royalty /(totals.sales - totals.cancelled + 0.00001)).formatMoney(2) + '</h2>'+
@@ -762,7 +774,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 							'</div>'+
 						'</div>'+
 						
-						'<div class="col-lg-2 col-sm-4 col-xs-12 no-card-bottom ">'+
+						'<div class="col-lg-2 col-sm-3 col-xs-12 no-card-bottom offset-sm-2 offset-md-2 offset-lg-0">'+
 							'<div class="maa-card card">'+
 								'<div class="card-body">'+                                                                       
 									'<h2 class="font-weight-lighter" style="color:#474C4F;"  >'+ ((totals.sales - totals.cancelled) /(numberofDaysInner+ 0.00001)).formatMoney(2) + '</h2>'+
@@ -771,7 +783,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 							'</div>'+
 						'</div>'+
 						
-						'<div class="col-lg-2 col-sm-4 col-xs-12 no-card-bottom ">'+
+						'<div class="col-lg-2 col-sm-3 col-xs-12 no-card-bottom ">'+
 							'<div class="maa-card card">'+
 								'<div class="card-body">'+                                                                       
 									'<h2 class="font-weight-lighter" style="color:#474C4F;"  >$'+ (totals.royalty /(numberofDaysInner+ 0.00001)).toFixed(2) + '</h2>'+
@@ -1125,7 +1137,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 							resultSumSales[i]["Name"] = responseArray[i2]["Name"];
 							resultSumSales[i]["ProductType"] = responseArray[i2]["Product Type"].replace(/-/i, '&#8209;');
 							resultSumSales[i]["Units"] += parseInt(responseArray[i2]["Units"]);
-							resultSumSales[i]["Cancellations"] += parseInt(responseArray[i2]["Cancellations"]);
+							resultSumSales[i]["Cancelled"] += parseInt(responseArray[i2]["Cancelled"]);
 							resultSumSales[i]["Royalty"] += parseFloat(responseArray[i2]["Royalty"]);
 							resultSumSales[i]["Revenue"] += parseFloat(responseArray[i2]["Revenue"]);
 						}
@@ -1191,7 +1203,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 						'</td>' +
 							
 						'<td class="text-center">' +
-							resultSumSales[i]["Cancellations"]  +
+							resultSumSales[i]["Cancelled"]  +
 						'</td>' +
 						
 						'<td class="text-center">' +
@@ -1203,7 +1215,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 						'</td>' +
 						
 						'<td class="text-center">' +
-							'$' + (resultSumSales[i]["Royalty"].toFixed(2) / (resultSumSales[i]["Units"] - resultSumSales[i]["Cancellations"] + 0.00001)).toFixed(2)  +
+							'$' + (resultSumSales[i]["Royalty"].toFixed(2) / (resultSumSales[i]["Units"] - resultSumSales[i]["Cancelled"] + 0.00001)).toFixed(2)  +
 						'</td>' +
 						'<td class="text-center btn-inside">' +  
 							'<a target="_blank" href="' + deleteLink + '" class="btn btn-outline-primary">Edit</a>' + 
@@ -1760,7 +1772,7 @@ function renderIndividualProductSales(queryParams){
 				for ( i2 = 0; i2 < responseArray.length; i2++){
 					if(axisLabels[i] == responseArray[i2]["Date"]){
 						salesData[i] += parseInt(responseArray[i2]["Units"]);
-						cancelData[i] += parseInt(responseArray[i2]["Cancellations"]);
+						cancelData[i] += parseInt(responseArray[i2]["Cancelled"]);
 						revenueData[i] += parseFloat(responseArray[i2]["Revenue"]);
 						royaltyData[i] += parseFloat(responseArray[i2]["Royalty"]);
 						
