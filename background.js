@@ -131,8 +131,6 @@ var checkforsales = function() {
 						
 						var sevenDaySales = csvToJSON(reqs.responseText);
 
-						console.log(sevenDaySales); //Cancellations Cancelled, Returned
-						
 						var sevenDaySaleCount = 0;
 						sevenDaySales.forEach(function(element) { //Tally up net units sold
 							sevenDaySaleCount += element["Units"] - element["Cancelled"];

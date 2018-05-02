@@ -958,7 +958,6 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 							backgroundColor: "rgba(255, 88, 39, 0.75)",
 							pointBorderColor: "rgba(255, 88, 39,1)",
 							borderColor: "rgba(255, 88, 39,1)"
-							
 						}, {
 							label: 'Cancellations',
 							data: cancelData,
@@ -1764,6 +1763,7 @@ function renderIndividualProductSales(queryParams){
 			
 			var salesData = new Array(axisLabels.length).fill(0);
 			var cancelData = new Array(axisLabels.length).fill(0);
+			var returnData = new Array(axisLabels.length).fill(0);
 			var revenueData = new Array(axisLabels.length).fill(0);
 			var royaltyData = new Array(axisLabels.length).fill(0);
 			
@@ -1780,6 +1780,7 @@ function renderIndividualProductSales(queryParams){
 					if(axisLabels[i] == responseArray[i2]["Date"]){
 						salesData[i] += parseInt(responseArray[i2]["Units"]);
 						cancelData[i] += parseInt(responseArray[i2]["Cancelled"]);
+						returnData[i] += parseInt(responseArray[i2]["Returned"]);
 						revenueData[i] += parseFloat(responseArray[i2]["Revenue"]);
 						royaltyData[i] += parseFloat(responseArray[i2]["Royalty"]);
 						
@@ -1811,7 +1812,7 @@ function renderIndividualProductSales(queryParams){
 			}
 			
 
-			var lifetimeSales = salesData.reduce(function(a, b) { return a + b; }, 0) - cancelData.reduce(function(a, b) { return a + b; }, 0) ;
+			var lifetimeSales = salesData.reduce(function(a, b) { return a + b; }, 0) - cancelData.reduce(function(a, b) { return a + b; }, 0) - returnData.reduce(function(a, b) { return a + b; }, 0);
 			var lifetimeRevenue = revenueData.reduce(function(a, b) { return a + b; }, 0).toFixed(2);
 			var lifetimeRoyalties = royaltyData.reduce(function(a, b) { return a + b; }, 0).toFixed(2);
 			
@@ -1958,6 +1959,12 @@ function renderIndividualProductSales(queryParams){
 						backgroundColor: "rgba(255, 61, 61, 0.75)",
 						pointBorderColor: "rgba(255, 61, 61,1)",
 						borderColor: "rgba(255, 61, 61,1)"
+					}, {		
+						label: 'Returns',
+						data: returnData,
+						backgroundColor: "rgba(255, 88, 39, 0.75)",
+						pointBorderColor: "rgba(255, 88, 39,1)",
+						borderColor: "rgba(255, 88, 39,1)"
 					}, {
 						label: 'Sales',
 						data: salesData,
