@@ -38,6 +38,7 @@ chrome.runtime.onInstalled.addListener(function(details){
 		let newVersion = chrome.runtime.getManifest().version;
 
 		//UPDATE MESSAGE
+		/*
 		chrome.notifications.create(undefined, {
 			type: 'basic',
 			title: 'Updated: Return Stats Added',
@@ -45,7 +46,7 @@ chrome.runtime.onInstalled.addListener(function(details){
 			iconUrl: '/img/logo-square.png',
 			message: "We added updated all the stats to include newly added Return stats."
 		});	
-		
+		*/
 	} else {
 		chrome.notifications.create(undefined, {
 			type: 'basic',

@@ -939,8 +939,6 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 					projectionRoyaltiesArray[projectionRoyaltiesArray.length - 1] = projectedRoyalties; 
 				}
 				
-				
-								
 				//Assemble Chart Info																	
 				var lineChartData1 = {
 					type: 'line',
@@ -1131,7 +1129,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 						Name: '',
 						ProductType: '',
 						Units: 0,
-						Cancellations: 0,
+						Cancelled: 0,
 						Royalty: 0,
 						Revenue: 0
 					})
@@ -1168,7 +1166,11 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 						'</tr>'  +
 					'</thead><tbody>';
 
-					
+				//Sort Sales Data By Units Sold Descending
+				resultSumSales.sort(function(a, b){
+				  return b.Units - a.Units;
+				});
+									
 				for (i=0; i < resultSumSales.length; i++){
 					//Assign Niche
 					var reminderPopoverData= ''; //Blank popover data
