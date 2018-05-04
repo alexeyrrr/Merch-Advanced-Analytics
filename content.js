@@ -1230,7 +1230,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 						'</td>' +
 						
 						'<td class="text-center">' +
-							'$' + (resultSumSales[i]["Royalty"].toFixed(2) / (resultSumSales[i]["Units"] - resultSumSales[i]["Cancelled"] + 0.00001)).toFixed(2)  +
+							'$' + (resultSumSales[i]["Royalty"].toFixed(2) / (resultSumSales[i]["Units"] - resultSumSales[i]["Cancelled"] - resultSumSales[i]["Returned"] + 0.00001)).toFixed(2)  +
 						'</td>' +
 						'<td class="text-center btn-inside">' +  
 							'<a target="_blank" href="' + deleteLink + '" class="btn btn-outline-primary">Edit</a>' + 
