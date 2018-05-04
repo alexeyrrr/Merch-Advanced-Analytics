@@ -2064,7 +2064,9 @@ function renderIndividualProductSales(queryParams){
 			/*Assemble Sales History Table */
 			var cp2 = '<table id="indvTable" class="maa-table table table-striped sortable"><thead><tr><th>#</th>' +
 				'<th class="text-center">Date Sold</th>' +
-				'<th class="text-center">Units</th>' +
+				'<th class="text-center">Sold</th>' +
+				'<th class="text-center">Cancelled</th>' +
+				'<th class="text-center">Returned</th>' +
 				'<th class="text-center">Revenue</th>' +
 				'<th class="text-center">Royalty</th>' +
 				'<th class="text-center">Gender</th>' +
@@ -2072,6 +2074,8 @@ function renderIndividualProductSales(queryParams){
 				'<th class="text-center">Color</th>' +
 				'</tr></thead><tbody>';
 
+			console.log(responseArray);
+				
 			for (i=0; i < responseArray.length; i++){
 				cp2 += '<tr><th scope="row">' + (i + 1) + '</th>' + 
 					'<td class="text-center">' + 
@@ -2080,6 +2084,14 @@ function renderIndividualProductSales(queryParams){
 					
 					'<td class="text-center">' +
 						responseArray[i]["Units"]  +
+					'</td>' +
+					
+					'<td class="text-center">' +
+						responseArray[i]["Cancelled"]  +
+					'</td>' +
+					
+					'<td class="text-center">' +
+						responseArray[i]["Returned"]  +
 					'</td>' +
 					
 					'<td class="text-center">' +
