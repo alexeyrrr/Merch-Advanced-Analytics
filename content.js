@@ -1130,6 +1130,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 						ProductType: '',
 						Units: 0,
 						Cancelled: 0,
+						Returned: 0,
 						Royalty: 0,
 						Revenue: 0
 					})
@@ -1142,6 +1143,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 							resultSumSales[i]["ProductType"] = responseArray[i2]["Product Type"].replace(/-/i, '&#8209;');
 							resultSumSales[i]["Units"] += parseInt(responseArray[i2]["Units"]);
 							resultSumSales[i]["Cancelled"] += parseInt(responseArray[i2]["Cancelled"]);
+							resultSumSales[i]["Returned"] += parseInt(responseArray[i2]["Returned"]);
 							resultSumSales[i]["Royalty"] += parseFloat(responseArray[i2]["Royalty"]);
 							resultSumSales[i]["Revenue"] += parseFloat(responseArray[i2]["Revenue"]);
 						}
@@ -1159,9 +1161,10 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 							'<th class="text-center">Product Details</th>' +
 							'<th class="text-center">Units Sold</th>' +
 							'<th class="text-center">Units Cancelled</th>' +
+							'<th class="text-center">Units Returned</th>' +
 							'<th class="text-center">Revenue</th>' +
 							'<th class="text-center">Royalties</th>' +
-							'<th class="text-center">Avg Royalties / Unit</th>' +
+							'<th class="text-center">Royalties / Unit</th>' +
 							'<th class="text-center">Edit / Delete </th>' +
 						'</tr>'  +
 					'</thead><tbody>';
@@ -1212,6 +1215,10 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 							
 						'<td class="text-center">' +
 							resultSumSales[i]["Cancelled"]  +
+						'</td>' +
+						
+						'<td class="text-center">' +
+							resultSumSales[i]["Returned"]  +
 						'</td>' +
 						
 						'<td class="text-center">' +
