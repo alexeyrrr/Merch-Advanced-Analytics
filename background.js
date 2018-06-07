@@ -38,15 +38,14 @@ chrome.runtime.onInstalled.addListener(function(details){
 		let newVersion = chrome.runtime.getManifest().version;
 
 		//UPDATE MESSAGE
-		/*
 		chrome.notifications.create(undefined, {
 			type: 'basic',
-			title: 'Updated: Return Stats Added',
+			title: 'Update: Returns Color',
 			isClickable: true,
 			iconUrl: '/img/logo-square.png',
-			message: "We added updated all the stats to include newly added Return stats."
+			message: "We updated the Returns color so it would be more vibrant. Also 'Never Sold' on the Manage page is now consistent with the 180 day policy."
 		});	
-		*/
+
 	} else {
 		chrome.notifications.create(undefined, {
 			type: 'basic',

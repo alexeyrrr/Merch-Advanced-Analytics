@@ -953,9 +953,9 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 						}, {
 							label: 'Returns',
 							data: returnData,
-							backgroundColor: "rgba(255, 88, 39, 0.75)",
-							pointBorderColor: "rgba(255, 88, 39,1)",
-							borderColor: "rgba(255, 88, 39,1)"
+							backgroundColor: "rgba(255, 204, 0, 0.75)",
+							pointBorderColor: "rgba(255, 204, 0,1)",
+							borderColor: "rgba(255, 204, 0,1)"
 						}, {
 							label: 'Cancellations',
 							data: cancelData,
@@ -1517,7 +1517,7 @@ function productManager() {
 				liveDesignsCounter++;
 				
 				//Determine if a design has ever sold
-				if(ts[i].daysUntilDeletion.length === 0 || parseInt(ts[i].daysUntilDeletion) > 90){
+				if(ts[i].daysUntilDeletion.length === 0 || ts[i].daysUntilDeletion == null){
 					hasLifetimeSales = true;
 					lifetimesSalesCounter++;
 				}
@@ -1971,9 +1971,9 @@ function renderIndividualProductSales(queryParams){
 					}, {		
 						label: 'Returns',
 						data: returnData,
-						backgroundColor: "rgba(255, 88, 39, 0.75)",
-						pointBorderColor: "rgba(255, 88, 39,1)",
-						borderColor: "rgba(255, 88, 39,1)"
+						backgroundColor: "rgba(255, 204, 0, 0.75)",
+						pointBorderColor: "rgba(255, 204, 0,1)",
+						borderColor: "rgba(255, 204, 0,1)"
 					}, {
 						label: 'Sales',
 						data: salesData,
