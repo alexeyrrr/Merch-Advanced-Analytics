@@ -272,6 +272,19 @@ if (cmd.indexOf("MerchAnalytics") !== -1 || cmd.indexOf("IndividualProductPage")
 		if (showNavTab != 0){
 			$('.top-nav-links-container ul').append('<li class="a-align-center top-nav-link-unselected"><a class="a-link-normal" target="_blank" href="/MerchAnalytics">Merch Analytics</a></li>');
 		}
+		
+		//testing
+		$(document).keypress(function(e) {
+			if(e.which == 13) {
+				if ($('.a-popover').is(':visible')) {
+					//Press confirmation button
+					$('.a-popover #publish-confirm-button-announce').click();	
+				} else {
+					//Press next / submit button
+					$('.a-button-primary:first-of-type button').click();
+				}
+			}
+		});
 	});
 }
 		
