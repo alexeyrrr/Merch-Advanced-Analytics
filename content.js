@@ -276,33 +276,36 @@ if (cmd.indexOf("MerchAnalytics") !== -1 || cmd.indexOf("IndividualProductPage")
 		
 		//Enter Key To Progress
 		if (enterToNextPage != 0){
-			
-			$(document).keypress(function(e) {
-				if(e.which == 13) {
-					if ($('.a-popover').is(':visible')) {
-						//Press confirmation button
-						$('.a-popover #publish-confirm-button-announce').click();	
-					}else if ($('.aok-float-right .a-button-text').is(':visible')){ //Add product button
-						window.location = "https://merch.amazon.com/merch-tshirt/title-setup/new/upload_art";
-						console.log('new product');
-						
-					}else if ($('.a-alert.a-alert-success.save-success').is(':visible')){
-						$('#save-and-continue-upload-art-announce').click();
-					} else {
-						//Press next / submit button
-						$('div').blur()
-						$('.a-button-primary:first button').click();
-						
-						
-					} 
-				}
-			});
-			
-			$('.a-button-primary:first button').closest('.a-row').after('<span style="line-height:25px" class="a-color-tertiary">(Press Enter To Submit)</span>');
-			
-			//siblings().find('.potter-directive-column span.a-color-tertiary').
+			$(document).ready(function () {
+				$(document).keydown(function (e) {
+					e.preventDefault();
+					var kCode = e.keyCode || e.charCode; 
+					
+					 if (kCode == 13) {
+						if ($('.a-popover').is(':visible')) {
+							//Press confirmation button
+							$('.a-popover #publish-confirm-button-announce').click();	
+						}else if ($('.aok-float-right .a-button-text').is(':visible')){ //Add product button
+							window.location = "https://merch.amazon.com/merch-tshirt/title-setup/new/upload_art";
+							
+						}else if ($('.a-button.a-button-span5.a-button-width-normal .a-button-text').is(':visible')){ //Add product button	from manage page
+							$('.a-button.a-button-span5.a-button-width-normal .a-button-text').click();
+							
+						}else if ($('.a-alert.a-alert-success.save-success').is(':visible')){ //Click Next button from image upload page
+							$('#save-and-continue-upload-art-announce').click();
+						} else {
+							//Press next / submit button
+							$('body .a-button-primary:first button').click();
+							
+							console.log('next button');
 
-		
+						} 
+					}
+				});
+			});
+						
+			$('.a-button-primary:first button').closest('.a-row').after('<span style="line-height:25px; width:100%; float: left; text-align: center;" class="a-color-tertiary">(Press Enter To Submit)</span>');
+					
 		}	
 	});
 }
