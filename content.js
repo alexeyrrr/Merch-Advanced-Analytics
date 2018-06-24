@@ -295,10 +295,7 @@ if (cmd.indexOf("MerchAnalytics") !== -1 || cmd.indexOf("IndividualProductPage")
 							$('#save-and-continue-upload-art-announce').click();
 						} else {
 							//Press next / submit button
-							$('body .a-button-primary:first button').click();
-							
-							console.log('next button');
-
+							$('.a-button-primary:first button').click();
 						} 
 					}
 				});
