@@ -267,24 +267,43 @@ if (cmd.indexOf("MerchAnalytics") !== -1 || cmd.indexOf("IndividualProductPage")
 		if(Object.values(items).length != 0){
 			var parsedJson = JSON.parse(items["Settings"]);
 			showNavTab = parsedJson["optionDashboard"];
+			enterToNextPage = parsedJson["enterToNextPage"];
 		}
 		
 		if (showNavTab != 0){
 			$('.top-nav-links-container ul').append('<li class="a-align-center top-nav-link-unselected"><a class="a-link-normal" target="_blank" href="/MerchAnalytics">Merch Analytics</a></li>');
 		}
 		
-		//testing
-		$(document).keypress(function(e) {
-			if(e.which == 13) {
-				if ($('.a-popover').is(':visible')) {
-					//Press confirmation button
-					$('.a-popover #publish-confirm-button-announce').click();	
-				} else {
-					//Press next / submit button
-					$('.a-button-primary:first-of-type button').click();
+		//Enter Key To Progress
+		if (enterToNextPage != 0){
+			
+			$(document).keypress(function(e) {
+				if(e.which == 13) {
+					if ($('.a-popover').is(':visible')) {
+						//Press confirmation button
+						$('.a-popover #publish-confirm-button-announce').click();	
+					}else if ($('.aok-float-right .a-button-text').is(':visible')){ //Add product button
+						window.location = "https://merch.amazon.com/merch-tshirt/title-setup/new/upload_art";
+						console.log('new product');
+						
+					}else if ($('.a-alert.a-alert-success.save-success').is(':visible')){
+						$('#save-and-continue-upload-art-announce').click();
+					} else {
+						//Press next / submit button
+						$('div').blur()
+						$('.a-button-primary:first button').click();
+						
+						
+					} 
 				}
-			}
-		});
+			});
+			
+			$('.a-button-primary:first button').closest('.a-row').after('<span style="line-height:25px" class="a-color-tertiary">(Press Enter To Submit)</span>');
+			
+			//siblings().find('.potter-directive-column span.a-color-tertiary').
+
+		
+		}	
 	});
 }
 		
@@ -2193,7 +2212,8 @@ function restore_options() {
 			optionSound	= parsedJson["sound"];
 			optionNotif	= parsedJson["popup"];
 			optionDashboard	= parsedJson["optionDashboard"];
-			
+			enterToNextPage	= parsedJson["enterToNextPage"];
+				
 			if (optionSound){
 				$('#notificationSound').prop('checked', true);
 			} else {
@@ -2205,6 +2225,13 @@ function restore_options() {
 			}else{
 				$('#notificationPopup').prop('checked', false);
 			}
+			
+			if (enterToNextPage){
+				$('#enterToNextPage').prop('checked', true);
+			}else{
+				$('#enterToNextPage').prop('checked', false);
+			}
+			
 			
 			if (optionDashboard){
 				$('#optionDashboard').prop('checked', true);
@@ -2219,12 +2246,14 @@ function restore_options() {
 function save_options() {
 	var optionSound = $('#notificationSound').prop("checked") ? 1 : 0;
 	var optionNotif = $('#notificationPopup').prop("checked") ? 1 : 0;
+	var enterToNextPage = $('#enterToNextPage').prop("checked") ? 1 : 0;
 	var optionDashboard = $('#optionDashboard').prop("checked") ? 1 : 0;
 	
 	var data = JSON.stringify({
 		'sound': optionSound,
 		'popup': optionNotif,
 		'optionDashboard': optionDashboard,
+		'enterToNextPage': enterToNextPage,
 	});
     var jsonfile = {};
     jsonfile["Settings"] = data;
