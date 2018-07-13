@@ -323,14 +323,17 @@ if (cmd.indexOf("MerchAnalytics") !== -1 || cmd.indexOf("IndividualProductPage")
 /***************************************************************/
 /********* Global Fetch Function (Sales & Live List) ***********/
 /***************************************************************/	
-function fetchSalesDataCSV(endDate, toDate, result, callback){
+function fetchSalesDataCSV(fromDate, toDate, result, callback){
 	//This Function Deals in Unix Milliseconds
 	var a = moment.unix(toDate);
-	var b = moment.unix(endDate);
+	var b = moment.unix(fromDate);
 	var daysDifference = a.diff(b, 'days')
 	
 	if(daysDifference <= 90){ //Period under 90 days (with grace period)
-        var sls = 'https://merch.amazon.com/product-purchases-report?fromDate=' + endDate * 1000 + '&toDate=' + toDate * 1000;
+        var sls = 'https://merch.amazon.com/product-purchases-report?fromDate=' + fromDate * 1000 + '&toDate=' + toDate * 1000;
+		
+		//https://merch.amazon.com/product-purchases-report?fromDate=1530687600000&toDate=1530770399000
+		
         var reqs = new XMLHttpRequest();
         reqs.open("GET", sls, true);
         reqs.onreadystatechange = function() {
@@ -344,7 +347,21 @@ function fetchSalesDataCSV(endDate, toDate, result, callback){
 						setstatus("Processing Data...");
 						
 						responseList = csvToJSON(reqs.responseText);
-						Array.prototype.push.apply(result,responseList);     
+						
+						intermediateResult = [];
+						Array.prototype.push.apply(intermediateResult,responseList);     
+						
+						//Filter to make sure actually within range
+						for(var i=0; i < intermediateResult.length; i++){
+							var compareDate = moment(intermediateResult[i]['Date'], "MM-DD-YYYY").unix();
+							
+							
+							if (compareDate >= b.startOf('day').unix() && compareDate <= a.endOf('day').unix()) {
+								
+								result.push(intermediateResult[i]);     
+							} 
+
+						}
 						
 						callback(result);
 					}
@@ -374,7 +391,7 @@ function fetchSalesDataCSV(endDate, toDate, result, callback){
 						
 						//Shift Last Call Date Down
 						toDate = moment.unix(toDate).subtract(91, 'days').startOf('day').unix();
-						fetchSalesDataCSV(endDate, toDate, result, callback);
+						fetchSalesDataCSV(fromDate, toDate, result, callback);
 					}
 				};
 
