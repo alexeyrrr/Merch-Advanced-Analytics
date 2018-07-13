@@ -717,6 +717,9 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 				totals.revenue = revenueData.reduce(function(a, b) { return a + b; }, 0).toFixed(2);				
 				totals.royalty = royaltyData.reduce(function(a, b) { return a + b; }, 0).toFixed(2);
 				
+				//Calculated Totals
+				totals.avgRoytPerUnit = ((totals.royalty /(totals.sales - totals.cancelled + 0.00001)).formatMoney(2) < 0 ? 0 : (totals.royalty /(totals.sales - totals.cancelled + 0.00001)).formatMoney(2));
+				totals.avgRoytPerTimePeriod = ((totals.royalty /(numberofDaysInner+ 0.00001)).toFixed(2) < 0 ? 0 : (totals.royalty /(numberofDaysInner+ 0.00001)).toFixed(2));
 
 				fromDateString = localUnixFromDate2.format("MM/DD/YYYY");
 				toDateString = localUnixToDate2.format("MM/DD/YYYY");
@@ -800,7 +803,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 						'<div class="col-lg-2 col-sm-3 col-xs-12 no-card-bottom">'+
 							'<div class="maa-card card">'+
 								'<div class="card-body">'+                                                                       
-									'<h2 class="font-weight-lighter" style="color:#474C4F;"  >$'+ (totals.royalty /(totals.sales - totals.cancelled + 0.00001)).formatMoney(2) + '</h2>'+
+									'<h2 class="font-weight-lighter" style="color:#474C4F;"  >$'+ totals.avgRoytPerUnit + '</h2>'+
 									'<span class="text-muted text-uppercase small">Avg Royalties / Unit Sold</span>'+
 								'</div>'+
 							'</div>'+
@@ -818,7 +821,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 						'<div class="col-lg-2 col-sm-3 col-xs-12 no-card-bottom ">'+
 							'<div class="maa-card card">'+
 								'<div class="card-body">'+                                                                       
-									'<h2 class="font-weight-lighter" style="color:#474C4F;"  >$'+ (totals.royalty /(numberofDaysInner+ 0.00001)).toFixed(2) + '</h2>'+
+									'<h2 class="font-weight-lighter" style="color:#474C4F;"  >$'+ totals.avgRoytPerTimePeriod + '</h2>'+
 									'<span class="text-muted text-uppercase small">Avg Royalties / '+ periodTitle +'</span>'+
 								'</div>'+
 							'</div>'+
@@ -2105,8 +2108,6 @@ function renderIndividualProductSales(queryParams){
 				'<th class="text-center">Size</th>' +
 				'<th class="text-center">Color</th>' +
 				'</tr></thead><tbody>';
-
-			console.log(responseArray);
 				
 			for (i=0; i < responseArray.length; i++){
 				cp2 += '<tr><th scope="row">' + (i + 1) + '</th>' + 
