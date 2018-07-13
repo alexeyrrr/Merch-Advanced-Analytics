@@ -40,10 +40,10 @@ chrome.runtime.onInstalled.addListener(function(details){
 		//UPDATE MESSAGE
 		chrome.notifications.create(undefined, {
 			type: 'basic',
-			title: 'Update: Returns Color',
+			title: 'Update: Enter Key To Submit',
 			isClickable: true,
 			iconUrl: '/img/logo-square.png',
-			message: "We updated the Returns color so it would be more vibrant. Also 'Never Sold' on the Manage page is now consistent with the 180 day policy."
+			message: "We added the ability to use your keyboard's enter key to submit new products and progress through all MBA prompts faster."
 		});	
 
 	} else {
