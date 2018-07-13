@@ -861,7 +861,8 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 				var shirtNicheColorsLUT = replicateArray(tealColorScheme, 20);
 				var pricingColorsLUT = replicateArray(greenColorScheme, 20);
 				
-				if(viewType == "month"){ //Monthly Labels
+				if(viewType == "month" && (localUnixToDate2.format("MMM YYYY") == moment().format("MMM YYYY"))){ //Monthly Labels
+					
 					//Projections
 					/* Calculate Projections */
 					startOfMonth = moment().startOf('month');
@@ -913,7 +914,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 					} 
 					
 					projectionRoyaltiesArray[projectionRoyaltiesArray.length - 1] = projectedRoyalties; 
-				} else if(viewType == "week"){ //Weekly Labels
+				} else if(viewType == "week" && (localUnixToDate2.format("ww YYYY") == moment().format("ww YYYY")) ){ //Weekly Labels 
 					//Projections
 					/* Calculate Projections */
 					startOfWeek = moment().startOf('week');
