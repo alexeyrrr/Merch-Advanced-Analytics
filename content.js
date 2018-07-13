@@ -119,6 +119,7 @@ var globalLoading = '<div class="container maa-container">' +
 						'</div>' +
 					'</div>';
 var globalBody = '<body class=""><div class="wrapper">' + globalSidebar + globalLoading + '</div></body>';
+var globalStatus = 'none';
 		
 function globalInit(){
 	document.head.innerHTML = globalHeader;
@@ -130,39 +131,51 @@ function globalInit(){
 	//Initialize Sidebar
 	$(function(){		
 		$("#todaySales").click(function(){
-			var fromDateToday = moment().startOf('day').unix();
-			var toDateToday = moment().endOf('day').unix();
-			
-			dailySalesPage(fromDateToday, toDateToday);
+			if (globalStatus == 'none'){
+				var fromDateToday = moment().startOf('day').unix();
+				var toDateToday = moment().endOf('day').unix();
+				
+				dailySalesPage(fromDateToday, toDateToday);
+			}
 		});
 		$("#dailySales, #logo").click(function(){
-			//Calculate Unix Timestamps
-			var fromDate7 = moment().subtract(7, 'days').unix();
-			var toDate = moment().unix();
-			
-			dailySalesPage(fromDate7, toDate);
+			if (globalStatus == 'none'){
+				//Calculate Unix Timestamps
+				var fromDate7 = moment().subtract(7, 'days').unix();
+				var toDate = moment().unix();
+				
+				dailySalesPage(fromDate7, toDate);
+			}
 		});
 		
 		$("#monthlySales").click(function(){
-			//Calculate Unix Timestamps
-			var fromDate6Mo = moment().endOf('month').subtract(5, 'months').startOf('month').unix();
-			var toDate = moment().unix();
-						
-			dailySalesPage(fromDate6Mo, toDate, "month");
+			if (globalStatus == 'none'){
+				//Calculate Unix Timestamps
+				var fromDate6Mo = moment().endOf('month').subtract(5, 'months').startOf('month').unix();
+				var toDate = moment().unix();
+							
+				dailySalesPage(fromDate6Mo, toDate, "month");
+			}
 		});
 		
 		$("#productManager").click(function(){
-			productManager();	
+			if (globalStatus == 'none'){
+				productManager();	
+			}
 		});
 		
 		$("#settingsPage").click(function(){
-			settingsPage();
+			if (globalStatus == 'none'){
+				settingsPage();
+			}
 		})
 		
 		$("#sidebar li").click(function(){
-			$("#sidebar li").removeClass("active");
-			$(this).addClass("active");
-			$('#indvProduct').closest("li").hide();
+			if (globalStatus == 'none'){
+				$("#sidebar li").removeClass("active");
+				$(this).addClass("active");
+				$('#indvProduct').closest("li").hide();
+			}
 		});
 	})
 	
@@ -452,7 +465,8 @@ function setstatus(message, type="loading"){
 /***************************************************************/
 /********************** Daily Sales Page ***********************/
 /***************************************************************/	
-function dailySalesPage(fromDate, toDate, viewType = 'day'){	
+function dailySalesPage(fromDate, toDate, viewType = 'day'){
+	globalStatus = 'working';
 	document.title = "Daily View - Merch Advanced Analytics";
 	var smallChartWidth = window.screen.availWidth / 6.9;
 	var smallChartHeight = window.screen.availWidth / 5.4;
@@ -1486,13 +1500,11 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 					$(function () {
 					  $('[data-toggle="tooltip"]').tooltip()
 					  
-
-		
 					})
 				
-				
 				});
-				
+			
+			globalStatus = 'none';
 			}); //Callback 2 end
 			
 		}); //Callback end
@@ -1504,6 +1516,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 /******************* Product Manager Page **********************/
 /***************************************************************/
 function productManager() {
+	globalStatus = 'working';
 	document.title = "Manage Products - Merch Advanced Analytics";
 		
 	var pageContent = '<div class="container maa-container">' + 
@@ -1670,13 +1683,15 @@ function productManager() {
 			
 		initSaveButtons(); //initialize event listeners for buttons
 		
-		});
+		globalStatus = 'none';
+	});
 }
 
 /***************************************************************/
 /**************** Individual Product Page **********************/
 /***************************************************************/
 function individualProductPage(queryParams){
+	globalStatus = 'working';
 	if (queryParams["ASIN"]){
 		pageContent = '<div class="container maa-container">' +
 							'<div class="maa-card card"></center>'+
@@ -2154,6 +2169,8 @@ function renderIndividualProductSales(queryParams){
 			
 			new Tablesort(document.getElementById('indvTable'));
 		});
+		
+		globalStatus = 'none';
 	});	
 }
 
@@ -2177,7 +2194,8 @@ function fetchIndividualProductSales(targetASIN, publishDate, callback){
 /*********************** Settings Page *************************/
 /***************************************************************/
 function settingsPage (e) {
-    document.title = "Settings - Merch Advanced Analytics";
+	globalStatus = 'working';
+	document.title = "Settings - Merch Advanced Analytics";
 	
 	$(".wrapper").children().filter(":not(#sidebar)").remove();
 	
@@ -2202,6 +2220,7 @@ function settingsPage (e) {
 		}
 	}
 	xhr.send();
+	globalStatus = 'none';
 }
 
 // Restores select box and checkbox state using the preferences
@@ -2241,6 +2260,8 @@ function restore_options() {
 				$('#optionDashboard').prop('checked', false);
 			}
 		}
+		
+		globalStatus = 'none';
 	});
 }
 
