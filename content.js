@@ -278,7 +278,7 @@ if (cmd.indexOf("MerchAnalytics") !== -1 || cmd.indexOf("IndividualProductPage")
 		if (enterToNextPage != 0){
 			$(document).ready(function () {
 				$(document).keydown(function (e) {
-					e.preventDefault();
+					//e.preventDefault();
 					var kCode = e.keyCode || e.charCode; 
 					
 					 if (kCode == 13) {
@@ -288,7 +288,7 @@ if (cmd.indexOf("MerchAnalytics") !== -1 || cmd.indexOf("IndividualProductPage")
 						}else if ($('.aok-float-right .a-button-text').is(':visible')){ //Add product button
 							window.location = "https://merch.amazon.com/merch-tshirt/title-setup/new/upload_art";
 							
-						}else if ($('.a-button.a-button-span5.a-button-width-normal .a-button-text').is(':visible')){ //Add product button	from manage page
+						}else if ($('.a-button.a-button-span5.a-button-width-normal .a-button-text').is(':visible') && !$('input, .a-input-text').is(':focus')){ //Add product button	from manage page
 							$('.a-button.a-button-span5.a-button-width-normal .a-button-text').click();
 							
 						}else if ($('.a-alert.a-alert-success.save-success').is(':visible')){ //Click Next button from image upload page
