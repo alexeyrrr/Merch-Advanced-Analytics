@@ -38,6 +38,7 @@ chrome.runtime.onInstalled.addListener(function(details){
 		let newVersion = chrome.runtime.getManifest().version;
 
 		//UPDATE MESSAGE
+		/*
 		chrome.notifications.create(undefined, {
 			type: 'basic',
 			title: 'Update: Enter Key To Submit',
@@ -45,6 +46,7 @@ chrome.runtime.onInstalled.addListener(function(details){
 			iconUrl: '/img/logo-square.png',
 			message: "We added the ability to use your keyboard's enter key to submit new products and progress through all MBA prompts faster."
 		});	
+		*/
 
 	} else {
 		chrome.notifications.create(undefined, {

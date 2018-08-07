@@ -129,13 +129,21 @@ function globalInit(){
 	document.body.classList.add('merch-advanced-analytics');
 		
 	//Initialize Sidebar
-	$(function(){		
+	$(function(){	
+		function showCorrectActive(thisObject){		
+			$("#sidebar li").removeClass("active");
+			$(thisObject).closest("li").addClass("active");
+			$('#indvProduct').closest("li").hide();
+		}
+		
 		$("#todaySales").click(function(){
 			if (globalStatus == 'none'){
 				var fromDateToday = moment().startOf('day').unix();
 				var toDateToday = moment().endOf('day').unix();
 				
 				dailySalesPage(fromDateToday, toDateToday);
+				
+				showCorrectActive(this);
 			}
 		});
 		$("#dailySales, #logo").click(function(){
@@ -145,6 +153,7 @@ function globalInit(){
 				var toDate = moment().unix();
 				
 				dailySalesPage(fromDate7, toDate);
+				showCorrectActive(this);
 			}
 		});
 		
@@ -155,28 +164,25 @@ function globalInit(){
 				var toDate = moment().unix();
 							
 				dailySalesPage(fromDate6Mo, toDate, "month");
+				showCorrectActive(this);
 			}
 		});
 		
 		$("#productManager").click(function(){
 			if (globalStatus == 'none'){
 				productManager();	
+				showCorrectActive(this);
 			}
 		});
 		
 		$("#settingsPage").click(function(){
 			if (globalStatus == 'none'){
 				settingsPage();
+				showCorrectActive(this);
 			}
 		})
 		
-		$("#sidebar li").click(function(){
-			if (globalStatus == 'none'){
-				$("#sidebar li").removeClass("active");
-				$(this).addClass("active");
-				$('#indvProduct').closest("li").hide();
-			}
-		});
+
 	})
 	
 	
