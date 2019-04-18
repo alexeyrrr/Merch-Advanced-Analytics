@@ -41,10 +41,10 @@ chrome.runtime.onInstalled.addListener(function(details){
 		/*
 		chrome.notifications.create(undefined, {
 			type: 'basic',
-			title: 'Update: Enter Key To Submit',
+			title: 'Update: Faster Product Manager',
 			isClickable: true,
 			iconUrl: '/img/logo-square.png',
-			message: "We added the ability to use your keyboard's enter key to submit new products and progress through all MBA prompts faster."
+			message: "We improved the product manager to load live product listing faster."
 		});	
 		*/
 

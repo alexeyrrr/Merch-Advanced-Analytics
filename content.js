@@ -270,6 +270,12 @@ function router(queryParams){
 router(getQueryParams());
 
 //Add header and sidebar
+
+
+				
+
+			
+			
 var cmd = window.location.href.split('?')[0];
 if (cmd.indexOf("MerchAnalytics") !== -1 || cmd.indexOf("IndividualProductPage") !== -1) {
 	globalInit();
@@ -291,6 +297,21 @@ if (cmd.indexOf("MerchAnalytics") !== -1 || cmd.indexOf("IndividualProductPage")
 		
 		if (showNavTab != 0){
 			$('.top-nav-links-container ul').append('<li class="a-align-center top-nav-link-unselected"><a class="a-link-normal" target="_blank" href="/MerchAnalytics">Merch Analytics</a></li>');
+						
+			//Analyze Button On MBA
+			/*
+			function trytest() {
+				if (!$(".gear-manage-products-row").length) {
+					window.requestAnimationFrame(trytest);
+				}else {
+					$(".gear-manage-products-row").each(function() { 
+						var link = $(this).find('.a-link-normal').attr("href").split('https://www.amazon.com/dp/')[1];
+						$(this).find('.a-spacing-micro').append('<a class="a-button" href="https://merch.amazon.com/IndividualProductPage/?ASIN='+ link +'" target="_blank"><span class="a-button-text">Analyze</span></a>');
+					});
+				}
+			};
+			trytest();
+			*/
 		}
 		
 		//Enter Key To Progress
@@ -353,8 +374,6 @@ function fetchSalesDataCSV(fromDate, toDate, result, callback){
 	if(daysDifference <= 90){ //Period under 90 days (with grace period)
         var sls = 'https://merch.amazon.com/product-purchases-report?fromDate=' + fromDate * 1000 + '&toDate=' + toDate * 1000;
 		
-		//https://merch.amazon.com/product-purchases-report?fromDate=1530687600000&toDate=1530770399000
-		
         var reqs = new XMLHttpRequest();
         reqs.open("GET", sls, true);
         reqs.onreadystatechange = function() {
@@ -362,7 +381,7 @@ function fetchSalesDataCSV(fromDate, toDate, result, callback){
                 if ([200, 201, 202, 203, 204, 205, 206, 207, 226].indexOf(reqs.status) === -1) {
 
 				} else {
-                    if (reqs.responseText.indexOf('AuthenticationPortal') != -1) {
+					if (reqs.responseText.length == 0) {
                         generateLoginModal();
                     } else {
 						setstatus("Processing Data...");
@@ -401,7 +420,7 @@ function fetchSalesDataCSV(fromDate, toDate, result, callback){
 				if ([200, 201, 202, 203, 204, 205, 206, 207, 226].indexOf(reqs.status) === -1) {
 
 				} else {
-					if (reqs.responseText.indexOf('AuthenticationPortal') != -1) {
+					if (reqs.responseText.length == 0) {
 						generateLoginModal();
 					} else {
 						setstatus("Gathering Data...");
@@ -436,7 +455,7 @@ function fetchAllLiveProducts(page, cursor, result, specificASIN=null, callback)
 				if ([200, 201, 202, 203, 204, 205, 206, 207, 226].indexOf(reqs.status) === -1) {
 					callback();
 				} else {
-					if (reqs.responseText.indexOf('AuthenticationPortal') != -1) {
+					if (reqs.responseText.length == 0) {
 						generateLoginModal();
 					} else {
 						var t1 = JSON.parse(reqs.responseText);
@@ -1683,7 +1702,7 @@ function productManager() {
 			'<table class="maa-table table table-striped"><thead>' + 
 				'<tr>' +
 					'<th class="text-center">Products With Atleast One Lifetime Sale</th>'+
-					'<th class="text-center">Total Live Products</th>' + 
+					'<th class="text-center">Total Live Products (US)</th>' + 
 					'<th class="text-center">% Of Designs that Have Ever Sold</th>' + 
 				'</tr></thead><tbody>' + 
 				'<tr class="success text-center">' + 
@@ -1842,8 +1861,6 @@ function renderIndividualProductSales(queryParams){
 			
 		fetchIndividualProductSales(targetASIN, firstPublishDate,function(responseArray){	
 			
-			
-			console.log(responseArray); //Testing
 			//TODO workaround error handling
 			if (!firstPublishDate){
 				alert("Item not found", "First Publish Date: ", firstPublishDate);
