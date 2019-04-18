@@ -299,23 +299,38 @@ if (cmd.indexOf("MerchAnalytics") !== -1 || cmd.indexOf("IndividualProductPage")
 				$(document).keydown(function (e) {
 					//e.preventDefault();
 					var kCode = e.keyCode || e.charCode; 
+					blockAddNewProduct = false;
 					
 					 if (kCode == 13) {
-						if ($('.a-popover').is(':visible')) {
+						if($('.top-nav-bar-links').is(':visible')){ //login enter key
+							//$('[href="/dashboard"]').click();
+							window.location.replace("https://merch.amazon.com/dashboard");
+						} else if($('.a-popover').is(':visible')) {
 							//Press confirmation button
 							$('.a-popover #publish-confirm-button-announce').click();	
 						}else if ($('.aok-float-right .a-button-text').is(':visible')){ //Add product button
 							window.location = "https://merch.amazon.com/merch-tshirt/title-setup/new/upload_art";
 							
-						}else if ($('.a-button.a-button-span5.a-button-width-normal .a-button-text').is(':visible') && !$('input, .a-input-text').is(':focus')){ //Add product button	from manage page
+						}else if ($('.a-button.a-button-span5.a-button-width-normal .a-button-text').is(':visible')){ //Add product button from manage page
 							$('.a-button.a-button-span5.a-button-width-normal .a-button-text').click();
-							
 						}else if ($('.a-alert.a-alert-success.save-success').is(':visible')){ //Click Next button from image upload page
 							$('#save-and-continue-upload-art-announce').click();
-						} else {
+						}else if(!$('#searchBox').is(':focus')){
 							//Press next / submit button
 							$('.a-button-primary:first button').click();
-						} 
+						}
+					} else if (kCode == 49) { // Number 1
+						$("#data-marketplace-native option:selected").removeAttr("selected");
+						$('#data-marketplace-native').find('option[value="US"]').attr("selected",true);
+						$('#data-marketplace .a-dropdown-prompt').text('Amazon.com');
+					} else if (kCode == 50) { // Number 2
+						$("#data-marketplace-native option:selected").removeAttr("selected");
+						$('#data-marketplace-native').find('option[value="GB"]').attr("selected",true);
+						$('#data-marketplace .a-dropdown-prompt').text('Amazon.co.uk');
+					} else if (kCode == 51) { // Number 3
+						$("#data-marketplace-native option:selected").removeAttr("selected");
+						$('#data-marketplace-native').find('option[value="DE"]').attr("selected",true);
+						$('#data-marketplace .a-dropdown-prompt').text('Amazon.de');
 					}
 				});
 			});
@@ -1827,6 +1842,8 @@ function renderIndividualProductSales(queryParams){
 			
 		fetchIndividualProductSales(targetASIN, firstPublishDate,function(responseArray){	
 			
+			
+			console.log(responseArray); //Testing
 			//TODO workaround error handling
 			if (!firstPublishDate){
 				alert("Item not found", "First Publish Date: ", firstPublishDate);
