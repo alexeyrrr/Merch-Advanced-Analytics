@@ -426,7 +426,7 @@ function fetchAllLiveProducts(page, cursor, result, specificASIN=null, callback)
 	if (cursor =='null'){ 
 		callback();
     } else {                   
-		var sls = 'https://merch.amazon.com/merchandise/list?pageSize=250&pageNumber=';
+		var sls = 'https://merch.amazon.com/merchandise/list?pageSize=250&statusFilters%5B%5D=LIVE&pageNumber=';
 		var url = sls + page;
 		
 		var reqs = new XMLHttpRequest();
