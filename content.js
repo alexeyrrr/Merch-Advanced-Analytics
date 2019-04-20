@@ -445,7 +445,7 @@ function fetchAllLiveProducts(page, cursor, result, specificASIN=null, callback)
 	if (cursor =='null'){ 
 		callback();
     } else {                   
-		var sls = 'https://merch.amazon.com/merchandise/list?pageSize=250&statusFilters%5B%5D=LIVE&pageNumber=';
+		var sls = 'https://merch.amazon.com/merchandise/list?pageSize=250&statusFilters%5B%5D=LIVE%2C&statusFilters%5B%5D=UNDER_REVIEW&statusFilters%5B%5D=PROCESSING&statusFilters%5B%5D=PENDING&pageNumber=';
 		var url = sls + page;
 		
 		var reqs = new XMLHttpRequest();
@@ -1629,7 +1629,7 @@ function productManager() {
 				}
 			}
 		
-			if (ts[i].marketplaceAsinMap.US !== undefined && ts[i].status == "LIVE"){
+			if (ts[i].marketplaceAsinMap.US !== undefined && (ts[i].status == "LIVE" || ts[i].status == "PROCESSING" || ts[i].status == "UNDER_AUTO_REVIEW") ){
 				//Parse Create Date
 				var stringifiedCreateDate = moment.unix(parseInt(ts[i].createDate) / 1000).format("MM-DD-YYYY");
 							
