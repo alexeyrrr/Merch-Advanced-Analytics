@@ -367,11 +367,15 @@ if (cmd.indexOf("MerchAnalytics") !== -1 || cmd.indexOf("IndividualProductPage")
 /***************************************************************/	
 function fetchSalesDataCSV(fromDate, toDate, result, callback){
 	//This Function Deals in Unix Milliseconds
-	var a = moment.unix(toDate);
-	var b = moment.unix(fromDate);
+	var a = moment.unix(toDate).endOf('day');
+	var b = moment.unix(fromDate).endOf('day');
 	var daysDifference = a.diff(b, 'days')
 	
-	if(daysDifference <= 90){ //Period under 90 days (with grace period)
+	//Change to end of day to prevent 90 day window because need full 7 day week
+	fromDate = moment.unix(fromDate).endOf('day').unix();
+	toDate = moment.unix(toDate).endOf('day').unix();
+
+	if(daysDifference <= (90)){ //Period under 90 days (with grace period)
         var sls = 'https://merch.amazon.com/product-purchases-report?fromDate=' + fromDate * 1000 + '&toDate=' + toDate * 1000;
 		
         var reqs = new XMLHttpRequest();
