@@ -376,7 +376,7 @@ function fetchSalesDataCSV(fromDate, toDate, result, callback){
 	toDate = moment.unix(toDate).endOf('day').unix();
 
 	if(daysDifference <= (90)){ //Period under 90 days (with grace period)
-        var sls = 'https://merch.amazon.com/product-purchases-report?fromDate=' + fromDate * 1000 + '&toDate=' + toDate * 1000;
+        var sls = 'https://merch.amazon.com/product-purchases-report?marketplaceId=ATVPDKIKX0DER&fromDate=' + fromDate * 1000 + '&toDate=' + toDate * 1000;
 		
         var reqs = new XMLHttpRequest();
         reqs.open("GET", sls, true);
@@ -416,7 +416,7 @@ function fetchSalesDataCSV(fromDate, toDate, result, callback){
     } else { //Period over 90 days (with grace period)
 		var newEndDate = moment.unix(toDate).subtract(90, 'days').unix();
 	
-		var sls = 'https://merch.amazon.com/product-purchases-report?fromDate=' + newEndDate * 1000+ '&toDate=' + toDate * 1000;
+		var sls = 'https://merch.amazon.com/product-purchases-report?marketplaceId=ATVPDKIKX0DER&fromDate=' + newEndDate * 1000+ '&toDate=' + toDate * 1000;
 		var reqs = new XMLHttpRequest();
 		reqs.open("GET", sls, true);
 		reqs.onreadystatechange = function() {
