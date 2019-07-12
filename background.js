@@ -41,12 +41,13 @@ chrome.runtime.onInstalled.addListener(function(details){
 		/*
 		chrome.notifications.create(undefined, {
 			type: 'basic',
-			title: 'Update: Faster Product Manager',
+			title: 'Update: Multi Product Upload',
 			isClickable: true,
 			iconUrl: '/img/logo-square.png',
-			message: "We improved the product manager to load live product listing faster."
+			message: "We improved added a Deselect All button to the Multi Product (BETA) upload feature."
 		});	
 		*/
+		
 
 	} else {
 		chrome.notifications.create(undefined, {

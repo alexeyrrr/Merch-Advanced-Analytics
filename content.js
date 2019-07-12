@@ -354,10 +354,41 @@ if (cmd.indexOf("MerchAnalytics") !== -1 || cmd.indexOf("IndividualProductPage")
 						$('#data-marketplace .a-dropdown-prompt').text('Amazon.de');
 					}
 				});
-			});
+			
 						
-			$('.a-button-primary:first button').closest('.a-row').after('<span style="line-height:25px; width:100%; float: left; text-align: center;" class="a-color-tertiary">(Press Enter To Submit)</span>');
-					
+				$('.a-button-primary:first button').closest('.a-row').after('<span style="line-height:25px; width:100%; float: left; text-align: center;" class="a-color-tertiary">(Press Enter To Submit)</span>');
+				
+				//Add Deselect All Button
+				var observer = new MutationObserver(function(mutations) {
+					mutations.forEach(function(mutation) {
+						if (!mutation.addedNodes) return
+
+						for (var i = 0; i < mutation.addedNodes.length; i++) {
+							var node = mutation.addedNodes[i]
+
+							if (node.className == "pl-medium-large mt-mini ng-star-inserted") { //wait until this class shows up
+								$('#select-marketplace-button').click(function(){
+									$('.modal-footer.mt-0').prepend('<a class="deselect-all" style="margin-right: auto; cursor: pointer;">Deselect All</a>');
+									$('.deselect-all').click(function(){
+										$('.modal-content .sci-check-box').click();
+									});
+									
+									// stop watching
+									observer.disconnect()
+								});
+							}
+						}
+					})
+				})
+
+				observer.observe(document.body, {
+					childList: true,
+					subtree: true,
+					attributes: false,
+					characterData: false,
+				});
+
+			});
 		}	
 	});
 }
