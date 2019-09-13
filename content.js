@@ -354,7 +354,7 @@ if (cmd.indexOf("MerchAnalytics") !== -1 || cmd.indexOf("IndividualProductPage")
 									if (kCode == 13) {										
 										if ($('.modal.show').is(":visible")){
 											$('.modal-footer .btn-submit').click();
-										} else if($('#submit-button').prop('disabled', false )){ // Check if submit button 
+										} else if($('#submit-button').is(":not(:disabled)")){ // Check if submit button 
 											$('#submit-button').click();
 										} 
 									} 
