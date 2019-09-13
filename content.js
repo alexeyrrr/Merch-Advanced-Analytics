@@ -317,7 +317,19 @@ if (cmd.indexOf("MerchAnalytics") !== -1 || cmd.indexOf("IndividualProductPage")
 		//Enter Key To Progress
 		if (enterToNextPage != 0){
 			$(document).ready(function () {
-				$('.a-button-primary:first button').closest('.a-row').after('<span style="line-height:25px; width:100%; float: left; text-align: center;" class="a-color-tertiary">(Press Enter To Submit)</span>');
+				
+					//Redirect to new product creation page
+					$(document).keydown(function (e) {
+						//e.preventDefault();
+						var kCode = e.keyCode || e.charCode; 
+						
+						if (kCode == 13 && $('.aok-float-right .a-button-text').is(':visible')) {
+							window.location = "https://merch.amazon.com/designs/new";
+						};
+					});
+				
+				
+				// Enter to Submit element $('.a-button-primary:first button').closest('.a-row').after('<span style="line-height:25px; width:100%; float: left; text-align: center;" class="a-color-tertiary">(Press Enter To Submit)</span>');
 				
 				//Add Deselect All Button
 				var observer = new MutationObserver(function(mutations) {
@@ -333,21 +345,18 @@ if (cmd.indexOf("MerchAnalytics") !== -1 || cmd.indexOf("IndividualProductPage")
 									$('.deselect-all').click(function(){
 										$('.modal-content .sci-check-box').click();
 									});
-									
-									
 								});
 								
 								$(document).keydown(function (e) {
 									//e.preventDefault();
 									var kCode = e.keyCode || e.charCode; 
 									
-									if (kCode == 13) {
-										console.log("pressed enter");
-										if($('#submit-button').prop('disabled', false )){
-											//Press next / submit button
-											console.log("test");
+									if (kCode == 13) {										
+										if ($('.modal.show').is(":visible")){
+											$('.modal-footer .btn-submit').click();
+										} else if($('#submit-button').prop('disabled', false )){ // Check if submit button 
 											$('#submit-button').click();
-										}
+										} 
 									} 
 								});
 								
