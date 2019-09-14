@@ -329,7 +329,7 @@ if (cmd.indexOf("MerchAnalytics") !== -1 || cmd.indexOf("IndividualProductPage")
 					});
 				
 				
-				// Enter to Submit element $('.a-button-primary:first button').closest('.a-row').after('<span style="line-height:25px; width:100%; float: left; text-align: center;" class="a-color-tertiary">(Press Enter To Submit)</span>');
+				
 				
 				//Add Deselect All Button
 				var observer = new MutationObserver(function(mutations) {
@@ -347,6 +347,8 @@ if (cmd.indexOf("MerchAnalytics") !== -1 || cmd.indexOf("IndividualProductPage")
 									});
 								});
 								
+								
+								$('#submit-button').after('<span style="line-height:25px; width:100%; float: left; text-align: right; color: #5F6368;" class="a-color-tertiary">(Press Enter To Submit)</span>');
 								$(document).keydown(function (e) {
 									//e.preventDefault();
 									var kCode = e.keyCode || e.charCode; 

@@ -38,15 +38,13 @@ chrome.runtime.onInstalled.addListener(function(details){
 		let newVersion = chrome.runtime.getManifest().version;
 
 		//UPDATE MESSAGE
-		/*
 		chrome.notifications.create(undefined, {
 			type: 'basic',
-			title: 'Update: Multi Product Upload',
+			title: 'Update: Enter To Submit',
 			isClickable: true,
 			iconUrl: '/img/logo-square.png',
-			message: "We improved added a Deselect All button to the Multi Product (BETA) upload feature."
+			message: "We added the Enter-To-Submit feature to the Multi Product Upload."
 		});	
-		*/
 		
 
 	} else {
