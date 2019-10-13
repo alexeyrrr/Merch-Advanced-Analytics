@@ -318,15 +318,15 @@ if (cmd.indexOf("MerchAnalytics") !== -1 || cmd.indexOf("IndividualProductPage")
 		if (enterToNextPage != 0){
 			$(document).ready(function () {
 				
-					//Redirect to new product creation page
-					$(document).keydown(function (e) {
-						//e.preventDefault();
-						var kCode = e.keyCode || e.charCode; 
-						
-						if (kCode == 13 && $('.aok-float-right .a-button-text').is(':visible')) {
-							window.location = "https://merch.amazon.com/designs/new";
-						};
-					});
+				//Redirect to new product creation page
+				$(document).keydown(function (e) {
+					//e.preventDefault();
+					var kCode = e.keyCode || e.charCode; 
+					
+					if (kCode == 13 && $('.aok-float-right .a-button-text').is(':visible')) {
+						window.location = "https://merch.amazon.com/designs/new";
+					};
+				});
 				
 				
 				
