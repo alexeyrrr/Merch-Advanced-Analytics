@@ -667,10 +667,9 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 		var royaltyData = new Array(axisLabels.length).fill(0);
 		
 		//Tally Numbers
-		var gendersArray = {'men': 0, 'women': 0, 'youth': 0, 'unisex': 0};
-		var sizesArray = {'male_small': 0, 'male_medium': 0, 'male_large': 0, 'XL': 0, '2XL': 0, '3XL': 0, '4': 0, '6': 0, '8': 0, '10': 0, '12': 0};
+		var gendersArray = {};
+		var sizesArray = {};
 		var shirtColorsObject = {};
-
 		var priceObject = {};
 		var productTypeObject = {};
 		
@@ -715,27 +714,23 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 					royaltyData[i] += parseFloat(responseArray[i2]["royalties"]["value"]);
 
 					//Determine Gender And Count it 
-					for (var key in gendersArray){
-						if (key.toString() == responseArray[i2]["variationInfo"]["fit"]){
-							gendersArray[key] += 1;
-						}
+					var shirtGender = responseArray[i2]["variationInfo"]["fit"];
+					if (shirtGender in gendersArray){
+						gendersArray[shirtGender] += 1;
+					} else {
+						gendersArray[shirtGender] = 1;
 					}
+
 					
 					//Determine Size And Count it 
-					for (var key in sizesArray){
-						if (key.toString() == responseArray[i2]["variationInfo"]["size"]){
-							sizesArray[key] += 1;
-						}
+					var shirtSize = responseArray[i2]["variationInfo"]["size"];
+					if (shirtSize in sizesArray){
+						sizesArray[shirtSize] += 1;
+					} else {
+						sizesArray[shirtSize] = 1;
 					}
 					
 					//Determine Color And Count it 
-					/*
-					for (var key in shirtColorsArray){
-						if (key.toString() == responseArray[i2]["variationInfo"]["color"]){
-							shirtColorsArray[key] += 1;
-						}
-					}
-					*/
 					var shirtColor = responseArray[i2]["variationInfo"]["color"];
 					if (shirtColor in shirtColorsObject){
 						shirtColorsObject[shirtColor] += 1;
@@ -903,21 +898,30 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 		document.getElementById("dailystats").innerHTML = stats;
 		
 		//Regroup all youth sizes to just Youth
-		var adjustedSizesArray = {'Youth': 0, 'Small': 0, 'Medium': 0, 'Large': 0, 'XL': 0, '2XL': 0, '3XL': 0};
+		var adjustedSizesArray = {};
 		for(var item in sizesArray){
-			if (item == "4" || item == "6" || item == "8" || item == "10" || item == "12") {
-				adjustedSizesArray['Youth'] += parseInt(sizesArray[item]);
-			}
-			else {
-				adjustedSizesArray[item] += parseInt(sizesArray[item]);
-			}
+			var newSize = item.split("_")[1];
+
+			if (/^\d+$/.test(newSize)){  // Old Way newSize == "3" || newSize == "4" || newSize == "6" || newSize == "8" || newSize == "10" || newSize == "12") {
+				if ('Youth' in adjustedSizesArray){
+					adjustedSizesArray['Youth'] += parseInt(sizesArray[item]);
+				} else {
+					adjustedSizesArray['Youth'] = 1;
+				}
+			} else{
+				if (newSize in adjustedSizesArray){
+					adjustedSizesArray[newSize] += parseInt(sizesArray[item]);
+				} else {
+					adjustedSizesArray[newSize] = 1;
+				}
+			}		
 		}
 		
 		//Make sure colors are in correct order												
-		var shirtColorsColorsLUT = {'Dark Heather': "#454b4b", 'Heather Grey': "#d5d9da", 'Heather Blue': "#696c9c", 'Black': "#222", 
-			'Navy': "#15232b", 'Silver': "#cfd1d1", 'Royal Blue': "#1c4086", 'Brown': "#31261d", 'Slate': "#818189", 'Red': "#b71111", 'Asphalt': "#3f3e3c", 
-			'Grass': "#5e9444", 'Olive': "#4a4f26", 'Kelly Green': "#006136", 'Baby Blue': "#8fb8db", 'White': "#eeeeee", 'Lemon': "#f0e87b", 'Cranberry': "#6e0a25",
-			'Pink': "#f8a3bc", 'Orange': "#ff5c39", 'Purple': "#514689"};
+		var shirtColorsColorsLUT = {'dark_heather': "#454b4b", 'heather_grey': "#d5d9da", 'heather_blue': "#696c9c", 'black': "#222", 
+			'navy': "#15232b", 'silver': "#cfd1d1", 'royal': "#1c4086", 'brown': "#31261d", 'slate': "#818189", 'red': "#b71111", 'asphalt': "#3f3e3c", 
+			'grass': "#5e9444", 'olive': "#4a4f26", 'kelly_green': "#006136", 'baby_blue': "#8fb8db", 'white': "#eeeeee", 'lemon': "#f0e87b", 'cranberry': "#6e0a25",
+			'pink': "#f8a3bc", 'orange': "#ff5c39", 'purple': "#514689", 'sapphire': "#3667A3", 'black_athletic_heather': "#454b4b", 'dark_heather_white': "#454b4b",'neon_pink': "#FE5BAC",'black_white': "#222",'forest_green': "#0f5b20"};
 		var finalShirtColorsLUT = [];
 		for (var key in shirtColorsObject){
 			finalShirtColorsLUT.push(shirtColorsColorsLUT[key]);
@@ -1642,6 +1646,7 @@ function individualProductPage(queryParams){
 	}
 }
 
+/*
 function renderIndividualProductSales(queryParams){
 	$('#sidebar li').removeClass("active")
 	$('#indvProduct').closest('li').addClass("active");
@@ -1938,7 +1943,7 @@ function renderIndividualProductSales(queryParams){
 				var ctxColors = document.getElementById("canvas5").getContext("2d");	
 				var myChart = new Chart(ctxColors, lineChartData5);
 					
-				/*Assemble Sales History Table */
+				//Assemble Sales History Table 
 				var cp2 = '<table id="indvTable" class="maa-table table table-striped sortable"><thead><tr><th>#</th>' +
 					'<th class="text-center">Date Sold</th>' +
 					'<th class="text-center">Sold</th>' +
@@ -2000,6 +2005,10 @@ function renderIndividualProductSales(queryParams){
 		globalStatus = 'none';
 	});	
 }
+
+*/
+
+
 
 function fetchIndividualProductSales(targetASIN, publishDate, callback){
 	var toDate = moment().unix();
