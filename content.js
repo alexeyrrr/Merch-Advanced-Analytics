@@ -685,6 +685,9 @@ function dailySalesPage(fromDate, toDate, viewType = 'day'){
 function renderDailyView(unixFromDate, unixToDate, viewType){	
 	fetchSalesDataCSV(unixFromDate, unixToDate, responseArray = [], function(){		
 		//Generate Axis Labels
+				
+		console.log(responseArray);
+		
 		var axisLabels = [];
 				
 		//Reset Var Scope
@@ -742,21 +745,21 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 						if(viewType == "month"){
 							var startDate   = moment(axisLabels[i], "MMM YYYY"); //This date month
 							var endDate     = moment(axisLabels[i], "MMM YYYY").add(1,'months'); //Previous month
-							var compareDate = moment(responseArray[i2]["Date"], "MM-DD-YYYY");
+							var compareDate = moment(responseArray[i2]["period"], "MM-DD-YYYY");
 
 							var isWithinRange = compareDate.isBetween(startDate, endDate, 'months', '[)') // left inclusive
 						
 						} else if(viewType == "week"){
 							var startDate   = moment(axisLabels[i], "ww YYYY"); //This date week
 							var endDate     = moment(axisLabels[i], "WW YYYY").add(1,'weeks'); //Previous week
-							var compareDate = moment(responseArray[i2]["Date"], "MM-DD-YYYY");
+							var compareDate = moment(responseArray[i2]["period"], "MM-DD-YYYY");
 							
 							var isWithinRange = compareDate.isBetween(startDate, endDate, 'weeks', '[)') // left inclusive
 							
 						} else if(viewType == "day"){ //Daily View
 							var startDate   = moment(axisLabels[i], "MM-DD-YYYY"); //This Date
 							var endDate     = moment(axisLabels[i], "MM-DD-YYYY").add(1,'days'); //Yesterday
-							var compareDate = moment(responseArray[i2]["Date"], "MM-DD-YYYY");
+							var compareDate = moment(responseArray[i2]["period"], "MM-DD-YYYY");
 							
 							var isWithinRange = compareDate.isBetween(startDate, endDate, 'days', '[)') // left inclusive
 						}
@@ -764,44 +767,44 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 						
 						if(isWithinRange){ //See if inside range
 							//If niche tag matches, increment count
-							if (responseArray[i2]["ASIN"] in nichesLookupArray){ 
-								var shirtNiche = JSON.parse(nichesLookupArray[responseArray[i2]["ASIN"]])["niche"];
+							if (responseArray[i2]["asin"] in nichesLookupArray){ 
+								var shirtNiche = JSON.parse(nichesLookupArray[responseArray[i2]["asin"]])["niche"];
 								nicheArray[shirtNiche] += 1;
 							} else {
 								nicheArray["unknown niche"] += 1;
 							}
 											
-							salesData[i] += parseInt(responseArray[i2]["Units"]);
-							cancelData[i] += parseInt(responseArray[i2]["Cancelled"]);
-							returnData[i] += parseInt(responseArray[i2]["Returned"]);
-							revenueData[i] += parseFloat(responseArray[i2]["Revenue"]);
-							royaltyData[i] += parseFloat(responseArray[i2]["Royalty"]);
+							salesData[i] += parseInt(responseArray[i2]["unitsSold"]);
+							cancelData[i] += parseInt(responseArray[i2]["unitsCancelled"]);
+							returnData[i] += parseInt(responseArray[i2]["unitsReturned"]);
+							revenueData[i] += parseFloat(responseArray[i2]["revenue"]["value"]);
+							royaltyData[i] += parseFloat(responseArray[i2]["royalties"]["value"]);
 
 							//Determine Gender And Count it 
 							for (var key in gendersArray){
-								if (key.toString() == responseArray[i2]["Category 1"]){
+								if (key.toString() == responseArray[i2]["variationInfo"]["fit"]){
 									gendersArray[key] += 1;
 								}
 							}
 							
 							//Determine Size And Count it 
 							for (var key in sizesArray){
-								if (key.toString() == responseArray[i2]["Category 2"]){
+								if (key.toString() == responseArray[i2]["variationInfo"]["size"]){
 									sizesArray[key] += 1;
 								}
 							}
 							
 							//Determine Color And Count it 
 							for (var key in shirtColorsArray){
-								if (key.toString() == responseArray[i2]["Category 3"]){
+								if (key.toString() == responseArray[i2]["variationInfo"]["color"]){
 									shirtColorsArray[key] += 1;
 								}
 							}
 							
 							//Determine Unit Price & Count it
-							var unitsSold = responseArray[i2]["Units"] - responseArray[i2]["Cancelled"];
+							var unitsSold = responseArray[i2]["unitsSold"] - responseArray[i2]["unitsCancelled"];
 							if (unitsSold != 0){ //Disregarding canceled units intentionally								
-								var unitPrice = "$"+(responseArray[i2]["Revenue"] / (unitsSold)).toFixed(2);	
+								var unitPrice = "$"+(responseArray[i2]["revenue"]["value"] / (unitsSold)).toFixed(2);	
 								if (unitPrice in priceObject){
 									priceObject[unitPrice] += 1;
 								} else {
@@ -810,7 +813,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 							}
 														
 							//Determine Product Type & Count it
-							var productType = responseArray[i2]["Product Type"];							
+							var productType = responseArray[i2]["productType"];							
 							if (productType in productTypeObject){
 								productTypeObject[productType] += 1;
 							} else {
@@ -819,6 +822,9 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 						}
 					}
 					
+					console.log(salesData);
+
+
 					if(viewType == "day" && axisLabels.length <= 15){
 						axisLabels[i] = moment(axisLabels[i], "MM-DD-YYYY").format('dddd');
 					} else if (viewType == "week" && axisLabels.length <= 90){
@@ -1273,7 +1279,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 				//Summing up all values
 				var allASINValues = [];
 				for (i = 0; i < responseArray.length; i++){
-					allASINValues.push(responseArray[i]["ASIN"]);
+					allASINValues.push(responseArray[i]["asin"]);
 				}
 												
 				uniqueArray = allASINValues.filter(function(item, pos) {
@@ -1297,7 +1303,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 				
 				for (i = 0; i < resultSumSales.length; i++){
 					for (i2 = 0; i2 < responseArray.length; i2++){
-						if(resultSumSales[i]["ASIN"] == responseArray[i2]["ASIN"]){
+						if(resultSumSales[i]["asin"] == responseArray[i2]["asin"]){
 							resultSumSales[i]["Name"] = responseArray[i2]["Name"];
 							resultSumSales[i]["ProductType"] = responseArray[i2]["Product Type"].replace(/-/i, '&#8209;');
 							resultSumSales[i]["Units"] += parseInt(responseArray[i2]["Units"]);
@@ -1336,8 +1342,8 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 				for (i=0; i < resultSumSales.length; i++){
 					//Assign Niche
 					var reminderPopoverData= ''; //Blank popover data
-					if(nichesLookupArray[resultSumSales[i]["ASIN"]] != undefined){
-						specificNiche = JSON.parse(nichesLookupArray[resultSumSales[i]["ASIN"]])["niche"];
+					if(nichesLookupArray[resultSumSales[i]["asin"]] != undefined){
+						specificNiche = JSON.parse(nichesLookupArray[resultSumSales[i]["asin"]])["niche"];
 					} else {
 						specificNiche = "unknown";
 						reminderPopoverData = 'data-toggle="tooltip" data-placement="bottom" title="Assign product niche on Manage Products Page"';
@@ -1349,7 +1355,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 					var deleteLink = 'https://merch.amazon.com/manage/products?pageNumber=1&pageSize=15&keywords=' + uriEncodedName + '&statusFilters=%5B%22DELETED%22%2C%22DRAFT%22%2C%22LIVE%22%2C%22NOT_DISCOVERABLE%22%2C%22PENDING%22%2C%22PROCESSING%22%2C%22STOPPED%22%2C%22UNDER_REVIEW%22%2C%22REJECTED%22%2C%22MANUALLY_REJECTED%22%5D';	
 				
 						
-					cp2 += '<tr data-href="https://www.amazon.com/dp/' + resultSumSales[i]["ASIN"]  +   '">' + 
+					cp2 += '<tr data-href="https://www.amazon.com/dp/' + resultSumSales[i]["asin"]  +   '">' + 
 						'<td>' + (i + 1) + '</td>' + 
 						'<td>' + 
 							resultSumSales[i]["Name"]  + 
@@ -1365,7 +1371,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 						'</td>' +
 						
 						'<td class="text-center btn-inside">' +						
-							'<a target="_blank" href="' + '/IndividualProductPage/?ASIN=' + resultSumSales[i]["ASIN"]  + '" class="btn btn-primary">Analyze</a>' +
+							'<a target="_blank" href="' + '/IndividualProductPage/?ASIN=' + resultSumSales[i]["asin"]  + '" class="btn btn-primary">Analyze</a>' +
 						'</td>' +
 										
 						'<td class="text-center">' +
