@@ -394,9 +394,9 @@ function fetchSalesDataCSV(fromDate, toDate, result, callback){
 	//Change to end of day to prevent 90 day window because need full 7 day week
 	fromDate = moment.unix(fromDate).endOf('day').unix();
 	toDate = moment.unix(toDate).endOf('day').unix();
-
+	
 	if(daysDifference <= (90)){ //Period under 90 days (with grace period)
-        var sls = 'https://merch.amazon.com/product-purchases-report?marketplaceId=ATVPDKIKX0DER&fromDate=' + fromDate * 1000 + '&toDate=' + toDate * 1000;
+		var sls = 'https://merch.amazon.com/api/reporting/purchases/report?marketplaceId=ATVPDKIKX0DER&fromDate=' + fromDate * 1000 + '&toDate=' + toDate * 1000;
 		
         var reqs = new XMLHttpRequest();
         reqs.open("GET", sls, true);
@@ -410,15 +410,14 @@ function fetchSalesDataCSV(fromDate, toDate, result, callback){
                     } else {
 						setstatus("Processing Data...");
 						
-						responseList = csvToJSON(reqs.responseText);
+						responseList = JSON.parse(reqs.responseText)["ATVPDKIKX0DER"];
 						
 						intermediateResult = [];
 						Array.prototype.push.apply(intermediateResult,responseList);     
-						
+
 						//Filter to make sure actually within range
 						for(var i=0; i < intermediateResult.length; i++){
-							var compareDate = moment(intermediateResult[i]['Date'], "MM-DD-YYYY").unix();
-							
+							var compareDate = moment(intermediateResult[i]['period']).unix();
 							
 							if (compareDate >= b.startOf('day').unix() && compareDate <= a.endOf('day').unix()) {
 								
@@ -436,7 +435,7 @@ function fetchSalesDataCSV(fromDate, toDate, result, callback){
     } else { //Period over 90 days (with grace period)
 		var newEndDate = moment.unix(toDate).subtract(90, 'days').unix();
 	
-		var sls = 'https://merch.amazon.com/product-purchases-report?marketplaceId=ATVPDKIKX0DER&fromDate=' + newEndDate * 1000+ '&toDate=' + toDate * 1000;
+		var sls = 'https://merch.amazon.com/api/reporting/purchases/report?marketplaceId=ATVPDKIKX0DER&fromDate=' + newEndDate * 1000+ '&toDate=' + toDate * 1000;
 		var reqs = new XMLHttpRequest();
 		reqs.open("GET", sls, true);
 		reqs.onreadystatechange = function() {
@@ -449,9 +448,8 @@ function fetchSalesDataCSV(fromDate, toDate, result, callback){
 					} else {
 						setstatus("Gathering Data...");
 					
-						responseList = csvToJSON(reqs.responseText);
+						responseList = JSON.parse(reqs.responseText)["ATVPDKIKX0DER"];
 						Array.prototype.push.apply(result,responseList); 	
-						
 						
 						//Shift Last Call Date Down
 						toDate = moment.unix(toDate).subtract(91, 'days').startOf('day').unix();

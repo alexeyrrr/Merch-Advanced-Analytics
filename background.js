@@ -114,7 +114,7 @@ var checkforsales = function() {
 		var toDate = moment();
 		var endDate = moment().subtract(7,'days').startOf('day');
 		
-		var sls = 'https://merch.amazon.com/product-purchases-report?marketplaceId=ATVPDKIKX0DER&fromDate=' + endDate + '&toDate=' + toDate ;
+		var sls = 'https://merch.amazon.com/api/reporting/purchases/report?marketplaceId=ATVPDKIKX0DER&fromDate=' + endDate + '&toDate=' + toDate ;
 		var reqs = new XMLHttpRequest();
 		reqs.open("GET", sls, true);
 		reqs.onreadystatechange = function() {
