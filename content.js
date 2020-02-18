@@ -48,32 +48,7 @@ function csvToJSON(csv) {
   return result;
 }
 
-function assembleDynamicBlankArray(callback){
-	chrome.storage.sync.get(null, function(items) {
-		//chrome.storage.local.get(null, function(localItems) { //Get both sync and local storage
-			var allValues = Object.values(items); // + Object.values(localItems);
-			
-			for (i = 0; i < allValues.length; i++){
-				allValues[i] =  JSON.parse(allValues[i]);
-				allValues[i] = allValues[i]["niche"]
-			}
-			
-			uniqueArray = allValues.filter(function(item, pos) {
-				return allValues.indexOf(item) == pos;
-			})
-			
-			var resultBlankArray = {};
-			//Init count to 0
-			for (i = 0; i < uniqueArray.length; i++){
-				resultBlankArray[uniqueArray[i]] = 0;
-			}
-			
-			resultBlankArray["unknown niche"] = 0;
-			
-			callback(resultBlankArray);
-		//});
-	});
-}
+
 
 function replicateArray(array, n) {
 	var arrays = Array.apply(null, new Array(n)); 
@@ -726,903 +701,715 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 		var priceObject = {};
 		var productTypeObject = {};
 		
-		//Assemble Dynamic Blank Array For Niches
-		var nicheArray = {};
-				
-		assembleDynamicBlankArray(function(resultBlankArray){
-			nicheArray = resultBlankArray;
+	
+		//Sales Data (Not Very Efficient)
+		var numberofDaysInner = axisLabels.length; //Janky Way to recover number of days with proper scope
 		
-			//Sales Data (Not Very Efficient)
-			getAllShirtNiches(function(nichesLookupArray){		
-				var numberofDaysInner = axisLabels.length; //Janky Way to recover number of days with proper scope
-				
-				//Reset Scope Again
-				var localUnixToDate2 = moment.unix(unixToDate);
-				var localUnixFromDate2 = moment.unix(unixFromDate);
-				
-				for (i = 0; i < axisLabels.length; i++) {
-					for ( i2 = 0; i2 < responseArray.length; i2++){						
-						if(viewType == "month"){
-							var startDate   = moment(axisLabels[i], "MMM YYYY"); //This date month
-							var endDate     = moment(axisLabels[i], "MMM YYYY").add(1,'months'); //Previous month
-							var compareDate = moment(responseArray[i2]["period"], "MM-DD-YYYY");
-
-							var isWithinRange = compareDate.isBetween(startDate, endDate, 'months', '[)') // left inclusive
-						
-						} else if(viewType == "week"){
-							var startDate   = moment(axisLabels[i], "ww YYYY"); //This date week
-							var endDate     = moment(axisLabels[i], "WW YYYY").add(1,'weeks'); //Previous week
-							var compareDate = moment(responseArray[i2]["period"], "MM-DD-YYYY");
-							
-							var isWithinRange = compareDate.isBetween(startDate, endDate, 'weeks', '[)') // left inclusive
-							
-						} else if(viewType == "day"){ //Daily View
-							var startDate   = moment(axisLabels[i], "MM-DD-YYYY"); //This Date
-							var endDate     = moment(axisLabels[i], "MM-DD-YYYY").add(1,'days'); //Yesterday
-							var compareDate = moment(responseArray[i2]["period"], "MM-DD-YYYY");
-							
-							var isWithinRange = compareDate.isBetween(startDate, endDate, 'days', '[)') // left inclusive
-						}
-						
-						
-						if(isWithinRange){ //See if inside range
-							//If niche tag matches, increment count
-							if (responseArray[i2]["asin"] in nichesLookupArray){ 
-								var shirtNiche = JSON.parse(nichesLookupArray[responseArray[i2]["asin"]])["niche"];
-								nicheArray[shirtNiche] += 1;
-							} else {
-								nicheArray["unknown niche"] += 1;
-							}
-											
-							salesData[i] += parseInt(responseArray[i2]["unitsSold"]);
-							cancelData[i] += parseInt(responseArray[i2]["unitsCancelled"]);
-							returnData[i] += parseInt(responseArray[i2]["unitsReturned"]);
-							revenueData[i] += parseFloat(responseArray[i2]["revenue"]["value"]);
-							royaltyData[i] += parseFloat(responseArray[i2]["royalties"]["value"]);
-
-							//Determine Gender And Count it 
-							for (var key in gendersArray){
-								if (key.toString() == responseArray[i2]["variationInfo"]["fit"]){
-									gendersArray[key] += 1;
-								}
-							}
-							
-							//Determine Size And Count it 
-							for (var key in sizesArray){
-								if (key.toString() == responseArray[i2]["variationInfo"]["size"]){
-									sizesArray[key] += 1;
-								}
-							}
-							
-							//Determine Color And Count it 
-							for (var key in shirtColorsArray){
-								if (key.toString() == responseArray[i2]["variationInfo"]["color"]){
-									shirtColorsArray[key] += 1;
-								}
-							}
-							
-							//Determine Unit Price & Count it
-							var unitsSold = responseArray[i2]["unitsSold"] - responseArray[i2]["unitsCancelled"];
-							if (unitsSold != 0){ //Disregarding canceled units intentionally								
-								var unitPrice = "$"+(responseArray[i2]["revenue"]["value"] / (unitsSold)).toFixed(2);	
-								if (unitPrice in priceObject){
-									priceObject[unitPrice] += 1;
-								} else {
-									priceObject[unitPrice] = 1;
-								}
-							}
-														
-							//Determine Product Type & Count it
-							var productType = responseArray[i2]["productType"];							
-							if (productType in productTypeObject){
-								productTypeObject[productType] += 1;
-							} else {
-								productTypeObject[productType] = 1;
-							}
-						}
-					}
-					
-					console.log(salesData);
-
-
-					if(viewType == "day" && axisLabels.length <= 15){
-						axisLabels[i] = moment(axisLabels[i], "MM-DD-YYYY").format('dddd');
-					} else if (viewType == "week" && axisLabels.length <= 90){
-						var weekMonth = moment(axisLabels[i], "ww YYYY").format('MMM');
-						
-						var myDate = moment(axisLabels[i], "ww YYYY"); //saturday
-						var day = myDate.day(); //6 = saturday
-						var nthOfMonth = Math.ceil(myDate.date() / 7); //1
-
-						axisLabels[i] = weekMonth + " Week " + nthOfMonth;
-					}
-				}
-				
-				/******* Render Top Page Stats *****************/
-				var totals = {};				
-				totals.sales = salesData.reduce(function(a, b) { return a + b; }, 0);
-				totals.cancelled = cancelData.reduce(function(a, b) { return a + b; }, 0);
-				totals.returned = returnData.reduce(function(a, b) { return a + b; }, 0);
-				totals.revenue = revenueData.reduce(function(a, b) { return a + b; }, 0).toFixed(2);				
-				totals.royalty = royaltyData.reduce(function(a, b) { return a + b; }, 0).toFixed(2);
-				
-				//Calculated Totals
-				totals.avgRoytPerUnit = ((totals.royalty /(totals.sales - totals.cancelled + 0.00001)).formatMoney(2) < 0 ? 0 : (totals.royalty /(totals.sales - totals.cancelled + 0.00001)).formatMoney(2));
-				totals.avgRoytPerTimePeriod = ((totals.royalty /(numberofDaysInner+ 0.00001)).toFixed(2) < 0 ? 0 : (totals.royalty /(numberofDaysInner+ 0.00001)).toFixed(2));
-
-				fromDateString = localUnixFromDate2.format("MM/DD/YYYY");
-				toDateString = localUnixToDate2.format("MM/DD/YYYY");
-				
-				//Show User the date range they've selected
-				var duration = moment.duration(localUnixToDate2.diff(localUnixFromDate2));
-				
+		//Reset Scope Again
+		var localUnixToDate2 = moment.unix(unixToDate);
+		var localUnixFromDate2 = moment.unix(unixFromDate);
+		
+		for (i = 0; i < axisLabels.length; i++) {
+			for ( i2 = 0; i2 < responseArray.length; i2++){						
 				if(viewType == "month"){
-					var pageTitle = "Monthly Statistics";
-					var periodTitle = "month";
-					var periodDuration = Math.round(duration.asMonths()) + " Month Range";
+					var startDate   = moment(axisLabels[i], "MMM YYYY"); //This date month
+					var endDate     = moment(axisLabels[i], "MMM YYYY").add(1,'months'); //Previous month
+					var compareDate = moment(responseArray[i2]["period"], "MM-DD-YYYY");
+
+					var isWithinRange = compareDate.isBetween(startDate, endDate, 'months', '[)') // left inclusive
 				
 				} else if(viewType == "week"){
-					var pageTitle = "Weekly Statistics";
-					var periodTitle = "week";
-					var periodDuration = Math.floor(duration.asDays()) + " Day Range"; //Keep as days
-				} else {
-					var pageTitle = "Daily Statistics";
-					var periodTitle = "day";
-					var periodDuration = Math.floor(duration.asDays()) + " Day Range";
+					var startDate   = moment(axisLabels[i], "ww YYYY"); //This date week
+					var endDate     = moment(axisLabels[i], "WW YYYY").add(1,'weeks'); //Previous week
+					var compareDate = moment(responseArray[i2]["period"], "MM-DD-YYYY");
+					
+					var isWithinRange = compareDate.isBetween(startDate, endDate, 'weeks', '[)') // left inclusive
+					
+				} else if(viewType == "day"){ //Daily View
+					var startDate   = moment(axisLabels[i], "MM-DD-YYYY"); //This Date
+					var endDate     = moment(axisLabels[i], "MM-DD-YYYY").add(1,'days'); //Yesterday
+					var compareDate = moment(responseArray[i2]["period"], "MM-DD-YYYY");
+					
+					var isWithinRange = compareDate.isBetween(startDate, endDate, 'days', '[)') // left inclusive
 				}
 				
-				stats = '<div class="container maa-container row no-padding-top">'+
-							'<div class="col-sm-6 col-xs-6">' +
-								'<h3>' + pageTitle + '</h3>' +
-								'<h4 class="subheading" style="margin-bottom: 0;">' + periodDuration +'</h4>' +
-							'</div>' +
-							'<div class="col-sm-6 col-xs-6">' +
-								'<div class="dropdown">' +
-									'<input class="date-selector" type="text" name="datefilter" class="form-control" value="' + fromDateString + " - " + toDateString + '" />' +
-									'<i class="fa fa-caret-down down-arrow" aria-hidden="true"></i>' +
-								'</div>' +
-							'</div>' +	
-						'</div>';	
-				stats += '<div class="container maa-container row no-gutters row-eq-height">' +
-						'<div class="col-lg-2 col-sm-3 col-xs-12 offset-sm-0 offset-md-1 offset-lg-2">'+
-							'<div class="maa-card card">'+
-								'<div class="card-body">'+                                                                       
-									'<h2 class="font-weight-lighter" style="color:#474C4F;"  >'+ totals.sales + '</h2>'+
-									'<span class="text-muted text-uppercase small">Units Sold</span>'+
-								'</div>'+
-							'</div>'+
-						'</div>'+
-						
-						'<div class="col-lg-2 col-sm-3 col-xs-12">'+
-							'<div class="maa-card card">'+
-								'<div class="card-body">'+                                                                       
-									'<h2 class="font-weight-lighter" style="color:#474C4F;"  >'+ totals.cancelled + '</h2>'+
-									'<span class="text-muted text-uppercase small">Units Cancelled</span>'+
-								'</div>'+
-							'</div>'+
-						'</div>'+
-						
-						'<div class="col-lg-2 col-sm-3 col-xs-12">'+
-							'<div class="maa-card card">'+
-								'<div class="card-body">'+                                                                       
-									'<h2 class="font-weight-lighter" style="color:#474C4F;"  >'+ totals.returned + '</h2>'+
-									'<span class="text-muted text-uppercase small">Units Returned</span>'+
-								'</div>'+
-							'</div>'+
-						'</div>'+
-						
-						'<div class="col-lg-2 col-sm-3 col-xs-12 offset-sm-1 offset-md-1 offset-lg-0">'+
-							'<div class="maa-card card">'+
-								'<div class="card-body">'+                                                                       
-									'<h2 class="font-weight-lighter" style="color:#474C4F;"  >$'+ parseFloat(totals.revenue).formatMoney(2) + '</h2>'+
-									'<span class="text-muted text-uppercase small">Revenue Earned</span>'+
-								'</div>'+
-							'</div>'+
-						'</div>'+
-						
-						'<div class="col-lg-2 col-sm-3 col-xs-12 no-card-bottom offset-lg-2">'+ 
-							'<div class="maa-card card">'+
-								'<div class="card-body">'+                                                                       
-									'<h2 class="font-weight-lighter" style="color:#474C4F;"  >$'+ parseFloat(totals.royalty).formatMoney(2) + '</h2>'+
-									'<span class="text-muted text-uppercase small">Royalties Earned</span>'+
-								'</div>'+
-							'</div>'+
-						'</div>'+
-						
-						'<div class="col-lg-2 col-sm-3 col-xs-12 no-card-bottom">'+
-							'<div class="maa-card card">'+
-								'<div class="card-body">'+                                                                       
-									'<h2 class="font-weight-lighter" style="color:#474C4F;"  >$'+ totals.avgRoytPerUnit + '</h2>'+
-									'<span class="text-muted text-uppercase small">Avg Royalties / Unit Sold</span>'+
-								'</div>'+
-							'</div>'+
-						'</div>'+
-						
-						'<div class="col-lg-2 col-sm-3 col-xs-12 no-card-bottom offset-sm-2 offset-md-2 offset-lg-0">'+
-							'<div class="maa-card card">'+
-								'<div class="card-body">'+                                                                       
-									'<h2 class="font-weight-lighter" style="color:#474C4F;"  >'+ ((totals.sales - totals.cancelled) /(numberofDaysInner+ 0.00001)).formatMoney(2) + '</h2>'+
-									'<span class="text-muted text-uppercase small">Avg Net Sales / '+ periodTitle +'</span>'+
-								'</div>'+
-							'</div>'+
-						'</div>'+
-						
-						'<div class="col-lg-2 col-sm-3 col-xs-12 no-card-bottom ">'+
-							'<div class="maa-card card">'+
-								'<div class="card-body">'+                                                                       
-									'<h2 class="font-weight-lighter" style="color:#474C4F;"  >$'+ totals.avgRoytPerTimePeriod + '</h2>'+
-									'<span class="text-muted text-uppercase small">Avg Royalties / '+ periodTitle +'</span>'+
-								'</div>'+
-							'</div>'+
-						'</div>';
-												
-				document.getElementById("dailystats").innerHTML = stats;
 				
-				//Regroup all youth sizes to just Youth
-				var adjustedSizesArray = {'Youth': 0, 'Small': 0, 'Medium': 0, 'Large': 0, 'XL': 0, '2XL': 0, '3XL': 0};
-				for(var item in sizesArray){
-					if (item == "4" || item == "6" || item == "8" || item == "10" || item == "12") {
-						adjustedSizesArray['Youth'] += parseInt(sizesArray[item]);
-					}
-					else {
-						adjustedSizesArray[item] += parseInt(sizesArray[item]);
-					}
-				}
-				
-				//Make sure colors are in correct order												
-				var shirtColorsColorsLUT = {'Dark Heather': "#454b4b", 'Heather Grey': "#d5d9da", 'Heather Blue': "#696c9c", 'Black': "#222", 
-					'Navy': "#15232b", 'Silver': "#cfd1d1", 'Royal Blue': "#1c4086", 'Brown': "#31261d", 'Slate': "#818189", 'Red': "#b71111", 'Asphalt': "#3f3e3c", 
-					'Grass': "#5e9444", 'Olive': "#4a4f26", 'Kelly Green': "#006136", 'Baby Blue': "#8fb8db", 'White': "#eeeeee", 'Lemon': "#f0e87b", 'Cranberry': "#6e0a25",
-					'Pink': "#f8a3bc", 'Orange': "#ff5c39", 'Purple': "#514689"};
-				var finalShirtColorsLUT = [];
-				for (var key in shirtColorsArray){
-					finalShirtColorsLUT.push(shirtColorsColorsLUT[key]);
-				}
-								
-				sortedPriceObject = {};
-				Object.keys(priceObject).sort(function(a,b){return priceObject[b]-priceObject[a]}).forEach(function(key) {
-					sortedPriceObject[key] = priceObject[key];
-				});
-				
-				var tealColorScheme = ["#e0f2f1", "#b2dfdb", "#80cbc4", "#4db6ac", "#26a69a", "#009688", "#00897b", "#00796b", "#00695c", "#004d40"];
-				var greenColorScheme = ["#429d54", "#4db461", "#65be76", "#7dc88b", "#95d2a1", "#addcb6", "#c4e6cb"]; 
-				//Extend Array Length
-				var shirtNicheColorsLUT = replicateArray(tealColorScheme, 20);
-				var pricingColorsLUT = replicateArray(greenColorScheme, 20);
-				
-				if(viewType == "month" && (localUnixToDate2.format("MMM YYYY") == moment().format("MMM YYYY"))){ //Monthly Labels
-					
-					//Projections
-					/* Calculate Projections */
-					startOfMonth = moment().startOf('month');
-					today = moment();
-					
-					
-					hoursSinceStartOfMonth = today.diff(startOfMonth, 'hours', true)
-					hoursInMonth = moment().daysInMonth() * 24;
-					
-					var projectionSalesArray = new Array(salesData.length).fill(null); //Array of Nulls for Projection
-					var projectionRevenueArray = new Array(salesData.length).fill(null); //Array of Nulls for Projection
-					var projectionRoyaltiesArray = new Array(salesData.length).fill(null); //Array of Nulls for Projection
-					
+				if(isWithinRange){ //See if inside range
+									
+					salesData[i] += parseInt(responseArray[i2]["unitsSold"]);
+					cancelData[i] += parseInt(responseArray[i2]["unitsCancelled"]);
+					returnData[i] += parseInt(responseArray[i2]["unitsReturned"]);
+					revenueData[i] += parseFloat(responseArray[i2]["revenue"]["value"]);
+					royaltyData[i] += parseFloat(responseArray[i2]["royalties"]["value"]);
 
-					/* Projected Sales */
-					salesLastMonth = salesData[salesData.length - 2];
-					salesThisMonthSoFar = salesData[salesData.length - 1];
-					projectedSales = (salesThisMonthSoFar * hoursInMonth / hoursSinceStartOfMonth).toFixed(2); //Calculate Projection
-					
-					//Set Limits
-					if (projectedSales >= salesLastMonth*3){
-						projectedSales = salesLastMonth*3;
-					} 
-					
-					projectionSalesArray[projectionSalesArray.length - 1] = projectedSales; 
-					
-					
-					/* Projected Revenue */
-					revenueLastMonth = revenueData[revenueData.length - 2];		
-					revenueThisMonthSoFar = revenueData[revenueData.length - 1];
-					projectedRevenue = (revenueThisMonthSoFar * hoursInMonth / hoursSinceStartOfMonth).toFixed(2); //Calculate Projection
-					
-					//Set Limits
-					if (projectedRevenue >= revenueLastMonth*3){
-						projectedRevenue = revenueLastMonth*3;
-					} 
-					
-					projectionRevenueArray[projectionRevenueArray.length - 1] = projectedRevenue; 
-					
-					/* Projected Profit */
-					royaltiesLastMonth = royaltyData[royaltyData.length - 2];
-					royaltiesThisMonthSoFar = royaltyData[royaltyData.length - 1];
-					projectedRoyalties = (royaltiesThisMonthSoFar * hoursInMonth / hoursSinceStartOfMonth).toFixed(2); //Calculate Projection
-					
-					
-					//Set Limits
-					if (projectedRoyalties >= royaltiesLastMonth*3){
-						projectedRoyalties = royaltiesLastMonth*3;
-					} 
-					
-					projectionRoyaltiesArray[projectionRoyaltiesArray.length - 1] = projectedRoyalties; 
-				} else if(viewType == "week" && (localUnixToDate2.format("ww YYYY") == moment().format("ww YYYY")) ){ //Weekly Labels 
-					//Projections
-					/* Calculate Projections */
-					startOfWeek = moment().startOf('week');
-					today = moment();
-					
-					
-					hoursSinceStartOfWeek = today.diff(startOfWeek, 'hours', true)
-					hoursInWeek = 7 * 24;
-					
-					var projectionSalesArray = new Array(salesData.length).fill(null); //Array of Nulls for Projection
-					var projectionRevenueArray = new Array(salesData.length).fill(null); //Array of Nulls for Projection
-					var projectionRoyaltiesArray = new Array(salesData.length).fill(null); //Array of Nulls for Projection
-					
-
-					/* Projected Sales */
-					salesLastMonth = salesData[salesData.length - 2];
-					salesThisMonthSoFar = salesData[salesData.length - 1];
-					projectedSales = (salesThisMonthSoFar * hoursInWeek / hoursSinceStartOfWeek).toFixed(2); //Calculate Projection
-					
-					//Set Limits
-					if (projectedSales >= salesLastMonth*3){
-						projectedSales = salesLastMonth*3;
-					} else if (projectedSales <= salesLastMonth*0.5){
-						projectedSales = salesLastMonth*0.5;
-					}
-					
-					projectionSalesArray[projectionSalesArray.length - 1] = projectedSales; 
-					
-					
-					/* Projected Revenue */
-					revenueLastMonth = revenueData[revenueData.length - 2];		
-					revenueThisMonthSoFar = revenueData[revenueData.length - 1];
-					projectedRevenue = (revenueThisMonthSoFar * hoursInWeek / hoursSinceStartOfWeek).toFixed(2); //Calculate Projection
-					
-					//Set Limits
-					if (projectedRevenue >= revenueLastMonth*3){
-						projectedRevenue = revenueLastMonth*3;
-					} else if (projectedRevenue <= revenueLastMonth*0.5){
-						projectedRevenue = revenueLastMonth*0.5;
-					}
-					
-					projectionRevenueArray[projectionRevenueArray.length - 1] = projectedRevenue; 
-					
-					
-					/* Projected Profit */
-					royaltiesLastMonth = royaltyData[royaltyData.length - 2];
-					royaltiesThisMonthSoFar = royaltyData[royaltyData.length - 1];
-					projectedRoyalties = (royaltiesThisMonthSoFar * hoursInWeek / hoursSinceStartOfWeek).toFixed(2); //Calculate Projection
-					
-					
-					//Set Limits
-					if (projectedRoyalties >= royaltiesLastMonth*3){
-						projectedRoyalties = royaltiesLastMonth*3;
-					} else if (projectedRoyalties <= royaltiesLastMonth*0.5){
-						projectedRoyalties = royaltiesLastMonth*0.5;
-					}
-					
-					projectionRoyaltiesArray[projectionRoyaltiesArray.length - 1] = projectedRoyalties; 
-				}
-				
-				//Assemble Chart Info																	
-				var lineChartData1 = {
-					type: 'line',
-					data: {
-						labels: axisLabels,
-						datasets: [{
-							label: 'Projected Sales',
-							data: projectionSalesArray,
-							backgroundColor: "rgba(200, 200, 200, 0.75)",
-							pointBorderColor: "#ddd",
-							borderColor: "#ddd"
-						}, {
-							label: 'Returns',
-							data: returnData,
-							backgroundColor: "rgba(255, 204, 0, 0.75)",
-							pointBorderColor: "rgba(255, 204, 0,1)",
-							borderColor: "rgba(255, 204, 0,1)"
-						}, {
-							label: 'Cancellations',
-							data: cancelData,
-							backgroundColor: "rgba(255, 61, 61, 0.75)",
-							pointBorderColor: "rgba(255, 61, 61,1)",
-							borderColor: "rgba(255, 61, 61,1)"
-						}, {
-							label: 'Sales',
-							data: salesData,
-							backgroundColor: "rgba(91, 185, 70, 0.75)",
-							pointBorderColor: "rgba(91, 185, 70,1)",
-							borderColor: "rgba(91, 185, 70,1)"
-						}]
-					},
-					options: globalLineChartOptions,
-				};
-					
-				var lineChartData2 = {
-					type: 'line',
-					data: {
-						labels: axisLabels,
-						datasets: [{
-							label: 'Royalties',
-							data: royaltyData,
-							backgroundColor: "rgba(215, 45, 255, 0.5)",
-							pointBorderColor: "rgba(215, 45, 255,1)",
-							borderColor: "rgba(215, 45, 255,1)"
-						}, {
-							label: 'Revenue',
-							data: revenueData,
-							backgroundColor: "rgba(246, 145, 30, 0.75)",
-							pointBorderColor: "rgba(246, 145, 30,1)",
-							borderColor: "rgba(246, 145, 30,1)"
-						}, {
-							label: 'Projected Royalties',
-							data: projectionRoyaltiesArray,
-							backgroundColor: "rgba(210, 210, 210, 0.75)",
-							pointBorderColor: "#ccc",
-							borderColor: "#ccc"
-						}, {
-							label: 'Projected Revenue',
-							data: projectionRevenueArray,
-							backgroundColor: "rgba(200, 200, 200, 0.75)",
-							pointBorderColor: "#ddd",
-							borderColor: "#ddd"
-						}]
-					},
-					options: globalLineChartOptions,
-				};
-				
-				//Genders Charts
-				var lineChartData3 = {
-					type: 'doughnut',
-					data: {
-						labels: Object.keys(gendersArray),
-						datasets: [{							
-							data: Object.values(gendersArray),
-							backgroundColor: ["#3498db", "#e86dab", "#84cb74"],
-						}]
-					},
-					options: globalLineChartOptions, 
-				};
-				
-				//Size Charts
-				var lineChartData4 = {
-					type: 'doughnut',
-					data: {
-						labels: Object.keys(adjustedSizesArray),
-						datasets: [{							
-							data: Object.values(adjustedSizesArray),
-							backgroundColor: ["#ffab91", "#ff8a65", "#ff7043", "#ff5722", "#e64a19", "#d84315", "#ffccbc"],
-						}]
-					},
-					options: globalLineChartOptions,
-				};
-				
-				//Colors Charts
-				var lineChartData5 = {
-					type: 'doughnut',
-					data: {
-						labels: Object.keys(shirtColorsArray),
-						datasets: [{							
-							data: Object.values(shirtColorsArray),
-							backgroundColor: finalShirtColorsLUT,
-						}]
-					},
-					options: globalLineChartOptions,
-				};
-				
-				
-				//Pricing Charts
-				var lineChartData6 = {
-					type: 'bar',
-					data: {
-						labels: Object.keys(sortedPriceObject),
-						datasets: [{							
-							data: Object.values(sortedPriceObject),
-							backgroundColor: pricingColorsLUT,
-						}]
-					},
-					options: globalLineChartOptions,
-				};
-				
-				//Pricing Charts
-				var lineChartData7 = {
-					type: 'doughnut',
-					data: {
-						labels: Object.keys(productTypeObject),
-						datasets: [{							
-							data: Object.values(productTypeObject),
-							backgroundColor: shirtNicheColorsLUT,
-						}]
-					},
-					options: globalLineChartOptions,
-				};
-				
-				
-				//Shirt Niches (Non-normalized) 
-				var lineChartData8 = {
-					type: 'doughnut',
-					data: {
-						labels: Object.keys(nicheArray),
-						datasets: [{							
-							data: Object.values(nicheArray),
-							backgroundColor: shirtNicheColorsLUT,
-						}]
-					},
-					options: globalLineChartOptions,
-				};
-				
-				var ctxSales = document.getElementById("canvas1").getContext("2d");	
-				var myChart = new Chart(ctxSales, lineChartData1);
-					
-				var ctxRevenue = document.getElementById("canvas2").getContext("2d");	
-				var myChart2 = new Chart(ctxRevenue, lineChartData2);
-								
-				var ctxGenders = document.getElementById("canvas3").getContext("2d");	
-				ctxGenders.height = 500;
-				var myChart3 = new Chart(ctxGenders, lineChartData3);
-				
-				var ctxSizes = document.getElementById("canvas4").getContext("2d");	
-				var myChart4 = new Chart(ctxSizes, lineChartData4);
-				
-				var ctxColors = document.getElementById("canvas5").getContext("2d");	
-				var myChart5 = new Chart(ctxColors, lineChartData5);
-				
-				var ctxPricing = document.getElementById("canvas6").getContext("2d");	
-				var myChart6 = new Chart(ctxPricing, lineChartData6);
-				
-				var ctxProdTypes = document.getElementById("canvas7").getContext("2d");	
-				var myChart7 = new Chart(ctxProdTypes, lineChartData7);
-				
-				var ctxNiches = document.getElementById("canvas8").getContext("2d");	
-				var myChart8 = new Chart(ctxNiches, lineChartData8);
-				
-				//Summing up all values
-				var allASINValues = [];
-				for (i = 0; i < responseArray.length; i++){
-					allASINValues.push(responseArray[i]["asin"]);
-				}
-												
-				uniqueArray = allASINValues.filter(function(item, pos) {
-					return allASINValues.indexOf(item) == pos;
-				})
-								
-				//Create blank target array
-				var resultSumSales = [];
-				for(i=0; i < uniqueArray.length; i++){
-					resultSumSales.push({
-						ASIN: uniqueArray[i],
-						Name: '',
-						ProductType: '',
-						Units: 0,
-						Cancelled: 0,
-						Returned: 0,
-						Royalty: 0,
-						Revenue: 0
-					})
-				}
-				
-				for (i = 0; i < resultSumSales.length; i++){
-					for (i2 = 0; i2 < responseArray.length; i2++){
-						if(resultSumSales[i]["asin"] == responseArray[i2]["asin"]){
-							resultSumSales[i]["Name"] = responseArray[i2]["Name"];
-							resultSumSales[i]["ProductType"] = responseArray[i2]["Product Type"].replace(/-/i, '&#8209;');
-							resultSumSales[i]["Units"] += parseInt(responseArray[i2]["Units"]);
-							resultSumSales[i]["Cancelled"] += parseInt(responseArray[i2]["Cancelled"]);
-							resultSumSales[i]["Returned"] += parseInt(responseArray[i2]["Returned"]);
-							resultSumSales[i]["Royalty"] += parseFloat(responseArray[i2]["Royalty"]);
-							resultSumSales[i]["Revenue"] += parseFloat(responseArray[i2]["Revenue"]);
+					//Determine Gender And Count it 
+					for (var key in gendersArray){
+						if (key.toString() == responseArray[i2]["variationInfo"]["fit"]){
+							gendersArray[key] += 1;
 						}
 					}
-				}
-									
-				// Assemble Sales History Table
-				var cp2 = '<table class="maa-table table table-striped sortable" id="itemizedList">' +
-					'<thead>' + 
-						'<tr>' +
-							'<th>#</th>' +
-							'<th>Product Name</th>' +
-							'<th>Product Type</th>' +
-							'<th>Niche Category</th>' +
-							'<th class="text-center">Product Details</th>' +
-							'<th class="text-center">Units Sold</th>' +
-							'<th class="text-center">Units Cancelled</th>' +
-							'<th class="text-center">Units Returned</th>' +
-							'<th class="text-center">Revenue</th>' +
-							'<th class="text-center">Royalties</th>' +
-							'<th class="text-center">Royalties / Unit</th>' +
-							'<th class="text-center">Edit / Delete </th>' +
-						'</tr>'  +
-					'</thead><tbody>';
-
-				//Sort Sales Data By Units Sold Descending
-				resultSumSales.sort(function(a, b){
-				  return b.Units - a.Units;
-				});
-									
-				for (i=0; i < resultSumSales.length; i++){
-					//Assign Niche
-					var reminderPopoverData= ''; //Blank popover data
-					if(nichesLookupArray[resultSumSales[i]["asin"]] != undefined){
-						specificNiche = JSON.parse(nichesLookupArray[resultSumSales[i]["asin"]])["niche"];
-					} else {
-						specificNiche = "unknown";
-						reminderPopoverData = 'data-toggle="tooltip" data-placement="bottom" title="Assign product niche on Manage Products Page"';
-					}
 					
-					
-					var itemName = resultSumSales[i]["Name"].replace(/"/g, "");
-					var uriEncodedName = encodeURIComponent(itemName); 
-					var deleteLink = 'https://merch.amazon.com/manage/products?pageNumber=1&pageSize=15&keywords=' + uriEncodedName + '&statusFilters=%5B%22DELETED%22%2C%22DRAFT%22%2C%22LIVE%22%2C%22NOT_DISCOVERABLE%22%2C%22PENDING%22%2C%22PROCESSING%22%2C%22STOPPED%22%2C%22UNDER_REVIEW%22%2C%22REJECTED%22%2C%22MANUALLY_REJECTED%22%5D';	
-				
-						
-					cp2 += '<tr data-href="https://www.amazon.com/dp/' + resultSumSales[i]["asin"]  +   '">' + 
-						'<td>' + (i + 1) + '</td>' + 
-						'<td>' + 
-							resultSumSales[i]["Name"]  + 
-						'</td>' + 
-						
-						'<td>' + 
-							resultSumSales[i]["ProductType"]   + 
-						'</td>' + 
-						
-						'<td class="niche-tag">'+
-							'<i class="fa fa-tag fa-inline" aria-hidden="true" ' + reminderPopoverData + '></i>' +
-							specificNiche +
-						'</td>' +
-						
-						'<td class="text-center btn-inside">' +						
-							'<a target="_blank" href="' + '/IndividualProductPage/?ASIN=' + resultSumSales[i]["asin"]  + '" class="btn btn-primary">Analyze</a>' +
-						'</td>' +
-										
-						'<td class="text-center">' +
-							resultSumSales[i]["Units"]  +
-						'</td>' +
-							
-						'<td class="text-center">' +
-							resultSumSales[i]["Cancelled"]  +
-						'</td>' +
-						
-						'<td class="text-center">' +
-							resultSumSales[i]["Returned"]  +
-						'</td>' +
-						
-						'<td class="text-center">' +
-							'$' + resultSumSales[i]["Revenue"].toFixed(2)  +
-						'</td>' +
-						
-						'<td class="text-center">' +
-							'$' + resultSumSales[i]["Royalty"].toFixed(2)  +
-						'</td>' +
-						
-						'<td class="text-center">' +
-							'$' + (resultSumSales[i]["Royalty"].toFixed(2) / (resultSumSales[i]["Units"] - resultSumSales[i]["Cancelled"] - resultSumSales[i]["Returned"] + 0.00001)).toFixed(2)  +
-						'</td>' +
-						'<td class="text-center btn-inside">' +  
-							'<a target="_blank" href="' + deleteLink + '" class="btn btn-outline-primary">Edit</a>' + 
-						'</td>' +
-					'</tr>'; 
-				}
-							
-				cp2 += '</tbody></table>';
-				
-				document.getElementById("shirtlist").innerHTML = cp2;
-					
-				//Init TableSort
-				new Tablesort(document.getElementById('itemizedList'));
-				
-				//Make Entire Row Clickable & Link to Individual Product Page
-				$(function(){
-					$('#itemizedList tbody > tr[data-href!=""] td:not(.btn-inside)').click(function() {
-						var url = $(this).closest("tr").data("href");
-						window.open(url, '_blank');
-					});
-				});
-
-				$('input[name="datefilter"]').daterangepicker(
-					{  
-						showDropdowns: true,
-						opens: 'left',
-						linkedCalendars: false,
-						showCustomRangeLabel: false,
-						autoApply: true,
-						autoUpdateInput: true,
-						alwaysShowCalendars: true,
-						maxDate: new Date,
-						minDate: new Date(2015, 9, 1),
-						ranges: {
-						   'Today': [moment(), moment()],
-						   'Last 7 Days': [moment().subtract(7, 'days').startOf('day'), moment().startOf('day')],
-						   'Last 14 Days': [moment().subtract(13, 'days'), moment()],
-						   'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-						   'This Month': [moment().startOf('month'), moment().endOf('month')],
-						   'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
-						   'Last 90 Days': [moment().subtract(89, 'days'), moment()]
+					//Determine Size And Count it 
+					for (var key in sizesArray){
+						if (key.toString() == responseArray[i2]["variationInfo"]["size"]){
+							sizesArray[key] += 1;
 						}
 					}
-				);
-				
-				function resubmitPage(picker){
-					//Calculate Unix Timestamps
-					var fromDate = picker.startDate.unix();
-					var toDate = picker.endDate.unix();
 					
-					if((toDate - fromDate) < (91*24*60*60) && (toDate - fromDate) > (32*24*60*60)){
-						var extraFlag = 'week';
-						fromDate = moment.unix(fromDate).startOf('week').unix(); //Get full weeks offset						
-					} else if ((toDate - fromDate) > 91*24*60*60){
-						var extraFlag = 'month';
-						fromDate = moment.unix(fromDate).startOf('month').unix(); //Get full months offset						
-					} else {
-						var extraFlag = 'day';
+					//Determine Color And Count it 
+					for (var key in shirtColorsArray){
+						if (key.toString() == responseArray[i2]["variationInfo"]["color"]){
+							shirtColorsArray[key] += 1;
+						}
 					}
-					dailySalesPage(fromDate, toDate, extraFlag);
-				}
-				
-				$('input[name="datefilter"]').on('apply.daterangepicker', function(ev, picker) {					
-					resubmitPage(picker);
-				});
-				
-				$('input[name="datefilter"], input[name="daterangepicker_start"],  input[name="daterangepicker_end"]').on("keyup", function(e) {
-					if (e.keyCode == 13) {
-						var picker = {};
-						
-						picker.startDate = $('input[name="datefilter"]').data('daterangepicker').startDate;
-						picker.endDate = $('input[name="datefilter"]').data('daterangepicker').endDate;
-						
-						resubmitPage(picker);
-					}
-				});
-
-				//********** Get Normalized Array ***************//
-				// (This is down here because it takes longer)
-				normalizedNicheArray = {};
-				normalizedPercentageArray = {};
-				
-				getNicheDistribution(function(totalTally){
-					for(var key in nicheArray){
-						if (key in totalTally){
-							loopTotalTally = totalTally[key];
+					
+					//Determine Unit Price & Count it
+					var unitsSold = responseArray[i2]["unitsSold"] - responseArray[i2]["unitsCancelled"];
+					if (unitsSold != 0){ //Disregarding canceled units intentionally								
+						var unitPrice = "$"+(responseArray[i2]["revenue"]["value"] / (unitsSold)).toFixed(2);	
+						if (unitPrice in priceObject){
+							priceObject[unitPrice] += 1;
 						} else {
-							loopTotalTally = 999; //Artifically Skew Unidentified shirts
-						}
-						
-						normalization = (nicheArray[key] / loopTotalTally);
-						normalizedNicheArray[key] = normalization;
-					}
-					
-					var grandTotal = 0;
-					for(var key in normalizedNicheArray){ //Get Total of Normalized
-						numberToAdd = parseFloat(normalizedNicheArray[key]);
-						if (!isNaN(numberToAdd)){					
-							grandTotal += numberToAdd;
+							priceObject[unitPrice] = 1;
 						}
 					}
-					
-					for(var key in normalizedNicheArray){
-						percertangeValue = (normalizedNicheArray[key] / grandTotal * 100).toFixed(1);
-						normalizedPercentageArray[key] = percertangeValue;
+												
+					//Determine Product Type & Count it
+					var productType = responseArray[i2]["productType"];							
+					if (productType in productTypeObject){
+						productTypeObject[productType] += 1;
+					} else {
+						productTypeObject[productType] = 1;
 					}
-					
-					var lineChartData8 = {
-						type: 'doughnut',
-						data: {
-							labels: Object.keys(normalizedPercentageArray),
-							datasets: [{							
-								data: Object.values(normalizedPercentageArray),
-								backgroundColor: shirtNicheColorsLUT,
-							}]
-						},
-						options: globalLineChartOptions,
-					};
-					
-					var ctxNormNiches = document.getElementById("canvas9").getContext("2d");	
-					var myChart9 = new Chart(ctxNormNiches, lineChartData8);
-					
-					
-					
-					//Compute Top Selling Niches
-					topSellingNiches = Object.keys(normalizedPercentageArray).sort(function(a,b) {
-							return normalizedPercentageArray[b]-normalizedPercentageArray[a]
-					});
-					
-					//Not a great execution
-					if (topSellingNiches.length < 3){
-						topSellingNiches = ['Unknown Niche', 'Unknown Niche', 'Unknown Niche' ];
-					}
-					
-					
-					//Generate Top Niches
-					topNichesData = '<div class="container maa-container row">' +					
-										'<div class="col-lg-3 col-sm-4 col-xs-12 offset-md-0 offset-lg-2">'+
-											'<div class="maa-card card">'+
-												'<div class="card-body">'+                                                                       
-													'<h2 class="font-weight-lighter" style="color:#474C4F;"  >'+ topSellingNiches[0] + '</h2>'+
-													'<span class="text-muted text-uppercase small">#1 Top Selling Niche</span>'+
-												'</div>'+
-											'</div>'+
-										'</div>'+
-									
-										'<div class="col-lg-3 col-sm-4 col-xs-12 ">'+
-											'<div class="maa-card card">'+
-												'<div class="card-body">'+                                                                       
-													'<h2 class="font-weight-lighter" style="color:#474C4F;"  >'+ topSellingNiches[1] + '</h2>'+
-													'<span class="text-muted text-uppercase small">#2 Top Selling Niche</span>'+
-												'</div>'+
-											'</div>'+
-										'</div>'+
-										
-										'<div class="col-lg-3 col-sm-4 col-xs-12 ">'+
-											'<div class="maa-card card">'+
-												'<div class="card-body">'+                                                                       
-													'<h2 class="font-weight-lighter" style="color:#474C4F;"  >'+ topSellingNiches[2] + '</h2>'+
-													'<span class="text-muted text-uppercase small">#3 Top Selling Niche</span>'+
-												'</div>'+
-											'</div>'+
-										'</div>'+
-						
-									'</div>';
-
-					$("#niche").prepend(topNichesData);
-					
+				}
+			}
 			
-					
-					
-					/*
-					//Dump Sales Data 
-					var nicheDistData = '<div class="col-xs-6">';
-					nicheDistData += '<h4>Total Number Of Shirts Available For Sale In Each Niche</h4>' +
-									'<div class="niche-list-area">';
-					
-					
-					//Have to sort by descending, this is ugly
-					var sortableTotalTally = [];
-					for (var number in totalTally) {
-						sortableTotalTally.push([number, totalTally[number]]);
-					}
+			console.log(salesData);
 
-					sortableTotalTally.sort(function(a, b) {
-						return b[1] - a[1];
-					});
-								
-					for(i=0; i < sortableTotalTally.length; i++){
-						nicheDistData += '<dl>'
-											+ '<dt>'
-											+ 		sortableTotalTally[i][0] + ":&nbsp;"
-											+ '</dt>'
-											+ '<dd>'
-											+ 		sortableTotalTally[i][1]
-											+ '</dd>'
-										+ '</dl>'
-					}
-					
-					nicheDistData += '</div>' + 
-									'<a class="more-btn">Display All</a>' +
-									'</div>';
-					
-								
-					$("#niche").append(nicheDistData);
-					
-					
-					
-					$(".more-btn").click(function(){
-						$('.niche-list-area').toggleClass('expanded');
-					});	
-					*/
-					
-					
 
-					//Initialize Tooltips
-					$(function () {
-					  $('[data-toggle="tooltip"]').tooltip()
-					  
-					})
+			if(viewType == "day" && axisLabels.length <= 15){
+				axisLabels[i] = moment(axisLabels[i], "MM-DD-YYYY").format('dddd');
+			} else if (viewType == "week" && axisLabels.length <= 90){
+				var weekMonth = moment(axisLabels[i], "ww YYYY").format('MMM');
 				
-				});
+				var myDate = moment(axisLabels[i], "ww YYYY"); //saturday
+				var day = myDate.day(); //6 = saturday
+				var nthOfMonth = Math.ceil(myDate.date() / 7); //1
+
+				axisLabels[i] = weekMonth + " Week " + nthOfMonth;
+			}
+		}
+		
+		/******* Render Top Page Stats *****************/
+		var totals = {};				
+		totals.sales = salesData.reduce(function(a, b) { return a + b; }, 0);
+		totals.cancelled = cancelData.reduce(function(a, b) { return a + b; }, 0);
+		totals.returned = returnData.reduce(function(a, b) { return a + b; }, 0);
+		totals.revenue = revenueData.reduce(function(a, b) { return a + b; }, 0).toFixed(2);				
+		totals.royalty = royaltyData.reduce(function(a, b) { return a + b; }, 0).toFixed(2);
+		
+		//Calculated Totals
+		totals.avgRoytPerUnit = ((totals.royalty /(totals.sales - totals.cancelled + 0.00001)).formatMoney(2) < 0 ? 0 : (totals.royalty /(totals.sales - totals.cancelled + 0.00001)).formatMoney(2));
+		totals.avgRoytPerTimePeriod = ((totals.royalty /(numberofDaysInner+ 0.00001)).toFixed(2) < 0 ? 0 : (totals.royalty /(numberofDaysInner+ 0.00001)).toFixed(2));
+
+		fromDateString = localUnixFromDate2.format("MM/DD/YYYY");
+		toDateString = localUnixToDate2.format("MM/DD/YYYY");
+		
+		//Show User the date range they've selected
+		var duration = moment.duration(localUnixToDate2.diff(localUnixFromDate2));
+		
+		if(viewType == "month"){
+			var pageTitle = "Monthly Statistics";
+			var periodTitle = "month";
+			var periodDuration = Math.round(duration.asMonths()) + " Month Range";
+		
+		} else if(viewType == "week"){
+			var pageTitle = "Weekly Statistics";
+			var periodTitle = "week";
+			var periodDuration = Math.floor(duration.asDays()) + " Day Range"; //Keep as days
+		} else {
+			var pageTitle = "Daily Statistics";
+			var periodTitle = "day";
+			var periodDuration = Math.floor(duration.asDays()) + " Day Range";
+		}
+		
+		stats = '<div class="container maa-container row no-padding-top">'+
+					'<div class="col-sm-6 col-xs-6">' +
+						'<h3>' + pageTitle + '</h3>' +
+						'<h4 class="subheading" style="margin-bottom: 0;">' + periodDuration +'</h4>' +
+					'</div>' +
+					'<div class="col-sm-6 col-xs-6">' +
+						'<div class="dropdown">' +
+							'<input class="date-selector" type="text" name="datefilter" class="form-control" value="' + fromDateString + " - " + toDateString + '" />' +
+							'<i class="fa fa-caret-down down-arrow" aria-hidden="true"></i>' +
+						'</div>' +
+					'</div>' +	
+				'</div>';	
+		stats += '<div class="container maa-container row no-gutters row-eq-height">' +
+				'<div class="col-lg-2 col-sm-3 col-xs-12 offset-sm-0 offset-md-1 offset-lg-2">'+
+					'<div class="maa-card card">'+
+						'<div class="card-body">'+                                                                       
+							'<h2 class="font-weight-lighter" style="color:#474C4F;"  >'+ totals.sales + '</h2>'+
+							'<span class="text-muted text-uppercase small">Units Sold</span>'+
+						'</div>'+
+					'</div>'+
+				'</div>'+
+				
+				'<div class="col-lg-2 col-sm-3 col-xs-12">'+
+					'<div class="maa-card card">'+
+						'<div class="card-body">'+                                                                       
+							'<h2 class="font-weight-lighter" style="color:#474C4F;"  >'+ totals.cancelled + '</h2>'+
+							'<span class="text-muted text-uppercase small">Units Cancelled</span>'+
+						'</div>'+
+					'</div>'+
+				'</div>'+
+				
+				'<div class="col-lg-2 col-sm-3 col-xs-12">'+
+					'<div class="maa-card card">'+
+						'<div class="card-body">'+                                                                       
+							'<h2 class="font-weight-lighter" style="color:#474C4F;"  >'+ totals.returned + '</h2>'+
+							'<span class="text-muted text-uppercase small">Units Returned</span>'+
+						'</div>'+
+					'</div>'+
+				'</div>'+
+				
+				'<div class="col-lg-2 col-sm-3 col-xs-12 offset-sm-1 offset-md-1 offset-lg-0">'+
+					'<div class="maa-card card">'+
+						'<div class="card-body">'+                                                                       
+							'<h2 class="font-weight-lighter" style="color:#474C4F;"  >$'+ parseFloat(totals.revenue).formatMoney(2) + '</h2>'+
+							'<span class="text-muted text-uppercase small">Revenue Earned</span>'+
+						'</div>'+
+					'</div>'+
+				'</div>'+
+				
+				'<div class="col-lg-2 col-sm-3 col-xs-12 no-card-bottom offset-lg-2">'+ 
+					'<div class="maa-card card">'+
+						'<div class="card-body">'+                                                                       
+							'<h2 class="font-weight-lighter" style="color:#474C4F;"  >$'+ parseFloat(totals.royalty).formatMoney(2) + '</h2>'+
+							'<span class="text-muted text-uppercase small">Royalties Earned</span>'+
+						'</div>'+
+					'</div>'+
+				'</div>'+
+				
+				'<div class="col-lg-2 col-sm-3 col-xs-12 no-card-bottom">'+
+					'<div class="maa-card card">'+
+						'<div class="card-body">'+                                                                       
+							'<h2 class="font-weight-lighter" style="color:#474C4F;"  >$'+ totals.avgRoytPerUnit + '</h2>'+
+							'<span class="text-muted text-uppercase small">Avg Royalties / Unit Sold</span>'+
+						'</div>'+
+					'</div>'+
+				'</div>'+
+				
+				'<div class="col-lg-2 col-sm-3 col-xs-12 no-card-bottom offset-sm-2 offset-md-2 offset-lg-0">'+
+					'<div class="maa-card card">'+
+						'<div class="card-body">'+                                                                       
+							'<h2 class="font-weight-lighter" style="color:#474C4F;"  >'+ ((totals.sales - totals.cancelled) /(numberofDaysInner+ 0.00001)).formatMoney(2) + '</h2>'+
+							'<span class="text-muted text-uppercase small">Avg Net Sales / '+ periodTitle +'</span>'+
+						'</div>'+
+					'</div>'+
+				'</div>'+
+				
+				'<div class="col-lg-2 col-sm-3 col-xs-12 no-card-bottom ">'+
+					'<div class="maa-card card">'+
+						'<div class="card-body">'+                                                                       
+							'<h2 class="font-weight-lighter" style="color:#474C4F;"  >$'+ totals.avgRoytPerTimePeriod + '</h2>'+
+							'<span class="text-muted text-uppercase small">Avg Royalties / '+ periodTitle +'</span>'+
+						'</div>'+
+					'</div>'+
+				'</div>';
+										
+		document.getElementById("dailystats").innerHTML = stats;
+		
+		//Regroup all youth sizes to just Youth
+		var adjustedSizesArray = {'Youth': 0, 'Small': 0, 'Medium': 0, 'Large': 0, 'XL': 0, '2XL': 0, '3XL': 0};
+		for(var item in sizesArray){
+			if (item == "4" || item == "6" || item == "8" || item == "10" || item == "12") {
+				adjustedSizesArray['Youth'] += parseInt(sizesArray[item]);
+			}
+			else {
+				adjustedSizesArray[item] += parseInt(sizesArray[item]);
+			}
+		}
+		
+		//Make sure colors are in correct order												
+		var shirtColorsColorsLUT = {'Dark Heather': "#454b4b", 'Heather Grey': "#d5d9da", 'Heather Blue': "#696c9c", 'Black': "#222", 
+			'Navy': "#15232b", 'Silver': "#cfd1d1", 'Royal Blue': "#1c4086", 'Brown': "#31261d", 'Slate': "#818189", 'Red': "#b71111", 'Asphalt': "#3f3e3c", 
+			'Grass': "#5e9444", 'Olive': "#4a4f26", 'Kelly Green': "#006136", 'Baby Blue': "#8fb8db", 'White': "#eeeeee", 'Lemon': "#f0e87b", 'Cranberry': "#6e0a25",
+			'Pink': "#f8a3bc", 'Orange': "#ff5c39", 'Purple': "#514689"};
+		var finalShirtColorsLUT = [];
+		for (var key in shirtColorsArray){
+			finalShirtColorsLUT.push(shirtColorsColorsLUT[key]);
+		}
+						
+		sortedPriceObject = {};
+		Object.keys(priceObject).sort(function(a,b){return priceObject[b]-priceObject[a]}).forEach(function(key) {
+			sortedPriceObject[key] = priceObject[key];
+		});
+		
+		var tealColorScheme = ["#e0f2f1", "#b2dfdb", "#80cbc4", "#4db6ac", "#26a69a", "#009688", "#00897b", "#00796b", "#00695c", "#004d40"];
+		var greenColorScheme = ["#429d54", "#4db461", "#65be76", "#7dc88b", "#95d2a1", "#addcb6", "#c4e6cb"]; 
+		//Extend Array Length
+		var shirtNicheColorsLUT = replicateArray(tealColorScheme, 20);
+		var pricingColorsLUT = replicateArray(greenColorScheme, 20);
+		
+		if(viewType == "month" && (localUnixToDate2.format("MMM YYYY") == moment().format("MMM YYYY"))){ //Monthly Labels
 			
-			globalStatus = 'none';
-			}); //Callback 2 end
+			//Projections
+			/* Calculate Projections */
+			startOfMonth = moment().startOf('month');
+			today = moment();
 			
-		}); //Callback end
+			
+			hoursSinceStartOfMonth = today.diff(startOfMonth, 'hours', true)
+			hoursInMonth = moment().daysInMonth() * 24;
+			
+			var projectionSalesArray = new Array(salesData.length).fill(null); //Array of Nulls for Projection
+			var projectionRevenueArray = new Array(salesData.length).fill(null); //Array of Nulls for Projection
+			var projectionRoyaltiesArray = new Array(salesData.length).fill(null); //Array of Nulls for Projection
+			
+
+			/* Projected Sales */
+			salesLastMonth = salesData[salesData.length - 2];
+			salesThisMonthSoFar = salesData[salesData.length - 1];
+			projectedSales = (salesThisMonthSoFar * hoursInMonth / hoursSinceStartOfMonth).toFixed(2); //Calculate Projection
+			
+			//Set Limits
+			if (projectedSales >= salesLastMonth*3){
+				projectedSales = salesLastMonth*3;
+			} 
+			
+			projectionSalesArray[projectionSalesArray.length - 1] = projectedSales; 
+			
+			
+			/* Projected Revenue */
+			revenueLastMonth = revenueData[revenueData.length - 2];		
+			revenueThisMonthSoFar = revenueData[revenueData.length - 1];
+			projectedRevenue = (revenueThisMonthSoFar * hoursInMonth / hoursSinceStartOfMonth).toFixed(2); //Calculate Projection
+			
+			//Set Limits
+			if (projectedRevenue >= revenueLastMonth*3){
+				projectedRevenue = revenueLastMonth*3;
+			} 
+			
+			projectionRevenueArray[projectionRevenueArray.length - 1] = projectedRevenue; 
+			
+			/* Projected Profit */
+			royaltiesLastMonth = royaltyData[royaltyData.length - 2];
+			royaltiesThisMonthSoFar = royaltyData[royaltyData.length - 1];
+			projectedRoyalties = (royaltiesThisMonthSoFar * hoursInMonth / hoursSinceStartOfMonth).toFixed(2); //Calculate Projection
+			
+			
+			//Set Limits
+			if (projectedRoyalties >= royaltiesLastMonth*3){
+				projectedRoyalties = royaltiesLastMonth*3;
+			} 
+			
+			projectionRoyaltiesArray[projectionRoyaltiesArray.length - 1] = projectedRoyalties; 
+		} else if(viewType == "week" && (localUnixToDate2.format("ww YYYY") == moment().format("ww YYYY")) ){ //Weekly Labels 
+			//Projections
+			/* Calculate Projections */
+			startOfWeek = moment().startOf('week');
+			today = moment();
+			
+			
+			hoursSinceStartOfWeek = today.diff(startOfWeek, 'hours', true)
+			hoursInWeek = 7 * 24;
+			
+			var projectionSalesArray = new Array(salesData.length).fill(null); //Array of Nulls for Projection
+			var projectionRevenueArray = new Array(salesData.length).fill(null); //Array of Nulls for Projection
+			var projectionRoyaltiesArray = new Array(salesData.length).fill(null); //Array of Nulls for Projection
+			
+
+			/* Projected Sales */
+			salesLastMonth = salesData[salesData.length - 2];
+			salesThisMonthSoFar = salesData[salesData.length - 1];
+			projectedSales = (salesThisMonthSoFar * hoursInWeek / hoursSinceStartOfWeek).toFixed(2); //Calculate Projection
+			
+			//Set Limits
+			if (projectedSales >= salesLastMonth*3){
+				projectedSales = salesLastMonth*3;
+			} else if (projectedSales <= salesLastMonth*0.5){
+				projectedSales = salesLastMonth*0.5;
+			}
+			
+			projectionSalesArray[projectionSalesArray.length - 1] = projectedSales; 
+			
+			
+			/* Projected Revenue */
+			revenueLastMonth = revenueData[revenueData.length - 2];		
+			revenueThisMonthSoFar = revenueData[revenueData.length - 1];
+			projectedRevenue = (revenueThisMonthSoFar * hoursInWeek / hoursSinceStartOfWeek).toFixed(2); //Calculate Projection
+			
+			//Set Limits
+			if (projectedRevenue >= revenueLastMonth*3){
+				projectedRevenue = revenueLastMonth*3;
+			} else if (projectedRevenue <= revenueLastMonth*0.5){
+				projectedRevenue = revenueLastMonth*0.5;
+			}
+			
+			projectionRevenueArray[projectionRevenueArray.length - 1] = projectedRevenue; 
+			
+			
+			/* Projected Profit */
+			royaltiesLastMonth = royaltyData[royaltyData.length - 2];
+			royaltiesThisMonthSoFar = royaltyData[royaltyData.length - 1];
+			projectedRoyalties = (royaltiesThisMonthSoFar * hoursInWeek / hoursSinceStartOfWeek).toFixed(2); //Calculate Projection
+			
+			
+			//Set Limits
+			if (projectedRoyalties >= royaltiesLastMonth*3){
+				projectedRoyalties = royaltiesLastMonth*3;
+			} else if (projectedRoyalties <= royaltiesLastMonth*0.5){
+				projectedRoyalties = royaltiesLastMonth*0.5;
+			}
+			
+			projectionRoyaltiesArray[projectionRoyaltiesArray.length - 1] = projectedRoyalties; 
+		}
+		
+		//Assemble Chart Info																	
+		var lineChartData1 = {
+			type: 'line',
+			data: {
+				labels: axisLabels,
+				datasets: [{
+					label: 'Projected Sales',
+					data: projectionSalesArray,
+					backgroundColor: "rgba(200, 200, 200, 0.75)",
+					pointBorderColor: "#ddd",
+					borderColor: "#ddd"
+				}, {
+					label: 'Returns',
+					data: returnData,
+					backgroundColor: "rgba(255, 204, 0, 0.75)",
+					pointBorderColor: "rgba(255, 204, 0,1)",
+					borderColor: "rgba(255, 204, 0,1)"
+				}, {
+					label: 'Cancellations',
+					data: cancelData,
+					backgroundColor: "rgba(255, 61, 61, 0.75)",
+					pointBorderColor: "rgba(255, 61, 61,1)",
+					borderColor: "rgba(255, 61, 61,1)"
+				}, {
+					label: 'Sales',
+					data: salesData,
+					backgroundColor: "rgba(91, 185, 70, 0.75)",
+					pointBorderColor: "rgba(91, 185, 70,1)",
+					borderColor: "rgba(91, 185, 70,1)"
+				}]
+			},
+			options: globalLineChartOptions,
+		};
+			
+		var lineChartData2 = {
+			type: 'line',
+			data: {
+				labels: axisLabels,
+				datasets: [{
+					label: 'Royalties',
+					data: royaltyData,
+					backgroundColor: "rgba(215, 45, 255, 0.5)",
+					pointBorderColor: "rgba(215, 45, 255,1)",
+					borderColor: "rgba(215, 45, 255,1)"
+				}, {
+					label: 'Revenue',
+					data: revenueData,
+					backgroundColor: "rgba(246, 145, 30, 0.75)",
+					pointBorderColor: "rgba(246, 145, 30,1)",
+					borderColor: "rgba(246, 145, 30,1)"
+				}, {
+					label: 'Projected Royalties',
+					data: projectionRoyaltiesArray,
+					backgroundColor: "rgba(210, 210, 210, 0.75)",
+					pointBorderColor: "#ccc",
+					borderColor: "#ccc"
+				}, {
+					label: 'Projected Revenue',
+					data: projectionRevenueArray,
+					backgroundColor: "rgba(200, 200, 200, 0.75)",
+					pointBorderColor: "#ddd",
+					borderColor: "#ddd"
+				}]
+			},
+			options: globalLineChartOptions,
+		};
+		
+		//Genders Charts
+		var lineChartData3 = {
+			type: 'doughnut',
+			data: {
+				labels: Object.keys(gendersArray),
+				datasets: [{							
+					data: Object.values(gendersArray),
+					backgroundColor: ["#3498db", "#e86dab", "#84cb74"],
+				}]
+			},
+			options: globalLineChartOptions, 
+		};
+		
+		//Size Charts
+		var lineChartData4 = {
+			type: 'doughnut',
+			data: {
+				labels: Object.keys(adjustedSizesArray),
+				datasets: [{							
+					data: Object.values(adjustedSizesArray),
+					backgroundColor: ["#ffab91", "#ff8a65", "#ff7043", "#ff5722", "#e64a19", "#d84315", "#ffccbc"],
+				}]
+			},
+			options: globalLineChartOptions,
+		};
+		
+		//Colors Charts
+		var lineChartData5 = {
+			type: 'doughnut',
+			data: {
+				labels: Object.keys(shirtColorsArray),
+				datasets: [{							
+					data: Object.values(shirtColorsArray),
+					backgroundColor: finalShirtColorsLUT,
+				}]
+			},
+			options: globalLineChartOptions,
+		};
+		
+		
+		//Pricing Charts
+		var lineChartData6 = {
+			type: 'bar',
+			data: {
+				labels: Object.keys(sortedPriceObject),
+				datasets: [{							
+					data: Object.values(sortedPriceObject),
+					backgroundColor: pricingColorsLUT,
+				}]
+			},
+			options: globalLineChartOptions,
+		};
+		
+		//Pricing Charts
+		var lineChartData7 = {
+			type: 'doughnut',
+			data: {
+				labels: Object.keys(productTypeObject),
+				datasets: [{							
+					data: Object.values(productTypeObject),
+					backgroundColor: shirtNicheColorsLUT,
+				}]
+			},
+			options: globalLineChartOptions,
+		};
+		
+		
+		
+		var ctxSales = document.getElementById("canvas1").getContext("2d");	
+		var myChart = new Chart(ctxSales, lineChartData1);
+			
+		var ctxRevenue = document.getElementById("canvas2").getContext("2d");	
+		var myChart2 = new Chart(ctxRevenue, lineChartData2);
+						
+		var ctxGenders = document.getElementById("canvas3").getContext("2d");	
+		ctxGenders.height = 500;
+		var myChart3 = new Chart(ctxGenders, lineChartData3);
+		
+		var ctxSizes = document.getElementById("canvas4").getContext("2d");	
+		var myChart4 = new Chart(ctxSizes, lineChartData4);
+		
+		var ctxColors = document.getElementById("canvas5").getContext("2d");	
+		var myChart5 = new Chart(ctxColors, lineChartData5);
+		
+		var ctxPricing = document.getElementById("canvas6").getContext("2d");	
+		var myChart6 = new Chart(ctxPricing, lineChartData6);
+		
+		var ctxProdTypes = document.getElementById("canvas7").getContext("2d");	
+		var myChart7 = new Chart(ctxProdTypes, lineChartData7);
+		
+		
+		//Summing up all values
+		var allASINValues = [];
+		for (i = 0; i < responseArray.length; i++){
+			allASINValues.push(responseArray[i]["asin"]);
+		}
+										
+		uniqueArray = allASINValues.filter(function(item, pos) {
+			return allASINValues.indexOf(item) == pos;
+		})
+						
+		//Create blank target array
+		var resultSumSales = [];
+		for(i=0; i < uniqueArray.length; i++){
+			resultSumSales.push({
+				ASIN: uniqueArray[i],
+				Name: '',
+				ProductType: '',
+				Units: 0,
+				Cancelled: 0,
+				Returned: 0,
+				Royalty: 0,
+				Revenue: 0
+			})
+		}
+		
+		for (i = 0; i < resultSumSales.length; i++){
+			for (i2 = 0; i2 < responseArray.length; i2++){
+				if(resultSumSales[i]["asin"] == responseArray[i2]["asin"]){
+					resultSumSales[i]["Name"] = responseArray[i2]["Name"];
+					resultSumSales[i]["ProductType"] = responseArray[i2]["Product Type"].replace(/-/i, '&#8209;');
+					resultSumSales[i]["Units"] += parseInt(responseArray[i2]["Units"]);
+					resultSumSales[i]["Cancelled"] += parseInt(responseArray[i2]["Cancelled"]);
+					resultSumSales[i]["Returned"] += parseInt(responseArray[i2]["Returned"]);
+					resultSumSales[i]["Royalty"] += parseFloat(responseArray[i2]["Royalty"]);
+					resultSumSales[i]["Revenue"] += parseFloat(responseArray[i2]["Revenue"]);
+				}
+			}
+		}
+							
+		// Assemble Sales History Table
+		var cp2 = '<table class="maa-table table table-striped sortable" id="itemizedList">' +
+			'<thead>' + 
+				'<tr>' +
+					'<th>#</th>' +
+					'<th>Product Name</th>' +
+					'<th>Product Type</th>' +
+					'<th class="text-center">Product Details</th>' +
+					'<th class="text-center">Units Sold</th>' +
+					'<th class="text-center">Units Cancelled</th>' +
+					'<th class="text-center">Units Returned</th>' +
+					'<th class="text-center">Revenue</th>' +
+					'<th class="text-center">Royalties</th>' +
+					'<th class="text-center">Royalties / Unit</th>' +
+					'<th class="text-center">Edit / Delete </th>' +
+				'</tr>'  +
+			'</thead><tbody>';
+
+		//Sort Sales Data By Units Sold Descending
+		resultSumSales.sort(function(a, b){
+		  return b.Units - a.Units;
+		});
+							
+		for (i=0; i < resultSumSales.length; i++){			
+			
+			var itemName = resultSumSales[i]["Name"].replace(/"/g, "");
+			var uriEncodedName = encodeURIComponent(itemName); 
+			var deleteLink = 'https://merch.amazon.com/manage/products?pageNumber=1&pageSize=15&keywords=' + uriEncodedName + '&statusFilters=%5B%22DELETED%22%2C%22DRAFT%22%2C%22LIVE%22%2C%22NOT_DISCOVERABLE%22%2C%22PENDING%22%2C%22PROCESSING%22%2C%22STOPPED%22%2C%22UNDER_REVIEW%22%2C%22REJECTED%22%2C%22MANUALLY_REJECTED%22%5D';	
+		
+				
+			cp2 += '<tr data-href="https://www.amazon.com/dp/' + resultSumSales[i]["asin"]  +   '">' + 
+				'<td>' + (i + 1) + '</td>' + 
+				'<td>' + 
+					resultSumSales[i]["Name"]  + 
+				'</td>' + 
+				
+				'<td>' + 
+					resultSumSales[i]["ProductType"]   + 
+				'</td>' + 
+										
+				'<td class="text-center btn-inside">' +						
+					'<a target="_blank" href="' + '/IndividualProductPage/?ASIN=' + resultSumSales[i]["asin"]  + '" class="btn btn-primary">Analyze</a>' +
+				'</td>' +
+								
+				'<td class="text-center">' +
+					resultSumSales[i]["Units"]  +
+				'</td>' +
+					
+				'<td class="text-center">' +
+					resultSumSales[i]["Cancelled"]  +
+				'</td>' +
+				
+				'<td class="text-center">' +
+					resultSumSales[i]["Returned"]  +
+				'</td>' +
+				
+				'<td class="text-center">' +
+					'$' + resultSumSales[i]["Revenue"].toFixed(2)  +
+				'</td>' +
+				
+				'<td class="text-center">' +
+					'$' + resultSumSales[i]["Royalty"].toFixed(2)  +
+				'</td>' +
+				
+				'<td class="text-center">' +
+					'$' + (resultSumSales[i]["Royalty"].toFixed(2) / (resultSumSales[i]["Units"] - resultSumSales[i]["Cancelled"] - resultSumSales[i]["Returned"] + 0.00001)).toFixed(2)  +
+				'</td>' +
+				'<td class="text-center btn-inside">' +  
+					'<a target="_blank" href="' + deleteLink + '" class="btn btn-outline-primary">Edit</a>' + 
+				'</td>' +
+			'</tr>'; 
+		}
+					
+		cp2 += '</tbody></table>';
+		
+		document.getElementById("shirtlist").innerHTML = cp2;
+			
+		//Init TableSort
+		new Tablesort(document.getElementById('itemizedList'));
+		
+		//Make Entire Row Clickable & Link to Individual Product Page
+		$(function(){
+			$('#itemizedList tbody > tr[data-href!=""] td:not(.btn-inside)').click(function() {
+				var url = $(this).closest("tr").data("href");
+				window.open(url, '_blank');
+			});
+		});
+
+		$('input[name="datefilter"]').daterangepicker(
+			{  
+				showDropdowns: true,
+				opens: 'left',
+				linkedCalendars: false,
+				showCustomRangeLabel: false,
+				autoApply: true,
+				autoUpdateInput: true,
+				alwaysShowCalendars: true,
+				maxDate: new Date,
+				minDate: new Date(2015, 9, 1),
+				ranges: {
+				   'Today': [moment(), moment()],
+				   'Last 7 Days': [moment().subtract(7, 'days').startOf('day'), moment().startOf('day')],
+				   'Last 14 Days': [moment().subtract(13, 'days'), moment()],
+				   'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+				   'This Month': [moment().startOf('month'), moment().endOf('month')],
+				   'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
+				   'Last 90 Days': [moment().subtract(89, 'days'), moment()]
+				}
+			}
+		);
+		
+		function resubmitPage(picker){
+			//Calculate Unix Timestamps
+			var fromDate = picker.startDate.unix();
+			var toDate = picker.endDate.unix();
+			
+			if((toDate - fromDate) < (91*24*60*60) && (toDate - fromDate) > (32*24*60*60)){
+				var extraFlag = 'week';
+				fromDate = moment.unix(fromDate).startOf('week').unix(); //Get full weeks offset						
+			} else if ((toDate - fromDate) > 91*24*60*60){
+				var extraFlag = 'month';
+				fromDate = moment.unix(fromDate).startOf('month').unix(); //Get full months offset						
+			} else {
+				var extraFlag = 'day';
+			}
+			dailySalesPage(fromDate, toDate, extraFlag);
+		}
+		
+		$('input[name="datefilter"]').on('apply.daterangepicker', function(ev, picker) {					
+			resubmitPage(picker);
+		});
+		
+		$('input[name="datefilter"], input[name="daterangepicker_start"],  input[name="daterangepicker_end"]').on("keyup", function(e) {
+			if (e.keyCode == 13) {
+				var picker = {};
+				
+				picker.startDate = $('input[name="datefilter"]').data('daterangepicker').startDate;
+				picker.endDate = $('input[name="datefilter"]').data('daterangepicker').endDate;
+				
+				resubmitPage(picker);
+			}
+		});
+
+	
+	globalStatus = 'none';
+	
+		
 	});
 	
 }
@@ -2041,43 +1828,7 @@ function renderIndividualProductSales(queryParams){
 								'</div>';
 				
 				document.getElementById("individualShirtSummary").innerHTML = shirtInfo;	
-				
-				getShirtNiche(targetASIN, function(determinedNiche){
-					if(determinedNiche != 'unknown niche'){					
-						$(".niche-input").val(determinedNiche);
-						$(".niche-input").closest('.form-group').addClass("has-success");
-						$(".niche-input").addClass("form-control-success");
-					}
-					
-					//Remove success on focus 
-					$('.niche-input').focusin(function() {
-						$(this).removeClass("form-control-success").removeClass("form-control-danger");
-					});
-					
-					var enterPressed = false; //Flag to prevent double saving
-					
-					//Enter key also saves
-					$('.niche-input')
-						.keydown(function(e) {
-							if (e.which == 13 || e.which == 9) { //Enter Key
-								e.preventDefault();
-										
-								if ($(this).val().length > 1){
-									nicheName = $(this).val();
-									saveShirtNiche(nicheName, targetASIN, $(this));
-									enterPressed = true;
-								}
-							}
-						}).focusout(function() {
-							if ($(this).val().length > 1 && !enterPressed){
-								nicheName = $(this).val();
-								saveShirtNiche(nicheName, targetASIN, $(this));
-							}
-							
-							enterPressed = false;
-					});			
-				})
-				
+								
 				//Regroup all youth sizes to just Youth
 				var adjustedSizesArray = {'Youth': 0, 'Small': 0, 'Medium': 0, 'Large': 0, 'XL': 0, '2XL': 0, '3XL': 0};
 				for(var item in sizesArray){
@@ -2398,194 +2149,6 @@ function save_options() {
     });
 	
 }
-/***************************************************************/
-/************************ Niche Storage ************************/
-/***************************************************************/
-function getShirtNiche(shirtASIN, callback){
-	var myKey = String(shirtASIN);
-	var determinedNiche = 'unknown niche'; //default state
-	
-	chrome.storage.sync.get(myKey, function(items) {
-		if(Object.values(items).length > 0){ 
-			parsedJson = JSON.parse(items[myKey]);
-			determinedNiche = parsedJson["niche"];
-		
-			callback(determinedNiche); //Run Callback     
-		} else{ //If no matches, try locally
-			chrome.storage.local.get(myKey, function(localItems) {
-				if(Object.values(localItems).length > 0){
-					parsedJson = JSON.parse(localItems[myKey]);
-					determinedNiche = parsedJson["niche"];
-				}
-				
-				callback(determinedNiche); //ALWAYS Run Callback
-			});
-		}
-	});
-}
-			
-function getAllShirtNiches(callback){
-	chrome.storage.sync.get(null, function(items) {
-		chrome.storage.local.get(null, function(localItems) {			
-			var itemsTogether = Object.assign({}, items, localItems);
-			callback(itemsTogether);
-		});
-	});
-}
-		
-function saveShirtNiche(nicheName, parentASIN, targetHTMLitem = null) {		
-	//Assemble Stringified JSON	
-	var key = parentASIN,
-	data = JSON.stringify({
-		'niche': nicheName
-	});
-    var jsonfile = {};
-    jsonfile[key] = data;
-	
-	// Save it using the Chrome extension storage API.	
-    chrome.storage.sync.set(jsonfile, function () {
-		if (chrome.runtime.lastError && chrome.runtime.lastError.message == 'This request exceeds the MAX_WRITE_OPERATIONS_PER_MINUTE quota.') {	
-			targetHTMLitem.closest('.form-group').addClass('has-danger');
-			targetHTMLitem.addClass("form-control-danger");
-			
-			generateStatusBar('Cannot store tag. You are entering items too quickly. Please slow down.', 'danger');
-			
-		} else if (chrome.runtime.lastError && chrome.runtime.lastError.message == 'MAX_ITEMS quota exceeded'){		
-			//Store it locally
-			chrome.storage.local.set(jsonfile, function () {
-				console.log('Saved in local:', key, data);
-				targetHTMLitem.closest('.form-group').addClass('has-success');
-				targetHTMLitem.addClass("form-control-success");
-			});
-			
-		} else if (chrome.runtime.lastError){
-			targetHTMLitem.closest('.form-group').addClass('has-danger');
-			targetHTMLitem.addClass("form-control-danger")
-			
-			console.log("Caught generic error");
 
-		} else{
-			console.log('Saved in Sync:', key, data);
-			targetHTMLitem.closest('.form-group').addClass('has-success');
-			targetHTMLitem.addClass("form-control-success");
-		}
-    });
-}
+	
 
-function readShirtNiche(){	//Used only on Product Manager Page
-	$('[name="nicheName"]').each(function () {
-		//Get ASIN
-		var myKey = $(this).closest('td').find('[name="parentASIN"]').val();
-		
-		var that = $(this);
-		//Fetch Matching Niche, Sync first, if not, attempt to get it locally.
-		chrome.storage.sync.get(myKey, function(items) {
-			if (typeof(items[myKey]) != 'undefined' && items[myKey].length > 1){
-				parsedJson = JSON.parse(items[myKey]);
-				that.val(parsedJson["niche"]);
-				that.closest('td').attr('data-sort', parsedJson["niche"]);
-				that.closest('.form-group').addClass("has-success");
-				that.addClass("form-control-success");
-			} else{
-				//Try to get it locally
-				chrome.storage.local.get(myKey, function(items) {
-					if (typeof(items[myKey]) != 'undefined' && items[myKey].length > 1){
-						parsedJson = JSON.parse(items[myKey]);
-						that.val(parsedJson["niche"]);
-						that.closest('td').attr('data-sort', parsedJson["niche"]);
-						that.closest('.form-group').addClass("has-success");
-						that.addClass("form-control-success");
-					}
-				});
-			}
-		});
-	});
-}
-	
-function getNicheDistribution(callback){
-	chrome.storage.sync.get(null, function(items) {
-		var allValues = Object.values(items);
-		
-		parsedArray = [];
-		for(var i=0; i < allValues.length; i++ ) {
-			parsedArray.push(JSON.parse(allValues[i])['niche']);
-			
-		}
-		
-		var totalTally = {};
-		parsedArray.forEach(function(x) { totalTally[x] = (totalTally[x] || 0)+1; });
-		
-		
-		callback(totalTally);
-	});
-	
-}
-	
-function clearAllNicheData(){
-	chrome.storage.sync.clear();
-	chrome.storage.local.clear();
-	$('.niche-input').val(''); 
-	$('.form-control-success').removeClass('form-control-success');
-	alert("All previous data has been cleared");
-}
-
-function initSaveButtons(){ //(Used only on Product Manager: Adds event listeners to all buttons	
-	$(function(){			
-		//Listener for reset button
-		document.getElementById('reset-button').addEventListener("click", function(){
-			var confirmResponse = confirm("This will clear all the data you have entered. Are you sure you want to clear all niches?");
-			if (confirmResponse == true) {
-				clearAllNicheData();
-			} 
-		}, false);
-		
-		//Remove success on focus 
-		$('#shirtlist input[type="text"]').focusin(function() {
-			$(this).removeClass("form-control-success").removeClass("form-control-danger");
-		})
-		
-		var enterPressed = false; //Flag to prevent double saving
-		//Unfocus auto saves
-		$('#shirtlist input[type="text"]')
-			.keydown(function(e) { 
-				//Enter key goes to next field
-				if (e.which == 13 || e.which == 9) { //Enter Key
-					e.preventDefault();
-							
-					if ($(this).val().length > 1){
-						nicheName = $(this).closest('td').find('[name="nicheName"]').val();
-						parentASIN = $(this).closest('td').find('[name="parentASIN"]').val();
-						$(this).closest('td').attr('data-sort', $(this).val()); //Add attr for table sorting
-						saveShirtNiche(nicheName, parentASIN, $(this));
-						enterPressed = true;
-						
-						$(this).closest("tr").next().find('input[type="text"]').focus(); //Focus on Next Field
-					}
-				}
-					
-				if (e.which == 38) { //Up Key
-					e.preventDefault();
-					$(this).closest("tr").prev().find('input[type="text"]').focus(); //Focus on Next Field
-				}
-				
-				if (e.which == 40) { //Down Key
-					e.preventDefault();
-					$(this).closest("tr").next().find('input[type="text"]').focus(); //Focus on Next Field
-				}
-	
-			})
-			.focusout(function() { //Unfocus also saves
-				if ($(this).val().length > 1 && !enterPressed){
-					nicheName = $(this).closest('td').find('[name="nicheName"]').val();
-					parentASIN = $(this).closest('td').find('[name="parentASIN"]').val();
-					$(this).closest('td').attr('data-sort', $(this).val()); //Add attr for table sorting
-					saveShirtNiche(nicheName, parentASIN, $(this));
-					
-
-				}
-				enterPressed = false;
-		})
-		
-		readShirtNiche();		
-	})
-}
