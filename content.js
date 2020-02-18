@@ -81,8 +81,8 @@ var globalSidebar = '<nav id="sidebar">' +
 							'<li><a id="todaySales"><i class="fa fa-calendar-o" aria-hidden="true"></i> Today\'s Sales</a></li>' +
 							'<li class="active"><a id="dailySales"><i class="fa fa-th-large" aria-hidden="true"></i> 7 Day Sales</a></li>' +
 							'<li><a id="monthlySales"><i class="fa fa-calendar" aria-hidden="true"></i> Monthly Sales</a></li>' +
-							'<li><a id="productManager"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Manage Products</a></li>' +
-							'<li style="display:none;"><a id="indvProduct"><i class="fa fa-crosshairs" aria-hidden="true"></i> Individual Product Info</a></li>' +
+							//'<li><a id="productManager"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Manage Products</a></li>' +
+							'<li><a id="indvProduct"><i class="fa fa-crosshairs" aria-hidden="true"></i> Individual Product Info</a></li>' + //style="display:none;"
 							'<li><a id="settingsPage"><i class="fa fa-cogs" aria-hidden="true"></i> Settings</a></li>' +
 						'</ul>' +
 				'</nav>';
