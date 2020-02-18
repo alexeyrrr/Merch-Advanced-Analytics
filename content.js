@@ -569,10 +569,6 @@ function dailySalesPage(fromDate, toDate, viewType = 'day'){
 								'<li class="nav-item"><a class="nav-link" href="#revenue" role="tab" data-toggle="tab">Revenue/Royalties</a></li>' +
 								'<li class="nav-item"><a class="nav-link" href="#productAnalysis" role="tab" data-toggle="tab">Product Analysis</a></li>' +
 								'<li class="nav-item"><a class="nav-link" href="#pricing" role="tab" data-toggle="tab">Pricing Analysis</a></li>' +
-								'<li class="nav-item"><a class="nav-link" href="#niche" role="tab" data-toggle="tab">'+
-									'Niche Analysis' +
-									'<i class="fa fa-info-circle" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="Group together TShirt designs of similar niches or styles to help forecast future winners on a broader scale. Niche tags can be set on the Manage Products page"></i>'+
-								'</a></li>' +
 							'</ul>' +
 						'</div>' +
 						
@@ -612,28 +608,6 @@ function dailySalesPage(fromDate, toDate, viewType = 'day'){
 
 								'</center>' +
 							'</div>' +
-							'<div class="tab-pane" role="tabpanel" id="niche">' +
-								'<div class="inner-container">' +
-									'<div class="container row">' +									
-										'<div class="col col-xs-6 col-sm-6">'+
-											'<center class="canvas-wrapper">' +
-												'<canvas id="canvas8" height="340" width="280"></canvas>'+
-												'<h5 class="canvas-title">Niche Distribution (Number Sold)</h5>' +
-											'</center>' +
-										'</div>' +
-										
-										'<div class="col col-xs-6 col-sm-6">'+
-											'<center class="canvas-wrapper">' +
-												'<canvas id="canvas9" height="340" width="280"></canvas>'+
-												'<div class="canvas-title">' +
-													'<h5>Normalized Niche Distribution (%)</h5>' +
-													'<i class="fa fa-info-circle" style="font-size:1rem;" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="A normalized distribution takes into account the number of shirts for each niche and factors out the relative availablilty of each niche. (i.e. think like comparing a country\'s GDP vs GDP Per Capita)"></i>'+
-												'</div>' +
-											'</center>' +
-										'</div>' +
-									'</div>' +
-								'</div>' +
-							'</div>' +
 						'</div>' +
 					'</div>' +
 					
@@ -660,8 +634,6 @@ function dailySalesPage(fromDate, toDate, viewType = 'day'){
 function renderDailyView(unixFromDate, unixToDate, viewType){	
 	fetchSalesDataCSV(unixFromDate, unixToDate, responseArray = [], function(){		
 		//Generate Axis Labels
-				
-		console.log(responseArray);
 		
 		var axisLabels = [];
 				
@@ -695,8 +667,8 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 		var royaltyData = new Array(axisLabels.length).fill(0);
 		
 		//Tally Numbers
-		var gendersArray = {'Men': 0, 'Women': 0, 'Youth': 0, 'Unisex': 0};
-		var sizesArray = {'Small': 0, 'Medium': 0, 'Large': 0, 'XL': 0, '2XL': 0, '3XL': 0, '4': 0, '6': 0, '8': 0, '10': 0, '12': 0};		
+		var gendersArray = {'men': 0, 'women': 0, 'youth': 0, 'unisex': 0};
+		var sizesArray = {'male_small': 0, 'male_medium': 0, 'male_large': 0, 'XL': 0, '2XL': 0, '3XL': 0, '4': 0, '6': 0, '8': 0, '10': 0, '12': 0};		
 		var shirtColorsArray = {'Dark Heather': 0, 'Heather Grey': 0, 'Heather Blue': 0, 'Black': 0, 'Navy': 0, 'Silver': 0, 'Royal Blue': 0, 'Brown': 0, 'Slate': 0, 'Red': 0, 'Asphalt': 0, 'Grass': 0, 'Olive': 0, 'Kelly Green': 0, 'Baby Blue': 0, 'White': 0, 'Lemon': 0, 'Cranberry': 0, 'Pink': 0, 'Orange': 0, 'Purple': 0};
 		var priceObject = {};
 		var productTypeObject = {};
@@ -714,28 +686,27 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 				if(viewType == "month"){
 					var startDate   = moment(axisLabels[i], "MMM YYYY"); //This date month
 					var endDate     = moment(axisLabels[i], "MMM YYYY").add(1,'months'); //Previous month
-					var compareDate = moment(responseArray[i2]["period"], "MM-DD-YYYY");
+					var compareDate = moment(responseArray[i2]["period"]);
 
 					var isWithinRange = compareDate.isBetween(startDate, endDate, 'months', '[)') // left inclusive
 				
 				} else if(viewType == "week"){
 					var startDate   = moment(axisLabels[i], "ww YYYY"); //This date week
 					var endDate     = moment(axisLabels[i], "WW YYYY").add(1,'weeks'); //Previous week
-					var compareDate = moment(responseArray[i2]["period"], "MM-DD-YYYY");
+					var compareDate = moment(responseArray[i2]["period"]);
 					
 					var isWithinRange = compareDate.isBetween(startDate, endDate, 'weeks', '[)') // left inclusive
 					
 				} else if(viewType == "day"){ //Daily View
 					var startDate   = moment(axisLabels[i], "MM-DD-YYYY"); //This Date
 					var endDate     = moment(axisLabels[i], "MM-DD-YYYY").add(1,'days'); //Yesterday
-					var compareDate = moment(responseArray[i2]["period"], "MM-DD-YYYY");
+					var compareDate = moment(responseArray[i2]["period"]);
 					
 					var isWithinRange = compareDate.isBetween(startDate, endDate, 'days', '[)') // left inclusive
 				}
 				
 				
 				if(isWithinRange){ //See if inside range
-									
 					salesData[i] += parseInt(responseArray[i2]["unitsSold"]);
 					cancelData[i] += parseInt(responseArray[i2]["unitsCancelled"]);
 					returnData[i] += parseInt(responseArray[i2]["unitsReturned"]);
@@ -784,7 +755,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 				}
 			}
 			
-			console.log(salesData);
+			//console.log(salesData);
 
 
 			if(viewType == "day" && axisLabels.length <= 15){
@@ -1249,16 +1220,18 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 			})
 		}
 		
+		console.log(responseArray);
+
 		for (i = 0; i < resultSumSales.length; i++){
 			for (i2 = 0; i2 < responseArray.length; i2++){
-				if(resultSumSales[i]["asin"] == responseArray[i2]["asin"]){
-					resultSumSales[i]["Name"] = responseArray[i2]["Name"];
-					resultSumSales[i]["ProductType"] = responseArray[i2]["Product Type"].replace(/-/i, '&#8209;');
-					resultSumSales[i]["Units"] += parseInt(responseArray[i2]["Units"]);
-					resultSumSales[i]["Cancelled"] += parseInt(responseArray[i2]["Cancelled"]);
-					resultSumSales[i]["Returned"] += parseInt(responseArray[i2]["Returned"]);
-					resultSumSales[i]["Royalty"] += parseFloat(responseArray[i2]["Royalty"]);
-					resultSumSales[i]["Revenue"] += parseFloat(responseArray[i2]["Revenue"]);
+				if(resultSumSales[i]["ASIN"] == responseArray[i2]["asin"]){
+					resultSumSales[i]["Name"] = responseArray[i2]["asinName"];
+					resultSumSales[i]["ProductType"] = responseArray[i2]["productType"].replace(/-/i, '&#8209;');
+					resultSumSales[i]["Units"] += parseInt(responseArray[i2]["unitsSold"]);
+					resultSumSales[i]["Cancelled"] += parseInt(responseArray[i2]["unitsCancelled"]);
+					resultSumSales[i]["Returned"] += parseInt(responseArray[i2]["unitsReturned"]);
+					resultSumSales[i]["Royalty"] += parseFloat(responseArray[i2]["royalties"]["value"]);
+					resultSumSales[i]["Revenue"] += parseFloat(responseArray[i2]["revenue"]["value"]);
 				}
 			}
 		}
@@ -1285,6 +1258,8 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 		resultSumSales.sort(function(a, b){
 		  return b.Units - a.Units;
 		});
+
+		console.log(resultSumSales);
 							
 		for (i=0; i < resultSumSales.length; i++){			
 			
@@ -1567,9 +1542,6 @@ function productManager() {
 			$('[data-toggle="tooltip"]').tooltip();//Init tooltips
 		});
 				
-			
-		initSaveButtons(); //initialize event listeners for buttons
-		
 		globalStatus = 'none';
 	});
 }
