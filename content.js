@@ -2,7 +2,12 @@
 /*************** Date & Global Helper Functions ******************/
 /***************************************************************/
 function titleCase(str) {
+	if(str == "HOUSE BRAND"){
+		str = "standard t-shirt";
+	}
+
 	str = str.toLowerCase().split(' ');
+	
 	for (var i = 0; i < str.length; i++) {
 		str[i] = str[i].charAt(0).toUpperCase() + str[i].slice(1);
 	}
@@ -42,7 +47,7 @@ var globalSidebar = '<nav id="sidebar">' +
 							'<li class="active"><a id="dailySales"><i class="fa fa-th-large" aria-hidden="true"></i> 7 Day Sales</a></li>' +
 							'<li><a id="monthlySales"><i class="fa fa-calendar" aria-hidden="true"></i> Monthly Sales</a></li>' +
 							//'<li><a id="productManager"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Manage Products</a></li>' +
-							'<li><a id="indvProduct"><i class="fa fa-crosshairs" aria-hidden="true"></i> Individual Product Info</a></li>' + //style="display:none;"
+							//'<li><a id="indvProduct"><i class="fa fa-crosshairs" aria-hidden="true"></i> Individual Product Info</a></li>' + //style="display:none;"
 							'<li><a id="settingsPage"><i class="fa fa-cogs" aria-hidden="true"></i> Settings</a></li>' +
 						'</ul>' +
 				'</nav>';
@@ -673,7 +678,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 					royaltyData[i] += parseFloat(responseArray[i2]["royalties"]["value"]);
 
 					//Determine Gender And Count it 
-					var shirtGender = responseArray[i2]["variationInfo"]["fit"];
+					var shirtGender = titleCase(responseArray[i2]["variationInfo"]["fit"]);
 					if (shirtGender in gendersArray){
 						gendersArray[shirtGender] += 1;
 					} else {
@@ -690,7 +695,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 					}
 					
 					//Determine Color And Count it 
-					var shirtColor = responseArray[i2]["variationInfo"]["color"];
+					var shirtColor = titleCase(responseArray[i2]["variationInfo"]["color"].replace(/_/g, " "));
 					if (shirtColor in shirtColorsObject){
 						shirtColorsObject[shirtColor] += 1;
 					} else {
@@ -711,7 +716,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 					}
 												
 					//Determine Product Type & Count it
-					var productType = titleCase(responseArray[i2]["productType"]).replace(/_/g, " ");		
+					var productType = titleCase(responseArray[i2]["productType"].replace(/_/g, " "));		
 					if (productType in productTypeObject){
 						productTypeObject[productType] += 1;
 					} else {
@@ -859,7 +864,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 		//Regroup all youth sizes to just Youth
 		var adjustedSizesArray = {};
 		for(var item in sizesArray){
-			var newSize = item.split("_")[1];
+			var newSize = titleCase(item.split("_")[1]);
 
 			if (/^\d+$/.test(newSize)){  // Old Way newSize == "3" || newSize == "4" || newSize == "6" || newSize == "8" || newSize == "10" || newSize == "12") {
 				if ('Youth' in adjustedSizesArray){
@@ -877,10 +882,10 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 		}
 		
 		//Make sure colors are in correct order												
-		var shirtColorsColorsLUT = {'dark_heather': "#454b4b", 'heather_grey': "#d5d9da", 'heather_blue': "#696c9c", 'black': "#222", 
-			'navy': "#15232b", 'silver': "#cfd1d1", 'royal': "#1c4086", 'brown': "#31261d", 'slate': "#818189", 'red': "#b71111", 'asphalt': "#3f3e3c", 
-			'grass': "#5e9444", 'olive': "#4a4f26", 'kelly_green': "#006136", 'baby_blue': "#8fb8db", 'white': "#eeeeee", 'lemon': "#f0e87b", 'cranberry': "#6e0a25",
-			'pink': "#f8a3bc", 'orange': "#ff5c39", 'purple': "#514689", 'sapphire': "#3667A3", 'black_athletic_heather': "#454b4b", 'dark_heather_white': "#454b4b",'neon_pink': "#FE5BAC",'black_white': "#222",'forest_green': "#0f5b20"};
+		var shirtColorsColorsLUT = {'Dark Heather': "#454b4b", 'Heather Grey': "#d5d9da", 'Heather Blue': "#696c9c", 'Black': "#222", 
+			'Navy': "#15232b", 'Silver': "#cfd1d1", 'Royal': "#1c4086", 'Brown': "#31261d", 'Slate': "#818189", 'Red': "#b71111", 'Asphalt': "#3f3e3c", 
+			'Grass': "#5e9444", 'Olive': "#4a4f26", 'Kelly Green': "#006136", 'Baby Blue': "#8fb8db", 'White': "#eeeeee", 'Lemon': "#f0e87b", 'Cranberry': "#6e0a25",
+			'Pink': "#f8a3bc", 'Orange': "#ff5c39", 'Purple': "#514689", 'Sapphire': "#3667A3", 'Black Athletic Heather': "#454b4b", 'Dark Heather White': "#454b4b",'Neon Pink': "#FE5BAC",'Black White': "#222",'Forest Green': "#0f5b20"};
 		var finalShirtColorsLUT = [];
 		for (var key in shirtColorsObject){
 			finalShirtColorsLUT.push(shirtColorsColorsLUT[key]);
@@ -1215,7 +1220,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 					'<th>#</th>' +
 					'<th>Product Name</th>' +
 					'<th>Product Type</th>' +
-					'<th class="text-center">Product Details</th>' +
+					//'<th class="text-center">Product Details</th>' +
 					'<th class="text-center">Units Sold</th>' +
 					'<th class="text-center">Units Cancelled</th>' +
 					'<th class="text-center">Units Returned</th>' +
@@ -1229,8 +1234,6 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 		resultSumSales.sort(function(a, b){
 		  return b.Units - a.Units;
 		});
-
-		console.log(resultSumSales);
 							
 		for (i=0; i < resultSumSales.length; i++){			
 			
@@ -1246,10 +1249,12 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 				'<td>' + 
 					resultSumSales[i]["ProductType"]   + 
 				'</td>' + 
-										
+						
+				/*
 				'<td class="text-center btn-inside">' +						
 					'<a target="_blank" href="' + '/IndividualProductPage/?ASIN=' + resultSumSales[i]["ASIN"]  + '" class="btn btn-primary">Analyze</a>' +
 				'</td>' +
+				*/
 								
 				'<td class="text-center">' +
 					resultSumSales[i]["Units"]  +

@@ -61,48 +61,6 @@ chrome.runtime.onInstalled.addListener(function(details){
 	firstInstall = true;
 });
 
-function csvToJSON(csv) {
-  var lines=csv.split("\n");
-  var result = [];
-  var headers = lines[0].split(",");
-
-  for(var i=1; i<lines.length; i++) {
-    var obj = {};
-
-    var row = lines[i],
-      queryIdx = 0,
-      startValueIdx = 0,
-      idx = 0;
-
-    if (row.trim() === '') { continue; }
-
-    while (idx < row.length) {
-      var c = row[idx];
-
-      if (c === '"') {
-        do { c = row[++idx]; } while (c !== '"' && idx < row.length - 1);
-      }
-
-      if (c === ',' || idx === row.length - 1) {
-        var value = row.substr(startValueIdx, idx - startValueIdx).trim();
-
-        if (value[0] === '"') { value = value.substr(1); }
-        if (value[value.length - 1] === ',') { value = value.substr(0, value.length - 1); }
-        if (value[value.length - 1] === '"') { value = value.substr(0, value.length - 1); }
-
-        var key = headers[queryIdx++];
-        obj[key] = value;
-        startValueIdx = idx + 1;
-      }
-
-      ++idx;
-    }
-
-    result.push(obj);
-  }
-  return result;
-}
-
 var checkforsales = function() {
 	chrome.storage.sync.get("Settings", function(items) {
 		if(Object.values(items).length != 0){
@@ -130,11 +88,14 @@ var checkforsales = function() {
 						chrome.browserAction.setBadgeBackgroundColor({ color: '#008000' }); 
 						chrome.browserAction.setBadgeText({ text: " " });
 						
-						var sevenDaySales = csvToJSON(reqs.responseText);
+						var sevenDaySales = JSON.parse(reqs.responseText)["ATVPDKIKX0DER"];
+						
+						//figure out keys for all below
+						
 
 						var sevenDaySaleCount = 0;
 						sevenDaySales.forEach(function(element) { //Tally up net units sold
-							sevenDaySaleCount += element["Units"] - element["Cancelled"];
+							sevenDaySaleCount += element["unitsSold"] - element["unitsCancelled"];
 						});
 						
 						chrome.browserAction.setBadgeText({ text: String(sevenDaySaleCount) }); 
@@ -143,10 +104,10 @@ var checkforsales = function() {
 						var newShirtsSoldToday = {};
 						sevenDaySales.forEach(function(element) {
 							if (element["Date"] == toDate.format("MM-DD-YYYY") ){
-								if (newShirtsSoldToday[element["ASIN"]]){ //If exists, add it
-									newShirtsSoldToday[element["ASIN"]] += element["Units"] - element["Cancelled"];
+								if (newShirtsSoldToday[element["asin"]]){ //If exists, add it
+									newShirtsSoldToday[element["asin"]] += element["unitsSold"] - element["unitsCancelled"];
 								} else{
-									newShirtsSoldToday[element["ASIN"]] = element["Units"] - element["Cancelled"];
+									newShirtsSoldToday[element["asin"]] = element["unitsSold"] - element["unitsCancelled"];
 								}
 							}
 						});
@@ -161,8 +122,8 @@ var checkforsales = function() {
 
 							for(var k=0; k < diffInSales; k++ ){
 								for(var i=0; i < sevenDaySales.length; i++ ) { //Look Up It's Name
-									if (sevenDaySales[i]["ASIN"] == item){
-										diff.push(sevenDaySales[i]["Name"]);
+									if (sevenDaySales[i]["asin"] == item){
+										diff.push(sevenDaySales[i]["asinName"]);
 										break;
 									}
 								}
