@@ -37,7 +37,7 @@
 	"manifest_version": 2,
 	"name": "Merch Advanced Analytics",
 	"short_name": "Merch Analytics",
-	"permissions": [ "tabs", "contextMenus", "notifications", "storage", "clipboardRead", "clipboardWrite", "*://*.amazon.com/*" ],
+	"permissions": [ "tabs", "activeTab", "contextMenus", "notifications", "storage", "clipboardRead", "clipboardWrite", "*://*.amazon.com/*" ],
 	"update_url": "https://clients2.google.com/service/update2/crx",
 	"version": "1.2.01"
 }
