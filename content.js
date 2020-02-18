@@ -207,15 +207,10 @@ function router(queryParams){
 	}
 }
 
-router(getQueryParams());
+//router(getQueryParams());
 
 //Add header and sidebar
 
-
-				
-
-			
-			
 var cmd = window.location.href.split('?')[0];
 if (cmd.indexOf("MerchAnalytics") !== -1 || cmd.indexOf("IndividualProductPage") !== -1) {
 	globalInit();
@@ -233,10 +228,13 @@ if (cmd.indexOf("MerchAnalytics") !== -1 || cmd.indexOf("IndividualProductPage")
 			var parsedJson = JSON.parse(items["Settings"]);
 			showNavTab = parsedJson["optionDashboard"];
 			enterToNextPage = parsedJson["enterToNextPage"];
+			uploadHelper = parsedJson["uploadHelper"];
 		}
 		
 		if (showNavTab != 0){
-			$('.top-nav-links-container ul').append('<li class="a-align-center top-nav-link-unselected"><a class="a-link-normal" target="_blank" href="/MerchAnalytics">Merch Analytics</a></li>');
+			$(document).ready(function () { //Idk if this ready needs to be here
+				$('.navigation ul').add('<li class="nav-item"><a class="nav-link" target="_blank" href="/MerchAnalytics">Merch Analytics</a></li>');
+			});
 						
 			//Analyze Button On MBA
 			/*
@@ -267,9 +265,6 @@ if (cmd.indexOf("MerchAnalytics") !== -1 || cmd.indexOf("IndividualProductPage")
 						window.location = "https://merch.amazon.com/designs/new";
 					};
 				});
-				
-				
-				
 				
 				//Add Deselect All Button
 				var observer = new MutationObserver(function(mutations) {
@@ -318,7 +313,108 @@ if (cmd.indexOf("MerchAnalytics") !== -1 || cmd.indexOf("IndividualProductPage")
 				});
 
 			});
-		}	
+		}
+
+		if (uploadHelper != 0){
+			$(document).ready(function () {
+				//Redirect to new product creation page
+				var observer = new MutationObserver(function(mutations) {
+					mutations.forEach(function(mutation) {
+						if (!mutation.addedNodes) return
+
+						for (var i = 0; i < mutation.addedNodes.length; i++) {
+							var node = mutation.addedNodes[i]
+
+							if (node.className == "nav-item nav-item-en ng-star-inserted") { //wait until this class shows up					
+								$(document).keydown(function (e) {
+									//e.preventDefault();
+									var kCode = e.keyCode || e.charCode; 
+
+									if (e.altKey && kCode == 57){ //other is 48			
+									
+										var t = document.createElement("textarea");
+										document.body.appendChild(t);
+										t.focus();
+										document.execCommand("paste");
+										var clipboardText = t.value; //this is your clipboard data
+										document.body.removeChild(t);
+										
+										var clipboardArray = clipboardText.split(/\r?\n/);
+										if(clipboardArray.length < 4){
+											alert('Too Short');
+										}
+
+										console.log(clipboardArray);
+										
+										//Brand
+										var myInput = document.querySelectorAll('#designCreator-productEditor-brandName')[0];						
+										var lastValue = myInput.value;
+										myInput.value = clipboardArray[0];
+										var event = new Event('input', { bubbles: true });
+										event.simulated = true;
+										var tracker = myInput._valueTracker;
+										if (tracker) {
+										  tracker.setValue(lastValue);
+										}
+										myInput.dispatchEvent(event);
+									
+										//Title 	
+										var myInput = document.querySelectorAll('#designCreator-productEditor-title')[0];						
+										var lastValue = myInput.value;
+										myInput.value = clipboardArray[1];
+										var event = new Event('input', { bubbles: true });
+										event.simulated = true;
+										var tracker = myInput._valueTracker;
+										if (tracker) {
+										  tracker.setValue(lastValue);
+										}
+										myInput.dispatchEvent(event);
+										
+										//Feature 1 	
+										var myInput = document.querySelectorAll('#designCreator-productEditor-featureBullet1')[0];						
+										var lastValue = myInput.value;
+										myInput.value = clipboardArray[2];
+										var event = new Event('input', { bubbles: true });
+										event.simulated = true;
+										var tracker = myInput._valueTracker;
+										if (tracker) {
+										  tracker.setValue(lastValue);
+										}
+										myInput.dispatchEvent(event);
+										
+										//Feature 2
+										var myInput = document.querySelectorAll('[formcontrolname="featureBullet2"]')[0];						
+										var lastValue = myInput.value;
+										myInput.value = clipboardArray[3];
+										var event = new Event('input', { bubbles: true });
+										event.simulated = true;
+										var tracker = myInput._valueTracker;
+										if (tracker) {
+										  tracker.setValue(lastValue);
+										}
+										myInput.dispatchEvent(event);
+											
+									};
+									
+								});	
+								
+								// stop watching
+								observer.disconnect();
+
+							}
+						}
+					})
+				})
+
+				observer.observe(document.body, {
+					childList: true,
+					subtree: true,
+					attributes: false,
+					characterData: false,
+				});
+			});
+
+		}
 	});
 }
 		
@@ -890,6 +986,14 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 		for (var key in shirtColorsObject){
 			finalShirtColorsLUT.push(shirtColorsColorsLUT[key]);
 		}
+
+		var gendersColorsLUT = {'Men': "#3498db", 'Women': "#e86dab", 'Kids': "#84cb74", 'Unisex': "#cfd1d1"};
+		var finalgendersColorsLUT = [];
+		for (var key in gendersArray){
+			finalgendersColorsLUT.push(gendersColorsLUT[key]);
+		}
+
+		
 						
 		sortedPriceObject = {};
 		Object.keys(priceObject).sort(function(a,b){return priceObject[b]-priceObject[a]}).forEach(function(key) {
@@ -1090,7 +1194,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 				labels: Object.keys(gendersArray),
 				datasets: [{							
 					data: Object.values(gendersArray),
-					backgroundColor: ["#3498db", "#e86dab", "#84cb74"],
+					backgroundColor: finalgendersColorsLUT,
 				}]
 			},
 			options: globalLineChartOptions, 
@@ -2034,6 +2138,7 @@ function restore_options() {
 			optionNotif	= parsedJson["popup"];
 			optionDashboard	= parsedJson["optionDashboard"];
 			enterToNextPage	= parsedJson["enterToNextPage"];
+			uploadHelper = parsedJson["uploadHelper"];
 				
 			if (optionSound){
 				$('#notificationSound').prop('checked', true);
@@ -2052,7 +2157,12 @@ function restore_options() {
 			}else{
 				$('#enterToNextPage').prop('checked', false);
 			}
-			
+
+			if (uploadHelper){
+				$('#uploadHelper').prop('checked', true);
+			}else{
+				$('#uploadHelper').prop('checked', false);
+			}
 			
 			if (optionDashboard){
 				$('#optionDashboard').prop('checked', true);
@@ -2070,6 +2180,7 @@ function save_options() {
 	var optionSound = $('#notificationSound').prop("checked") ? 1 : 0;
 	var optionNotif = $('#notificationPopup').prop("checked") ? 1 : 0;
 	var enterToNextPage = $('#enterToNextPage').prop("checked") ? 1 : 0;
+	var uploadHelper = $('#uploadHelper').prop("checked") ? 1 : 0;
 	var optionDashboard = $('#optionDashboard').prop("checked") ? 1 : 0;
 	
 	var data = JSON.stringify({
@@ -2077,6 +2188,7 @@ function save_options() {
 		'popup': optionNotif,
 		'optionDashboard': optionDashboard,
 		'enterToNextPage': enterToNextPage,
+		'uploadHelper': uploadHelper,
 	});
     var jsonfile = {};
     jsonfile["Settings"] = data;
