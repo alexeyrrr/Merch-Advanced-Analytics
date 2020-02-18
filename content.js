@@ -1,53 +1,13 @@
 /***************************************************************/
 /*************** Date & Global Helper Functions ******************/
 /***************************************************************/
-function csvToJSON(csv) {
-  var lines=csv.split("\n");
-  var result = [];
-  var headers = lines[0].split(",");
-
-  for(var i=1; i<lines.length; i++) {
-    var obj = {};
-
-    var row = lines[i],
-      queryIdx = 0,
-      startValueIdx = 0,
-      idx = 0;
-
-    if (row.trim() === '') { continue; }
-
-    while (idx < row.length) {
-      /* if we meet a double quote we skip until the next one */
-      var c = row[idx];
-
-      if (c === '"') {
-        do { c = row[++idx]; } while (c !== '"' && idx < row.length - 1);
-      }
-
-      if (c === ',' || /* handle end of line with no comma */ idx === row.length - 1) {
-        /* we've got a value */
-        var value = row.substr(startValueIdx, idx - startValueIdx).trim();
-
-        /* skip first double quote */
-        if (value[0] === '"') { value = value.substr(1); }
-        /* skip last comma */
-        if (value[value.length - 1] === ',') { value = value.substr(0, value.length - 1); }
-        /* skip last double quote */
-        if (value[value.length - 1] === '"') { value = value.substr(0, value.length - 1); }
-
-        var key = headers[queryIdx++];
-        obj[key] = value;
-        startValueIdx = idx + 1;
-      }
-
-      ++idx;
-    }
-
-    result.push(obj);
-  }
-  return result;
+function titleCase(str) {
+	str = str.toLowerCase().split(' ');
+	for (var i = 0; i < str.length; i++) {
+		str[i] = str[i].charAt(0).toUpperCase() + str[i].slice(1);
+	}
+	return str.join(' ');
 }
-
 
 
 function replicateArray(array, n) {
@@ -657,7 +617,6 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 				axisLabels.push(String(localUnixFromDate.format("MM-DD-YYYY")));
 				localUnixFromDate.add(1, 'days');
 			}
-			
 		}
 			
 		var salesData = new Array(axisLabels.length).fill(0);
@@ -752,7 +711,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 					}
 												
 					//Determine Product Type & Count it
-					var productType = responseArray[i2]["productType"];							
+					var productType = titleCase(responseArray[i2]["productType"]).replace(/_/g, " ");		
 					if (productType in productTypeObject){
 						productTypeObject[productType] += 1;
 					} else {
@@ -1239,7 +1198,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 			for (i2 = 0; i2 < responseArray.length; i2++){
 				if(resultSumSales[i]["ASIN"] == responseArray[i2]["asin"]){
 					resultSumSales[i]["Name"] = responseArray[i2]["asinName"];
-					resultSumSales[i]["ProductType"] = responseArray[i2]["productType"].replace(/-/i, '&#8209;');
+					resultSumSales[i]["ProductType"] = titleCase(responseArray[i2]["productType"].replace(/-/i, '&#8209;').replace(/_/g, " "));
 					resultSumSales[i]["Units"] += parseInt(responseArray[i2]["unitsSold"]);
 					resultSumSales[i]["Cancelled"] += parseInt(responseArray[i2]["unitsCancelled"]);
 					resultSumSales[i]["Returned"] += parseInt(responseArray[i2]["unitsReturned"]);
@@ -1278,7 +1237,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 			var itemName = resultSumSales[i]["Name"].replace(/"/g, "");
 			var uriEncodedName = encodeURIComponent(itemName); 		
 				
-			cp2 += '<tr data-href="https://www.amazon.com/dp/' + resultSumSales[i]["asin"]  +   '">' + 
+			cp2 += '<tr data-href="https://www.amazon.com/dp/' + resultSumSales[i]["ASIN"]  +   '">' + 
 				'<td>' + (i + 1) + '</td>' + 
 				'<td>' + 
 					resultSumSales[i]["Name"]  + 
@@ -1289,7 +1248,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 				'</td>' + 
 										
 				'<td class="text-center btn-inside">' +						
-					'<a target="_blank" href="' + '/IndividualProductPage/?ASIN=' + resultSumSales[i]["asin"]  + '" class="btn btn-primary">Analyze</a>' +
+					'<a target="_blank" href="' + '/IndividualProductPage/?ASIN=' + resultSumSales[i]["ASIN"]  + '" class="btn btn-primary">Analyze</a>' +
 				'</td>' +
 								
 				'<td class="text-center">' +
