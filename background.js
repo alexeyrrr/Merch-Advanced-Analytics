@@ -40,10 +40,10 @@ chrome.runtime.onInstalled.addListener(function(details){
 		//UPDATE MESSAGE
 		chrome.notifications.create(undefined, {
 			type: 'basic',
-			title: 'Update: Enter To Submit',
+			title: 'Update: Renewed Functionality',
 			isClickable: true,
 			iconUrl: '/img/logo-square.png',
-			message: "We added the Enter-To-Submit feature to the Multi Product Upload."
+			message: "We updated the extension to renew the existing functionality."
 		});	
 		
 
