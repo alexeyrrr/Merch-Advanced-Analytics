@@ -668,8 +668,9 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 		
 		//Tally Numbers
 		var gendersArray = {'men': 0, 'women': 0, 'youth': 0, 'unisex': 0};
-		var sizesArray = {'male_small': 0, 'male_medium': 0, 'male_large': 0, 'XL': 0, '2XL': 0, '3XL': 0, '4': 0, '6': 0, '8': 0, '10': 0, '12': 0};		
-		var shirtColorsArray = {'Dark Heather': 0, 'Heather Grey': 0, 'Heather Blue': 0, 'Black': 0, 'Navy': 0, 'Silver': 0, 'Royal Blue': 0, 'Brown': 0, 'Slate': 0, 'Red': 0, 'Asphalt': 0, 'Grass': 0, 'Olive': 0, 'Kelly Green': 0, 'Baby Blue': 0, 'White': 0, 'Lemon': 0, 'Cranberry': 0, 'Pink': 0, 'Orange': 0, 'Purple': 0};
+		var sizesArray = {'male_small': 0, 'male_medium': 0, 'male_large': 0, 'XL': 0, '2XL': 0, '3XL': 0, '4': 0, '6': 0, '8': 0, '10': 0, '12': 0};
+		var shirtColorsObject = {};
+
 		var priceObject = {};
 		var productTypeObject = {};
 		
@@ -728,11 +729,21 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 					}
 					
 					//Determine Color And Count it 
+					/*
 					for (var key in shirtColorsArray){
 						if (key.toString() == responseArray[i2]["variationInfo"]["color"]){
 							shirtColorsArray[key] += 1;
 						}
 					}
+					*/
+					var shirtColor = responseArray[i2]["variationInfo"]["color"];
+					if (shirtColor in shirtColorsObject){
+						shirtColorsObject[shirtColor] += 1;
+					} else {
+						shirtColorsObject[shirtColor] = 1;
+					}
+
+
 					
 					//Determine Unit Price & Count it
 					var unitsSold = responseArray[i2]["unitsSold"] - responseArray[i2]["unitsCancelled"];
@@ -908,7 +919,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 			'Grass': "#5e9444", 'Olive': "#4a4f26", 'Kelly Green': "#006136", 'Baby Blue': "#8fb8db", 'White': "#eeeeee", 'Lemon': "#f0e87b", 'Cranberry': "#6e0a25",
 			'Pink': "#f8a3bc", 'Orange': "#ff5c39", 'Purple': "#514689"};
 		var finalShirtColorsLUT = [];
-		for (var key in shirtColorsArray){
+		for (var key in shirtColorsObject){
 			finalShirtColorsLUT.push(shirtColorsColorsLUT[key]);
 		}
 						
@@ -1134,9 +1145,9 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 		var lineChartData5 = {
 			type: 'doughnut',
 			data: {
-				labels: Object.keys(shirtColorsArray),
+				labels: Object.keys(shirtColorsObject),
 				datasets: [{							
-					data: Object.values(shirtColorsArray),
+					data: Object.values(shirtColorsObject),
 					backgroundColor: finalShirtColorsLUT,
 				}]
 			},
@@ -1220,8 +1231,6 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 			})
 		}
 		
-		console.log(responseArray);
-
 		for (i = 0; i < resultSumSales.length; i++){
 			for (i2 = 0; i2 < responseArray.length; i2++){
 				if(resultSumSales[i]["ASIN"] == responseArray[i2]["asin"]){
@@ -1250,7 +1259,6 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 					'<th class="text-center">Revenue</th>' +
 					'<th class="text-center">Royalties</th>' +
 					'<th class="text-center">Royalties / Unit</th>' +
-					'<th class="text-center">Edit / Delete </th>' +
 				'</tr>'  +
 			'</thead><tbody>';
 
@@ -1264,9 +1272,7 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 		for (i=0; i < resultSumSales.length; i++){			
 			
 			var itemName = resultSumSales[i]["Name"].replace(/"/g, "");
-			var uriEncodedName = encodeURIComponent(itemName); 
-			var deleteLink = 'https://merch.amazon.com/manage/products?pageNumber=1&pageSize=15&keywords=' + uriEncodedName + '&statusFilters=%5B%22DELETED%22%2C%22DRAFT%22%2C%22LIVE%22%2C%22NOT_DISCOVERABLE%22%2C%22PENDING%22%2C%22PROCESSING%22%2C%22STOPPED%22%2C%22UNDER_REVIEW%22%2C%22REJECTED%22%2C%22MANUALLY_REJECTED%22%5D';	
-		
+			var uriEncodedName = encodeURIComponent(itemName); 		
 				
 			cp2 += '<tr data-href="https://www.amazon.com/dp/' + resultSumSales[i]["asin"]  +   '">' + 
 				'<td>' + (i + 1) + '</td>' + 
@@ -1304,9 +1310,6 @@ function renderDailyView(unixFromDate, unixToDate, viewType){
 				
 				'<td class="text-center">' +
 					'$' + (resultSumSales[i]["Royalty"].toFixed(2) / (resultSumSales[i]["Units"] - resultSumSales[i]["Cancelled"] - resultSumSales[i]["Returned"] + 0.00001)).toFixed(2)  +
-				'</td>' +
-				'<td class="text-center btn-inside">' +  
-					'<a target="_blank" href="' + deleteLink + '" class="btn btn-outline-primary">Edit</a>' + 
 				'</td>' +
 			'</tr>'; 
 		}
@@ -1745,7 +1748,6 @@ function renderIndividualProductSales(queryParams){
 				}; 
 				
 				var uriEncodedName = encodeURIComponent(shirtName); 
-				var deleteLink = 'https://merch.amazon.com/manage/products?pageNumber=1&pageSize=15&keywords=' + uriEncodedName + '&statusFilters=%5B%22DELETED%22%2C%22DRAFT%22%2C%22LIVE%22%2C%22NOT_DISCOVERABLE%22%2C%22PENDING%22%2C%22PROCESSING%22%2C%22STOPPED%22%2C%22UNDER_REVIEW%22%2C%22REJECTED%22%2C%22MANUALLY_REJECTED%22%5D';
 				
 				var shirtInfo = '<center>' +
 									'<h2><a target="_blank" href="https://www.amazon.com/dp/' + targetASIN + '">' +
@@ -1794,7 +1796,6 @@ function renderIndividualProductSales(queryParams){
 										'</dl>' +
 										'<div class="btn-group-inline">' +
 											'<a target="_blank" href="' + productEditBaseUrl + shirtID + '/add_details" class="btn btn-outline-primary">Edit</a>' + 
-											'<a target="_blank" href="' + deleteLink + '" class="btn btn-outline-danger"><i class="fa fa-trash-o fa-lg"></i></a>' + 
 										'</div>' +
 									'</div>' +
 								'</div>';
