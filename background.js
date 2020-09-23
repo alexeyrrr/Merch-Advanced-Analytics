@@ -4,11 +4,13 @@ function openMerchAnalytics(info, tab) {
 	chrome.tabs.create({ url: l2 });
 };
 	
+/*
 chrome.contextMenus.create({
 	"title": "Open Merch Analytics", contexts:["browser_action"], onclick: function(info, tab) { 
 		openMerchAnalytics(); 
 	}
 });
+*/
 
 //Make Analytics Clickable
 chrome.notifications.onClicked.addListener(function(notificationId, byUser) {
