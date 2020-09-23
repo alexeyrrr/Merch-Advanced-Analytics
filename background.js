@@ -40,10 +40,10 @@ chrome.runtime.onInstalled.addListener(function(details){
 		//UPDATE MESSAGE
 		chrome.notifications.create(undefined, {
 			type: 'basic',
-			title: 'Update: Renewed Functionality',
+			title: 'Update: MAA Is Now Open Source',
 			isClickable: true,
 			iconUrl: '/img/logo-square.png',
-			message: "We updated the extension to renew the existing functionality."
+			message: "If you'd like to contribute to the project, please find us on Github."
 		});	
 		
 
