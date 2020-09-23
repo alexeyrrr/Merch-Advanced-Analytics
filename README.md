@@ -1,38 +1,17 @@
 # README #
 
-This README would normally document whatever steps are necessary to get your application up and running.
+Merch by Amazon Advanced Analytics tool built to expand the functionality of MerchTools. Allows users to assign niche tags to each of your products in order to study cohorts better.
 
-### What is this repository for? ###
+Gives you the ability to view individual product lifetime sales as well as in different date ranges. Sales notifications whenever you get a sales.
 
-* Quick summary
-* Version 0.0.0.1
-* Merch Analyitics Branch From Merch Tools
-Adds new data visualization tools for merch.
+### How do I use this project? ###
 
-### How do I get set up? ###
+* You can install the Chrome extension here: https://chrome.google.com/webstore/detail/merch-advanced-analytics/dnoeippmocfhleigngbdncdiaiehjaff
 
-* Summary of set up
+### This project is open source and we'd love any suggestions. ###
 
 
-### Contribution guidelines ###
-
-* Writing tests
 
 
-### Who do I talk to? ###
-
-
-### Functions Summary ###
-
-
-func1: need a function that gets 90 days of data,
-		inputs: startDate, EndDate
-
-func 2: calls Func1, returns all data
-		inputs: # of days or # months
-		
-		
-func 3 : Parses data for necessary info, processes
-		inputs: from func2
 
 
